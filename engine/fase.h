@@ -14,9 +14,9 @@
         ld      de, dst \
         call    0xfe80-smooth*0x25f \
     __endasm;
-unsigned char __at (0x5b01) tiles[150];
-unsigned char __at (0x5b00) screen;
-unsigned char __at (0x5c00) sprites[8][4];
+unsigned char __at (0x5b40) tiles[150];
+unsigned char __at (0x5c00) screen;
+unsigned char __at (0x5b00) sprites[8][4];
 __sfr __banked __at 0xf7fe Keyb54321;
 __sfr __banked __at 0xfbfe KeybTREWQ;
 __sfr __banked __at 0xfdfe KeybGFDSA;

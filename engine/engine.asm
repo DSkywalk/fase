@@ -1,26 +1,19 @@
         include define.asm
-        DEFINE  mapw  12              ; map width is 12
-        DEFINE  maph  2               ; map height is 2, our demo has 12x2 screens
-        DEFINE  scrw  15              ; screen width is 12
-        DEFINE  scrh  10              ; screen height is 8, our window is 12x8 tiles (exactly half of the screen area)
-        DEFINE  DMAP_BITSYMB 6        ; these 3 constants are for the map decompressor
-        DEFINE  DMAP_BITHALF 1        ; BITSYMB and BITHALF declares 5.5 bits per symbol (16 tiles with 5 bits and 32 with 6 bits)
-        DEFINE  DMAP_BUFFER  $5b01    ; BUFFER points to where is decoded the uncompressed screen
-        DEFINE  sylo  $66
-        DEFINE  syhi  $c0
-        DEFINE  smooth  1
-        DEFINE  clipup  1
-        DEFINE  clipdn  1
-        DEFINE  safeco  1
-        DEFINE  initregs
-        DEFINE  port    $5bf8
+        include defmap.asm
+        DEFINE  sylo    $66
+        DEFINE  syhi    $c0
+        DEFINE  enems   $5b00
+        DEFINE  mapbuf  $5b40
+        DEFINE  screen  $5c00
+        DEFINE  port    $5c01
+        DEFINE  selbeg  $5c02
+        DEFINE  selend  $5c03
+        DEFINE  tiladdr $5c08
         DEFINE  sprites $fe00
-        DEFINE  tiladdr $5c50
-        DEFINE  enems   $5c00
       IF  smooth=0
-        DEFINE  final   $fd50
+        DEFINE  final   $fd00
       ELSE
-        DEFINE  final   $fc21
+        DEFINE  final   $fc81
       ENDIF
 
       MACRO updremove
@@ -51,12 +44,32 @@
 .upd
       ENDM
 
-      MACRO updclip
+    MACRO updcldn
         ld      a, h
         and     $07
         jp      nz, .upd&$ffff
+      IF  offsey+scrh*2&7
         ld      de, $f820
         add     hl, de
+      ELSE
+        ld      a, l
+        add     a, $20
+        ld      l, a
+        jr      c, .upd
+        ld      a, h
+        sub     $08
+        ld      h, a
+      ENDIF
+.upd
+    ENDM
+
+      MACRO updclup
+        ld      a, d
+        and     $07
+        jp      nz, .upd&$ffff
+        ld      a, d
+        sub     $08
+        ld      d, a
 .upd
       ENDM
 
@@ -90,7 +103,6 @@
       ENDM
 
 ; Paolo Ferraris' shortest loader, then we move all the code to $8000
-        output  engine.bin
         org     staspr+final-mapend-$
 staspr  defw    draw_sprites+3
         nop
@@ -145,19 +157,13 @@ do4     ld      a, update_complete-2-do3&$ff
 
 ;Complete background update
 update_complete
-        ld      hl, $5b00
+        ld      hl, screen
         ld      a, (hl)
         inc     a
         jp      z, delete_sprites&$ffff
-      IF  machine=0
-        ld      b, l
-        ld      (hl), $ff
-        ld      hl, mapend+syhi-1&$ffff
-      ELSE
         ld      bc, $00ff
         ld      (hl), c
         ld      hl, mapend+$fe&$ffff
-      ENDIF
         ld      de, map&$ffff
 desc1   sbc     hl, bc
         ex      de, hl
@@ -183,18 +189,26 @@ desc2   out     (c), e
       ELSE
         ld      b, $80          ; marker bit
       ENDIF
-        ld      de, DMAP_BUFFER+149
-desc3   ld      a, 256 >> DMAP_BITSYMB
-desc4   call    gbit3&$ffff     ; load DMAP_BITSYMB bits (literal)
+        ld      de, mapbuf+scrw*scrh-1
+desc3   ld      a, 256 >> bitsym
+desc4   call    gbit3&$ffff     ; load bitsym bits (literal)
         jr      nc, desc4
-      IF DMAP_BITHALF=1
+    IF bithlf=1
+      IF bitsym=1
+        rrca
+        jr      nc, desc45
+        xor     a
+        call    gbit3&$ffff
+        inc     a
+      ELSE
         rrca                    ; half bit implementation (ie 48 tiles)
         call    c, gbit1&$ffff
-      ELSE
-        and     a
       ENDIF
-        ld      (de), a         ; write literal
-desc5   dec     e               ; test end of file (map is always 150 bytes)
+    ENDIF
+desc45  ld      (de), a         ; write literal
+        dec     e               ; test end of file (map is always 150 bytes)
+desc5   ld      a, e
+        cp      $3f
         jr      z, descb
         call    gbit3&$ffff     ; read one bit
         rra
@@ -209,7 +223,7 @@ desc6   call    nc, gbit3&$ffff ; (Elias gamma coding)
         inc     a               ; adjust length
         ld      c, a            ; save lenth to c
         xor     a
-        ld      de, 15          ; initially point to 15
+        ld      de, scrw        ; initially point to scrw
         call    gbit3&$ffff     ; get two bits
         call    gbit3&$ffff
         jr      z, desc9        ; 00 = 1
@@ -218,6 +232,17 @@ desc6   call    nc, gbit3&$ffff ; (Elias gamma coding)
         jr      z, desca        ; 010 = 15
         bit     2, a
         jr      nz, desc7
+    IF  scrw>15
+        call    gbit3&$ffff     ; [011, 100, 101] xx = from 2 to 13
+        dec     a
+        call    gbit3&$ffff
+        jr      desc95
+desc7   call    gbit3&$ffff     ; [110, 111] xxxxxx = from 14-15, 17-142
+        jr      nc, desc7
+        cp      scrw-14
+        sbc     a, -14
+    ELSE
+      IF  scrw=15
         add     a, $7c          ; [011, 100, 101] xx = from 2 to 13
         dec     e
 desc7   dec     e               ; [110, 111] xxxxxx = 14 and from 16 to 142
@@ -225,8 +250,19 @@ desc8   call    gbit3&$ffff
         jr      nc, desc8
         jr      z, desca
         add     a, e
+      ELSE
+        call    gbit3&$ffff     ; [011, 100, 101] xx = from 2 to 11 and from 13 to 14
+        call    gbit3&$ffff
+        cp      scrw+2
+        sbc     a, 2
+        jr      desc9
+desc7   call    gbit3&$ffff     ; [110, 111] xxxxxx = from 15 to 142
+        jr      nc, desc7
+        add     a, 14
+      ENDIF
+    ENDIF
 desc9   inc     a
-        ld      e, a
+desc95  ld      e, a
 desca   ld      a, b            ; save b (byte reading) on a
         ld      b, d            ; b= 0 because lddr moves bc bytes
         ex      (sp), hl        ; store source, restore destination
@@ -235,7 +271,6 @@ desca   ld      a, b            ; save b (byte reading) on a
         lddr
         pop     hl              ; restore source address (compressed data)
         ld      b, a            ; restore b register
-        inc     e               ; prepare test of end of file
         jr      desc5           ; jump to main loop
 descb   ld      a, scrh
         ld      (upba2-1), a
@@ -244,8 +279,8 @@ descb   ld      a, scrh
         ld      a, $40-scrw*2
         ld      (upba6+1), a
         ld      (upba7+1), a
-        ld      bc, $5810-scrw
-        ld      hl, $4010-scrw
+        ld      bc, $5800+offsex+offsey*32
+        ld      hl, $4000+offsex+(offsey<<5&0xe0)+(offsey<<8&0x1800)
 upba1
       IF  machine=1
         ld      a, (port)
@@ -260,7 +295,7 @@ upba1
         xor     a
         ld      (upba4+1), a
       ELSE
-        ld      bc, DMAP_BUFFER 
+        ld      bc, mapbuf 
       ENDIF
         ld      a, 0
 upba2   ex      af, af'
@@ -268,7 +303,7 @@ upba2   ex      af, af'
 upba3 IF  tmode=3
         ld      hl, upba4+1
         inc     (hl)
-upba4   ld      hl, DMAP_BUFFER 
+upba4   ld      hl, mapbuf 
       ELSE
         ld      h, b
         ld      l, c
@@ -384,24 +419,6 @@ upba5   ld      sp, 0
         ld      l, c
         pop     bc
         ld      (hl), c
-      IF  machine=1
-        set     7, h
-        ld      (hl), c
-        inc     l
-        ld      (hl), b
-        res     7, h
-        ld      (hl), b
-        ld      bc, $001f
-        add     hl, bc
-        pop     bc
-        ld      (hl), c
-        set     7, h
-        ld      (hl), c
-        inc     l
-        ld      (hl), b
-        res     7, h
-        ld      (hl), b
-      ELSE
         inc     l
         ld      (hl), b
         ld      bc, $001f
@@ -410,7 +427,6 @@ upba5   ld      sp, 0
         ld      (hl), c
         inc     l
         ld      (hl), b
-      ENDIF
         ld      bc, $ffe1
         add     hl, bc
         ld      b, h
@@ -536,7 +552,7 @@ uppa2   ld      c, 0
         jr      uppa5
       ENDIF
 
-uppa3   ld      hl, $5bff
+uppa3   ld      hl, selend
         ld      a, (hl)
         dec     l
         ld      c, (hl)
@@ -593,10 +609,10 @@ uppa5   ld      a, l
         xor     c
         and     %11100001
         xor     c
-      IF  scrw=15
+      IF  offsex=1
         inc     a
       ELSE
-        add     a, $10-scrw
+        add     a, offsex
       ENDIF
         ld      c, a
         ld      l, a
@@ -622,10 +638,28 @@ draw1   ld      (drawh+1&$ffff), a
         add     a, a
         add     a, a
         inc     l
+    IF safehr && !cliphr
+        ex      af, af
+        ld      a, (hl)
+        cp      9
+        jr      nc, draw15
+        ld      a, 8
+draw15  cp      (scrw<<4)-8
+        jr      c, draw16
+        ld      a, (scrw<<4)-8
+draw16
+      IF smooth=0
+        and     $fe
+      ENDIF
+
+        ld      e, a
+        ex      af, af
+    ELSE
         ld      e, (hl)
       IF smooth=0
         res     0, e
       ENDIF
+    ENDIF
         inc     l
         xor     e
         and     $f8
@@ -635,6 +669,10 @@ draw1   ld      (drawh+1&$ffff), a
       ENDIF
         ld      (draw2+2&$ffff), a
         ld      a, e
+        and     $f8
+        rra
+        rra
+        rra
         ld      (draw8+1&$ffff), a
 draw2   ld      sp, (sprites)
         pop     de
@@ -642,73 +680,92 @@ draw2   ld      sp, (sprites)
   IF smooth=0
         and     $fe
     IF clipdn=0
-      IF safeco=1
-        cp      $98+1
+      IF safevr=1
+        cp      scrh*16-7
         jr      c, draw3
-        ld      a, $98
+        ld      a, scrh*16-8
       ENDIF
 draw3   add     a, d
     ELSE
-      IF safeco=1
-        cp      $a0+1
+      IF safevr=1
+        cp      scrh*16+1
         jr      c, draw3
-        ld      a, $a0
+        ld      a, scrh*16
       ENDIF
 draw3   add     a, d
-        cp      $ea
+      IF clipdn=2
+        cp      1+((offsey+scrh*2-2)<<3)
         jp      nc, craw1&$ffff
-    ENDIF
-    IF clipup=0
-      IF safeco=1
-        cp      $58
-        jr      nc, draw6
-        ld      a, $58
-      ENDIF
-    ELSE
-        cp      $58
-        jp      c, braw1&$ffff
-    ENDIF
-  ELSE
-    IF safeco=1
-      IF clipdn=0
-        cp      $98+1
-        jr      c, draw3
-        ld      a, $98
-      ELSE
-        cp      $a0+1
-        jr      c, draw3
-        ld      a, $a0
       ENDIF
     ENDIF
-draw3   add     a, d
     IF clipup=0
-      IF safeco=1
-        cp      $58
+      IF safevr=1
+        cp      offsey<<3
         jr      nc, draw4
-        ld      a, $58
+        ld      a, offsey<<3
       ENDIF
     ELSE
-        cp      $58
+      IF clipup=2
+        cp      offsey<<3
         jp      c, braw1&$ffff
+      ENDIF
     ENDIF
-draw4   add     a, a
-        jr      nc, draw6
-      IF clipdn=1
-        cp      $d2
+draw4
+  ELSE
+    IF safevr=1
+      IF clipdn=0
+        cp      scrh*16-7
+        jr      c, draw3
+        ld      a, scrh*16-8
+      ELSE
+        cp      scrh*16+1
+        jr      c, draw3
+        ld      a, scrh*16
+      ENDIF
+    ENDIF
+draw3   add     a, d
+  IF clipup=0
+      IF safevr=1
+        cp      offsey<<3
+        jr      nc, draw4
+        ld      a, offsey<<3
+      ENDIF
+  ELSE
+    IF clipup=2
+      IF offsey=0
+        jp      nc, braw1&$ffff
+      ELSE
+        cp      offsey<<3
+        jp      c, braw1&$ffff
+      ENDIF
+    ENDIF
+  ENDIF
+draw4
+      IF clipdn=2
+        cp      1+((offsey+scrh*2-2)<<3)
         jp      nc, craw1&$ffff
       ENDIF
-        ld      (draw5+1), a
-draw5   ld      hl, (lookt+$100&$ffff)
-        jr      draw8
   ENDIF
-draw6   ld      (draw7+1&$ffff), a
-draw7   ld      hl, (lookt&$ffff)
-draw8   ld      a, 0
-        and     $f8
-        rra
-        rra
-        rra
-        or      l
+        ld      (draw5+1), a
+        cp      192
+draw5   ld      a, (lookt&$ffff)
+        jr      nc, draw6
+        ld      l, a          ; A=L= rrrRRppp
+        and     %00011111
+        ld      h, a          ;   H= 000RRppp
+        set     6, h
+        xor     l             ;   A= rrr00000
+        ld      l, a          ;   L= rrr00000
+        jr      draw8
+draw6   ld      l, a          ; A=L= rrrRRppp
+        and     %00011111
+        ld      h, a          ;   H= 000RRppp
+        set     5, h
+        xor     l             ;   A= rrr00000
+draw8   add     a, 0
+      IF  offsex != 1
+        add     a, offsex-1
+      ENDIF
         ld      l, a
       IF  machine=1
         ld      a, (port)
@@ -889,27 +946,29 @@ drawj   ld      sp, 0
       ENDIF
         ret
 
-    IF clipup=1
+    IF clipup=2
 braw1   ld      (brawa+1&$ffff), bc  
-      IF smooth=1
-        add     a, a
-      ENDIF
         ld      (braw2+1&$ffff), a
-braw2   ld      hl, (lookt&$ffff)
-        rrca
+        sub     d
         cpl
-      IF smooth=0
-        sub     $d3
-      ELSE
-        sub     $a6
+        sub     -10
         rra
-      ENDIF
         ld      ixh, a
+braw2   ld      a, (lookt&$ffff)
+        ld      l, a          ; A=L= rrrRRppp
+        and     %00011111
+        ld      h, a          ;   H= 000RRppp
+      IF offsey=0
+        set     5, h
+      ELSE
+        set     6, h
+      ENDIF
+        xor     l             ;   A= rrr00000
+        ld      l, a          ;   L= rrr00000
         ld      a, (draw8+1)
-        and     $f8
-        rra
-        rra
-        rra
+      IF  offsex != 1
+        add     a, offsex-1
+      ENDIF
         or      l
         ld      l, a
       IF  machine=1
@@ -934,7 +993,13 @@ braw4   ld      hl, 12
         add     hl, sp
         ld      sp, hl
         inc     d
+      IF smooth=1 && offsey&7
+        updclup
+      ENDIF
         inc     d
+      IF offsey&7
+        updclup
+      ENDIF
         dec     ixh
         jr      z, braw8
         djnz    braw4
@@ -943,7 +1008,13 @@ braw5   ld      hl, 8
         add     hl, sp
         ld      sp, hl
         inc     d
+      IF smooth=1 && offsey&7
+        updclup
+      ENDIF
         inc     d
+      IF offsey&7
+        updclup
+      ENDIF
         dec     ixh
         jr      z, braw8
         djnz    braw5
@@ -951,7 +1022,13 @@ braw5   ld      hl, 8
 braw6   pop     hl
         pop     hl
         inc     d
+      IF smooth=1 && offsey&7
+        updclup
+      ENDIF
         inc     d
+      IF offsey&7
+        updclup
+      ENDIF
         dec     ixh
         jr      z, braw8
         djnz    braw6
@@ -986,25 +1063,23 @@ brawa   ld      bc, 0
         jp      drawa
     ENDIF
 
-    IF clipdn=1
+    IF clipdn=2
 craw1   ld      (craw2+1&$ffff), a
-      IF smooth=0
-craw2   ld      hl, (lookt&$ffff)
         cpl
-        sub     $06
-      ELSE
-craw2   ld      hl, (lookt+$100&$ffff)
-        rrca
-        cpl
-        sub     $87
-      ENDIF
+        sub     $ff-(offsey+scrh*2<<3)
         rra
         ld      ixh, a
+craw2   ld      a, (lookt&$ffff)
+        ld      l, a          ; A=L= rrrRRppp
+        and     %00011111
+        ld      h, a          ;   H= 000RRppp
+        set     6, h
+        xor     l             ;   A= rrr00000
+        ld      l, a          ;   L= rrr00000
         ld      a, (draw8+1)
-        and     $f8
-        rra
-        rra
-        rra
+      IF  offsex != 1
+        add     a, offsex-1
+      ENDIF
         or      l
         ld      l, a
       IF  machine=1
@@ -1053,7 +1128,7 @@ craw4   pop     de
         ld      (hl), a
         inc     h
       IF smooth=1
-        updclip
+        updcldn
       ENDIF
         pop     de
         ld      a, (hl)
@@ -1079,7 +1154,7 @@ craw4   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updclip
+        updcldn
         dec     ixh
         jp      z, craw8&$ffff
         dec     ixl
@@ -1106,7 +1181,7 @@ craw5   pop     de
         ld      (hl), a
         inc     h
       IF smooth=1
-        updclip
+        updcldn
       ENDIF
         pop     de
         ld      a, (hl)
@@ -1124,7 +1199,7 @@ craw5   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updclip
+        updcldn
         dec     ixh
         jp      z, craw8&$ffff
         dec     ixl
@@ -1139,7 +1214,7 @@ craw6   pop     de
         ld      (hl), a
         inc     h
       IF smooth=1
-        updclip
+        updcldn
       ENDIF
         pop     de
         ld      a, (hl)
@@ -1149,7 +1224,7 @@ craw6   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updclip
+        updcldn
         dec     ixh
         jp      z, craw8&$ffff
         dec     ixl
@@ -1178,23 +1253,73 @@ craw8   ld      a, 1
     ENDIF
 
 init    ld      (ini7+1&$ffff), sp
-        ld      a, 19
+
+      IF clipup=1
+        ld      hl, $5800+offsex  -cliphr+(offsey-1<<5)
+        ld      de, $5800+offsex+1-cliphr+(offsey-1<<5)
+        ld      bc, (scrh+cliphr<<1)-1
+        ld      (hl), b
+        ldir
+      ENDIF
+    IF clipdn=1
+        ld      hl, $5800+offsex  -cliphr+(offsey+2*scrh<<5)
+        ld      de, $5800+offsex+1-cliphr+(offsey+2*scrh<<5)
+      IF clipup=1
+        ld      c, (scrh+cliphr<<1)-1
+      ELSE
+        ld      bc, (scrh+cliphr<<1)-1
+      ENDIF
+        ld      (hl), b
+        ldir
+    ENDIF
+; aprovechar bc=0
+
+    IF  scrw=16 || cliphr=0
+        xor     a
+    ELSE
+      IF  scrw=15 && offsex=1
+        ld      a, scrh*2-1
         ld      de, $0020
         ld      b, d
         ld      c, d
-        ld      hl, $5821
+        ld      hl, $5821+(offsey<<5)
 ini1    ld      sp, hl
         push    bc
         add     hl, de
         dec     a
         jr      nz, ini1
-        ld      ($5800), a
-        ld      ($5a7f), a
-      IF  machine=0
+        ld      ($5800+(offsey<<5)), a
+        ld      ($5a7f+(offsey<<5)), a
+      ELSE
+        ld      a, scrh*2
+        ld      de, scrw*2+1
+        ld      bc, 31-scrw*2
+        ld      hl, $5800+offsex-1+(offsey<<5)
+ini1    ld      (hl), b
+        add     hl, de
+        ld      (hl), b
+        add     hl, bc
         dec     a
-        ld      ($5b00), a
-        ld      ($5bfe), a
-        ld      sp, $50a0
+        jr      nz, ini1
+      ENDIF
+    ENDIF
+    IF  machine=0
+        dec     a
+        ld      (screen), a
+        ld      (selbeg), a
+      IF clipdn=1
+        ld      sp, $4020+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
+      ELSE
+        ld      sp, $4020+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
+      ENDIF
+        ld      b, 16
+ini15   push    af
+        djnz    ini15
+      IF clipdn=1
+        ld      sp, $4120+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
+      ELSE
+        ld      sp, $4120+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
+      ENDIF
         ld      de, sylo | syhi<<8
         ld      h, e
         ld      l, e
@@ -1204,7 +1329,11 @@ ini2    push    de
         ld      b, 6
 ini3    push    hl
         djnz    ini3
-        ld      sp, $51a0
+      IF clipdn=1
+        ld      sp, $4220+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
+      ELSE
+        ld      sp, $4220+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
+      ENDIF
         push    de
         push    de
         push    de
@@ -1212,11 +1341,19 @@ ini3    push    hl
         ld      b, 13
 ini4    push    de
         djnz    ini4
-        ld      sp, $52a0
+      IF clipdn=1
+        ld      sp, $4320+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
+      ELSE
+        ld      sp, $4320+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
+      ENDIF
         ld      b, 16
 ini5    push    de
         djnz    ini5
-        ld      sp, $5aa0
+      IF clipdn=1
+        ld      sp, $5820+(offsey+1+2*scrh<<5)
+      ELSE
+        ld      sp, $5820+(offsey+2*scrh<<5)
+      ENDIF
         ld      b, 16
 ini6    push    de
         djnz    ini6
@@ -1224,20 +1361,21 @@ ini6    push    de
         ld      (do3+1), a
 ini7    ld      sp, 0
         ret
-      ENDIF
+    ENDIF
       IF  machine=1
+        ld      sp, $5c06
         ld      (do3+1), a
         ld      (port), a
-        dec     a
-        ld      ($5b00), a
-        ld      ($5bfe), a
         ld      hl, ini3&$ffff
-        ld      de, $4000
+        ld      de, $5b00
         ld      c, ini4-ini3
         ldir
         ld      hl, $db00
-        call    $4000
-        ld      a, $fe
+        call    $5b00
+        ld      a, $ff
+        ld      (screen), a
+        ld      (selbeg), a
+        dec     a
         ld      i, a
         im      2
 ini7    ld      sp, 0
@@ -1245,7 +1383,7 @@ ini7    ld      sp, 0
 ini3    ld      c, $ff+ini3-ini4&$ff
         ldir
         ld      a, $17
-        call    $4000+ini35-ini3
+        call    $5b00+ini35-ini3
         ld      c, $ff+ini3-ini4&$ff
         ex      de, hl
         dec     e
@@ -1257,12 +1395,12 @@ ini3    ld      c, $ff+ini3-ini4&$ff
         ld      c, $ff+ini3-ini4&$ff
         add     hl, bc
         ld      a, $10
-        call    $4000+ini35-ini3
+        call    $5b00+ini35-ini3
         jr      nc, ini3
-        call    $4000+ini34-ini3
-        ld      hl, $5000+ini4-ini3
-        ld      d, $d0
-        ld      bc, $0b00-ini4+ini3
+        call    $5b00+ini34-ini3
+        ld      hl, $4000
+        ld      de, $c000
+        ld      bc, $1b00
         ldir
 ini34   xor     $07
 ini35   push    bc
@@ -1275,8 +1413,8 @@ ini4
       IF  machine=2
         ld      (do3+1), a
         dec     a
-        ld      ($5b00), a
-        ld      ($5bfe), a
+        ld      (screen), a
+        ld      (selbeg), a
         dec     a
         ld      i, a
         im      2
@@ -1284,10 +1422,10 @@ ini7    ld      sp, 0
         ret
       ENDIF
 
-      IF DMAP_BITHALF=1
-gbit1   sub     $80 - (1 << DMAP_BITSYMB - 2)
+    IF bithlf=1 && bitsym>1
+gbit1   sub     $80 - (1 << bitsym - 2)
         defb    $da             ; second part of half bit implementation
-      ENDIF
+    ENDIF
 gbit2   ld      b, (hl)         ; load another group of 8 bits
         dec     hl
 gbit3   rl      b               ; get next bit
@@ -1310,15 +1448,15 @@ ini9    in      a, ($ff)
 map     incbin  map_compressed.bin
 mapend
       IF smooth=0
-        block   $fd50-$&$ffff
-lookt   incbin  table0.bin
+        block   $fd00-$&$ffff
+lookt   incbin  file1.bin
         block   $fe80-$&$ffff
-        incbin  dzx7b_rcs_0.bin
+        incbin  file2.bin
         defb    $ff
       ELSE
-        block   $fc21-$&$ffff
-        incbin  dzx7b_rcs_1.bin
-lookt   incbin  table1.bin
+        block   $fc81-$&$ffff
+        incbin  file3.bin
+lookt   incbin  file1.bin
       ENDIF
         block   $ff00-$&$ffff
         defb    $ff

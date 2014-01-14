@@ -1,12 +1,15 @@
-        include defload.asm
+        include ndefload.asm
         DEFINE  border_loading 0
       IF  smooth=0
         DEFINE  desc  $fe80
-        DEFINE  ramt  $fd50
+        DEFINE  ramt  $fd00
       ELSE
-        DEFINE  desc  $fc21
+        DEFINE  desc  $fc81
         DEFINE  ramt  desc
       ENDIF
+        display "----------------------------"
+        display /A,0x7e50-stasp-main_size, " bytes free"
+        display "____________________________"
         output  loader.bin
         org     $5b06+ini-prnbuf
 ini     ld      de, desc
@@ -38,14 +41,14 @@ ini     ld      de, desc
         call    desc
         ld      sp, $5b06
         ld      de, $ffff
-        ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl3len
+        ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len
       IF  smooth=0
         ld      bc, $101
         lddr
         ld      e, $7f
-        ld      bc, $130
+        ld      bc, $180
       ELSE
-        ld      bc, $360
+        ld      bc, $300
       ENDIF
         lddr
         ld      hl, $5ccb+prnbuf-ini
@@ -81,14 +84,14 @@ next    call    ramt-maplen-12
         ld      ($fffd), hl
         ld      hl, frame0
         ld      ($fff2), hl
-copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl3len-$231-$12f*smooth
+copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth
         ld      de, $7fff
-        ld      bc, $2469
+        ld      bc, $23f8
         lddr
-      IF  bl3len>0
+      IF  bl2len>0
         ld      hl, ramt-maplen-codel2-codel1-codel0-1
-        ld      de, $10000-stasp+bl3len-1
-        ld      bc, bl3len
+        ld      de, $10000-stasp+bl2len-1
+        ld      bc, bl2len
         lddr
       ENDIF
         ld      hl, $ffff
@@ -107,7 +110,7 @@ fin
 screen  incbin  loading.zx7
 descom  
       IF  smooth=0
-        incbin  dzx7b_rcs_0.bin
+        incbin  file2.bin
       ELSE
-        incbin  dzx7b_rcs_1.bin
+        incbin  file3.bin
       ENDIF
