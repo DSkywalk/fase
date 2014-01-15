@@ -25,6 +25,9 @@ posterizezx: PosterizeZX.c
 tmxcnv: TmxCnv.c
   @ echo "compile: tmxcnv"
   @ $(CC) -o tmxcnv TmxCnv.c $(CFLAGS)
+rcs: rcs.c
+  @ echo "compile: rcs"
+  @ $(CC) -o rcs rcs.c $(CFLAGS)
 tmxcompress: TmxCompress.c
   @ echo "compile: tmxcompress"
   @ $(CC) -o tmxcompress TmxCompress.c lodepng.c $(CFLAGS)
