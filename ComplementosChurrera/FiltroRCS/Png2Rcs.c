@@ -1,4 +1,4 @@
-#include "lodepng.h"
+#include "lodepng.c"
 #include <stdio.h>
 #include <stdlib.h>
 unsigned char *image, *pixel, output[0x5b00];

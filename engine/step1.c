@@ -1,4 +1,4 @@
-#include "lodepng.h"
+#include "lodepng.c"
 #include <stdio.h>
 #include <stdlib.h>
 unsigned char *image, *pixel, output[0x10000];
@@ -252,7 +252,6 @@ salir:
   output[(64<<smooth)-1]= outpos-inipos;
   fwrite(output, 1, outpos, fo);
   fclose(fo);
-//  printf("Generating      table.bin...Done\n");
   printf("Files generated successfully\n");
   free(image);
 
@@ -263,10 +262,5 @@ salir:
   for ( int i= 0; i<0x100; i++ )
     table[i]=  i&0x07 | i>>3&0x18 | i<<2&0xe0;
   fwrite(table, 1, 0x100, fo);
-
-/*  fo= fopen("file2.bin", "wb+");
-  for ( int i= 0x38; i<0xe8; i++ )
-    table[i-0x38]=  0x3800 + (i<<8&0x700) + (((offsey<<3)+i)<<2&0xe0) + (((offsey<<3)+i)<<5&0x1800);
-  fwrite(table, 1, 0x160, fo);*/
   fclose(fo);
 }
