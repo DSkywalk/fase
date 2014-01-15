@@ -569,7 +569,7 @@ uppa3   ld      hl, selend
         jr      c, draw_sprites
 
 ;Partial background update
-        ld      (hl), l
+        ld      (hl), $ff
         ld      l, a
       IF  machine=1
         ld      h, c
@@ -607,22 +607,27 @@ uppa5   ld      a, l
         and     $0f
         inc     a
         ld      (upba2-1), a
-        ld      a, c
-        and     $f0
-        ld      b, $58 >> 2
-        rla
-        rl      b
-        rla
-        rl      b
-        rl      c
-        xor     c
-        and     %11100001
-        xor     c
-      IF  offsex=1
+        ld      a, c            ; A= yyyyxxxx
+        and     $f0             ; A= yyyy0000
+      IF  offsey>0
+        add     a, offsey<<3
+      ENDIF
+        ld      b, $58 >> 2     ; B= 00010110
+        rla                     ; A= yyy00000
+        rl      b               ; B= 0010110y
+        rla                     ; A= yy000000
+        rl      b               ; B= 010110yy
+        rl      c               ; C= yyyxxxx0
+        xor     c        
+        and     %11100001       
+        xor     c               ; A= yy0xxxx0
+    IF  offsex=1
         inc     a
-      ELSE
+    ELSE
+      IF  offsex>1
         add     a, offsex
       ENDIF
+    ENDIF
         ld      c, a
         ld      l, a
         ld      a, b
