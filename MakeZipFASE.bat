@@ -6,11 +6,14 @@ call setvars.bat
 %dmc% engine\step2.c
 %dmc% engine\zx7b.c
 %dmc% engine\numbers4map.c
+%dmc% engine\generate_table.c
 copy engine\numbers4map.png .
 numbers4map.exe
+generate_table.exe
+move file1.bin engine
 move numbers4map.h engine
 %dmc% engine\GenTmx.c
-del numbers4map.exe numbers4map.png
+del numbers4map.exe numbers4map.png generate_table.exe
 move /Y TmxCompress.exe engine\util
 move /Y Png2Rcs.exe engine\util
 move /Y step1.exe engine\util
@@ -28,6 +31,6 @@ call fase gfx
   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
   util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe^
   engine0.asm engine1.asm engine2.asm engine.asm loader.asm ^
-  loading.png sprites.png tiles.png map.tmx ^
+  loading.png sprites.png tiles.png ^
   main.c fase.h main.bas fase.bas
 cd ..

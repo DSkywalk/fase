@@ -1,7 +1,16 @@
         include define.asm
         include defmap.asm
+; 0 black, 1 blue, 2 red, 3 magenta, 4 green, 5 cyan, 6 yellow, 7 white
+; 8 none, 9-15 bright versions of 1-7
+        DEFINE  scolor  5
+        DEFINE  ccolor  9
         DEFINE  sylo    $66
+      IF scolor=0
         DEFINE  syhi    $c0
+      ELSE
+        DEFINE  syhi    ($80 | scolor<<3&$78 | scolor&$07)
+      ENDIF
+        DEFINE  atrbar  (ccolor<<3&$78 | ccolor&$07)
         DEFINE  enems   $5b00
         DEFINE  mapbuf  $5b40
         DEFINE  screen  $5c00
@@ -1254,13 +1263,17 @@ craw8   ld      a, 1
 
 init    ld      (ini7+1&$ffff), sp
 
-      IF clipup=1
+    IF clipup=1
         ld      hl, $5800+offsex  -cliphr+(offsey-1<<5)
         ld      de, $5800+offsex+1-cliphr+(offsey-1<<5)
         ld      bc, (scrh+cliphr<<1)-1
+      IF atrbar=0
         ld      (hl), b
-        ldir
+      ELSE
+        ld      (hl), atrbar
       ENDIF
+        ldir
+    ENDIF
     IF clipdn=1
         ld      hl, $5800+offsex  -cliphr+(offsey+2*scrh<<5)
         ld      de, $5800+offsex+1-cliphr+(offsey+2*scrh<<5)
@@ -1269,15 +1282,19 @@ init    ld      (ini7+1&$ffff), sp
       ELSE
         ld      bc, (scrh+cliphr<<1)-1
       ENDIF
+      IF atrbar=0
         ld      (hl), b
+      ELSE
+        ld      (hl), atrbar
+      ENDIF
         ldir
     ENDIF
 ; aprovechar bc=0
 
-    IF  scrw=16 || cliphr=0
+  IF  scrw=16 || cliphr=0
         xor     a
-    ELSE
-      IF  scrw=15 && offsex=1
+  ELSE
+    IF  scrw=15 && offsex=1
         ld      a, scrh*2-1
         ld      de, $0020
         ld      b, d
@@ -1288,21 +1305,34 @@ ini1    ld      sp, hl
         add     hl, de
         dec     a
         jr      nz, ini1
+      IF atrbar=0
         ld      ($5800+(offsey<<5)), a
         ld      ($5a7f+(offsey<<5)), a
       ELSE
+        ld      a, atrbar
+        ld      ($5800+(offsey<<5)), a
+        ld      ($5a7f+(offsey<<5)), a
+        xor     a
+      ENDIF
+    ELSE
         ld      a, scrh*2
         ld      de, scrw*2+1
         ld      bc, 31-scrw*2
         ld      hl, $5800+offsex-1+(offsey<<5)
+      IF atrbar=0
 ini1    ld      (hl), b
         add     hl, de
         ld      (hl), b
+      ELSE
+ini1    ld      (hl), atrbar
+        add     hl, de
+        ld      (hl), atrbar
+      ENDIF
         add     hl, bc
         dec     a
         jr      nz, ini1
-      ENDIF
     ENDIF
+  ENDIF
     IF  machine=0
         dec     a
         ld      (screen), a

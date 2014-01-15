@@ -254,13 +254,4 @@ salir:
   fclose(fo);
   printf("Files generated successfully\n");
   free(image);
-
-// table
-
-  unsigned char table[0x100];
-  fo= fopen("file1.bin", "wb+");
-  for ( int i= 0; i<0x100; i++ )
-    table[i]=  i&0x07 | i>>3&0x18 | i<<2&0xe0;
-  fwrite(table, 1, 0x100, fo);
-  fclose(fo);
 }
