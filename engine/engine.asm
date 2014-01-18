@@ -72,39 +72,70 @@
 .upd
     ENDM
 
-      MACRO updclup
-        ld      a, d
-        and     $07
-        jp      nz, .upd&$ffff
-        ld      a, d
-        sub     $08
-        ld      d, a
-.upd
+      MACRO cellp
+        pop     de
+        ld      (hl), e
+        inc     h
+        ld      (hl), d
+        inc     h
+        pop     de
+        ld      (hl), e
+        inc     h
+        ld      (hl), d
+        inc     h
+        pop     de
+        ld      (hl), e
+        inc     h
+        ld      (hl), d
+        inc     h
+        pop     de
+        ld      (hl), e
+        inc     h
+        ld      (hl), d
       ENDM
 
       MACRO cellprint addition
-        pop     de
-        ld      (hl), e
-        inc     h
-        ld      (hl), d
-        inc     h
-        pop     de
-        ld      (hl), e
-        inc     h
-        ld      (hl), d
-        inc     h
-        pop     de
-        ld      (hl), e
-        inc     h
-        ld      (hl), d
-        inc     h
-        pop     de
-        ld      (hl), e
-        inc     h
-        ld      (hl), d
+        cellp
         ld      de, addition
         add     hl, de
       ENDM
+
+      MACRO cellprin1
+        cellp
+        inc     h
+        ld      a, $1f
+        add     a, l
+        ld      l, a
+        jr      c, .cell
+        ld      a, $f8
+        add     a, h
+        ld      h, a
+.cell
+      ENDM
+
+      MACRO cellprin2
+        cellp
+        ld      de, $f8e1
+        ld      a, l
+        add     a, e
+        jp      c, .cell
+        ld      d, $f1
+.cell   add     hl, de
+      ENDM
+
+    MACRO tileprint
+      IF offsey&1
+        cellprint $f901
+        cellprin1
+        cellprint $f901
+        cellprin2
+      ELSE
+        cellprint $f901
+        cellprint $f91f
+        cellprint $f901
+        cellprint $f8e1
+      ENDIF
+    ENDM
 
       MACRO ndjnz addr
         defb    $10, addr-.ndj
@@ -304,15 +335,16 @@ upba1
         xor     a
         ld      (upba4+1), a
       ELSE
-        ld      bc, mapbuf 
+        ld      bc, mapbuf
       ENDIF
         ld      a, 0
 upba2   ex      af, af'
         ld      a, 0
-upba3 IF  tmode=3
+upba3   ld      (papi+1), a
+      IF  tmode=3
         ld      hl, upba4+1
         inc     (hl)
-upba4   ld      hl, mapbuf 
+upba4   ld      hl, mapbuf
       ELSE
         ld      h, b
         ld      l, c
@@ -332,10 +364,7 @@ upba4   ld      hl, mapbuf
         add     hl, de
         ld      sp, hl
         exx
-        cellprint $f901
-        cellprint $f91f
-        cellprint $f901
-        cellprint $f8e1
+        tileprint
       ENDIF
       IF  tmode=1
         ld      d, h
@@ -359,10 +388,7 @@ upba4   ld      hl, mapbuf
         add     hl, de
         ld      sp, hl
         exx
-        cellprint $f901
-        cellprint $f91f
-        cellprint $f901
-        cellprint $f8e1
+        tileprint
 upba5   ld      sp, 0
       ENDIF
       IF  tmode=2
@@ -387,10 +413,7 @@ upba5   ld      sp, 0
         add     hl, de
         ld      (upba5+1), hl
         exx
-        cellprint $f901
-        cellprint $f91f
-        cellprint $f901
-        cellprint $f8e1
+        tileprint
 upba5   ld      sp, 0
       ENDIF
       IF  tmode=3
@@ -417,10 +440,7 @@ upba5   ld      sp, 0
         add     hl, bc
         ld      sp, hl
         exx
-        cellprint $f901
-        cellprint $f91f
-        cellprint $f901
-        cellprint $f8e1
+        tileprint
 upba5   ld      sp, 0
       ENDIF
         ex      de, hl
@@ -445,6 +465,7 @@ upba5   ld      sp, 0
       IF  tmode<3
         inc     c
       ENDIF
+papi    ld      a, 0
         dec     a
         jp      nz, upba3
         exx
@@ -456,9 +477,8 @@ upba6   ld      bc, 0
         ex      de, hl
 upba7   ld      de, 0
         ld      a, l
-        add     a, a
-        jr      nc, upba8
-        jp      p, upba8
+        cp      $c0
+        jr      c, upba8
         ld      d, 7
 upba8   add     hl, de
         exx
@@ -964,8 +984,13 @@ drawj   ld      sp, 0
 braw1   ld      (brawa+1&$ffff), bc  
         ld      (braw2+1&$ffff), a
         cpl
-        sub     -18
+      IF offsey>0
+        sub     -(offsey<<3)-2
         rra
+      ELSE
+        rra
+        inc     a
+      ENDIF
         ld      ixh, a
 braw2   ld      a, (lookt&$ffff)
         ld      l, a          ; A=L= rrrRRppp
@@ -1006,13 +1031,7 @@ braw4   ld      hl, 12
         add     hl, sp
         ld      sp, hl
         inc     d
-      IF smooth=1 && offsey&7
-        updclup
-      ENDIF
         inc     d
-      IF offsey&7
-        updclup
-      ENDIF
         dec     ixh
         jr      z, braw8
         djnz    braw4
@@ -1021,13 +1040,7 @@ braw5   ld      hl, 8
         add     hl, sp
         ld      sp, hl
         inc     d
-      IF smooth=1 && offsey&7
-        updclup
-      ENDIF
         inc     d
-      IF offsey&7
-        updclup
-      ENDIF
         dec     ixh
         jr      z, braw8
         djnz    braw5
@@ -1035,13 +1048,7 @@ braw5   ld      hl, 8
 braw6   pop     hl
         pop     hl
         inc     d
-      IF smooth=1 && offsey&7
-        updclup
-      ENDIF
         inc     d
-      IF offsey&7
-        updclup
-      ENDIF
         dec     ixh
         jr      z, braw8
         djnz    braw6
@@ -1050,11 +1057,17 @@ braw7   ex      af, af'
         jp      nz, braw3
         ld      bc, (brawa+1&$ffff)
         jp      drawh
-braw8   ld      a, e
+braw8   
+      IF offsey&7
+        ld      hl, $f820
+        add     hl, de
+      ELSE
+        ld      a, e
         add     a, $20
-        ld      e, a
+        ld      l, a
+        ld      h, d
+      ENDIF
         ndjnz   braw9
-        ex      de, hl
         ld      bc, (brawa+1&$ffff)
         ex      af, af'
         dec     a
@@ -1067,7 +1080,6 @@ braw9   ld      ixl, b
         ex      af, af'
         ld      (drawg+1), a
         ex      af, af'
-        ex      de, hl
         ld      a, c
 brawa   ld      bc, 0
         and     %00001100
