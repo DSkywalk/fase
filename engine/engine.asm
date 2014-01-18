@@ -963,9 +963,8 @@ drawj   ld      sp, 0
     IF clipup=2
 braw1   ld      (brawa+1&$ffff), bc  
         ld      (braw2+1&$ffff), a
-        sub     d
         cpl
-        sub     -10
+        sub     -18
         rra
         ld      ixh, a
 braw2   ld      a, (lookt&$ffff)
