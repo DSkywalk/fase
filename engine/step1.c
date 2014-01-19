@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 unsigned char *image, *pixel, output[0x10000];
-char tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey;
+char tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey, notabl;
 unsigned error, width, height, i, j, k, l, min, max, nmin, nmax, amin, amax,
           mask, pics, amask, apics, inipos, reppos, smooth, outpos, fondo, tinta;
 long long atr, celdas[4];
@@ -72,6 +72,8 @@ int main(int argc, char *argv[]){
       offsex= atoi(fou+6);
     else if( fou= (char *) strstr(tmpstr, "offsey") )
       offsey= atoi(fou+6);
+    else if( fou= (char *) strstr(tmpstr, "notabl") )
+      notabl= atoi(fou+6);
   }
   fclose(ft);
 
@@ -155,8 +157,9 @@ int main(int argc, char *argv[]){
               "        DEFINE  safevr %d\n"
               "        DEFINE  safehr %d\n"
               "        DEFINE  offsex %d\n"
-              "        DEFINE  offsey %d\n",  tmode, pics, reppos, apics, smooth, clipup,
-                                              clipdn, cliphr, safevr, safehr, offsex, offsey);
+              "        DEFINE  offsey %d\n"
+              "        DEFINE  notabl %d\n", tmode, pics, reppos, apics, smooth, clipup, clipdn,
+                                             cliphr, safevr, safehr, offsex, offsey, notabl);
   fclose(ft);
   printf("\nno index     %d bytes\n", pics*36);
   printf("index bitmap %d bytes\n", pics*5+reppos*32);
@@ -205,7 +208,7 @@ int main(int argc, char *argv[]){
       if( inipos )
         output[((j|i<<3)>>(1-smooth))-1]= outpos-inipos;
       output[inipos= outpos]= 0;
-      output[inipos+1]= 0xf8+offsey*8;//0x50;
+      output[inipos+1]= 0xf8+offsey*8;
       outpos+= 2;
       nmin= nmax= 4;
       for ( k= 0; k < 16; k++ ){

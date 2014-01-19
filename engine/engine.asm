@@ -20,9 +20,9 @@
         DEFINE  tiladdr $5c08
         DEFINE  sprites $fe00
       IF  smooth=0
-        DEFINE  final   $fd00
+        DEFINE  final   $fd00+(notabl<<8)
       ELSE
-        DEFINE  final   $fc81
+        DEFINE  final   $fc81+(notabl<<8)
       ENDIF
 
       MACRO updremove
@@ -137,14 +137,9 @@
       ENDIF
     ENDM
 
-      MACRO ndjnz addr
-        defb    $10, addr-.ndj
-.ndj
-      ENDM
-
 ; Paolo Ferraris' shortest loader, then we move all the code to $8000
         org     staspr+final-mapend-$
-staspr  defw    draw_sprites+3
+staspr  defw    draw_sprites+3&$ffff
         nop
 do_sprites
         ld      (drawj+1&$ffff), sp
@@ -340,7 +335,10 @@ upba1
         ld      a, 0
 upba2   ex      af, af'
         ld      a, 0
-upba3   ld      (papi+1), a
+upba3
+      IF offsey&1
+        ld      (upba55+1), a
+      ENDIF
       IF  tmode=3
         ld      hl, upba4+1
         inc     (hl)
@@ -465,7 +463,9 @@ upba5   ld      sp, 0
       IF  tmode<3
         inc     c
       ENDIF
-papi    ld      a, 0
+      IF offsey&1
+upba55  ld      a, 0
+      ENDIF
         dec     a
         jp      nz, upba3
         exx
@@ -485,7 +485,7 @@ upba8   add     hl, de
         ex      af, af'
         dec     a
         jp      nz, upba2
-        jp      draw_sprites
+        jp      draw_sprites&$ffff
 
 delete_sprites
         ld      sp, 0
@@ -685,7 +685,6 @@ draw16
       IF smooth=0
         and     $fe
       ENDIF
-
         ld      e, a
         ex      af, af
     ELSE
@@ -780,22 +779,59 @@ draw4
         jp      nc, craw1&$ffff
       ENDIF
   ENDIF
+    IF notabl=1
+        ld      l, a          ; A=L= RRrrrppp
+      IF offsey=0
+        cp      192
+        jr      nc, draw5
+      ENDIF
+        rrca
+        rrca
+        rrca                  ; A= pppRRrrr
+        xor     l
+        and     %00011000
+        xor     l             ; A= RRrRRppp
+        and     %00011111
+        or      %01000000
+      IF offsey=0
+        jr      draw6
+draw5   rrca
+        rrca
+        rrca                  ; A= pppRRrrr
+        xor     l
+        and     %00011000
+        xor     l             ; A= RRrRRppp
+        and     %00011111
+        or      %00100000
+      ENDIF
+draw6   ld      h, a
+        ld      a, l
+        rlca
+        rlca
+        and     $e0
+    ELSE
         ld      (draw5+1), a
+      IF offsey=0
         cp      192
 draw5   ld      a, (lookt&$ffff)
         jr      nc, draw6
+      ELSE
+draw5   ld      a, (lookt&$ffff)
+      ENDIF
         ld      l, a          ; A=L= rrrRRppp
         and     %00011111
         ld      h, a          ;   H= 000RRppp
         set     6, h
         xor     l             ;   A= rrr00000
-        ld      l, a          ;   L= rrr00000
+      IF offsey=0
         jr      draw8
 draw6   ld      l, a          ; A=L= rrrRRppp
         and     %00011111
         ld      h, a          ;   H= 000RRppp
         set     5, h
         xor     l             ;   A= rrr00000
+      ENDIF
+    ENDIF
 draw8   add     a, 0
       IF  offsex != 1
         add     a, offsex-1
@@ -992,6 +1028,27 @@ braw1   ld      (brawa+1&$ffff), bc
         inc     a
       ENDIF
         ld      ixh, a
+    IF notabl=1
+braw2   ld      a, 0
+        ld      l, a
+        rrca
+        rrca
+        rrca                  ; A= pppRRrrr
+        xor     l
+        and     %00011000
+        xor     l             ; A= RRrRRppp
+        and     %00011111
+      IF offsey=0
+        or      %00100000
+      ELSE
+        or      %01000000
+      ENDIF
+        ld      h, a
+        ld      a, l
+        rlca
+        rlca
+        and     $e0
+    ELSE
 braw2   ld      a, (lookt&$ffff)
         ld      l, a          ; A=L= rrrRRppp
         and     %00011111
@@ -1002,6 +1059,7 @@ braw2   ld      a, (lookt&$ffff)
         set     6, h
       ENDIF
         xor     l             ;   A= rrr00000
+    ENDIF
         ld      l, a          ;   L= rrr00000
         ld      a, (draw8+1)
       IF  offsex != 1
@@ -1057,23 +1115,6 @@ braw7   ex      af, af'
         jp      nz, braw3
         ld      bc, (brawa+1&$ffff)
         jp      drawh
-braw8   
-      IF offsey&7
-        ld      hl, $f820
-        add     hl, de
-      ELSE
-        ld      a, e
-        add     a, $20
-        ld      l, a
-        ld      h, d
-      ENDIF
-        ndjnz   braw9
-        ld      bc, (brawa+1&$ffff)
-        ex      af, af'
-        dec     a
-        ld      (drawg+1), a
-        jp      nz, draw9
-        jp      drawh
 braw9   ld      ixl, b
         ld      iyh, b
         ld      iyl, c
@@ -1086,6 +1127,23 @@ brawa   ld      bc, 0
         jp      z, drawc
         jp      po, drawb
         jp      drawa
+braw8
+      IF offsey&7
+        ld      hl, $f820
+        add     hl, de
+      ELSE
+        ld      a, e
+        add     a, $20
+        ld      l, a
+        ld      h, d
+      ENDIF
+        djnz    braw9
+        ld      bc, (brawa+1&$ffff)
+        ex      af, af'
+        dec     a
+        ld      (drawg+1), a
+        jp      nz, draw9
+        jp      drawh
     ENDIF
 
     IF clipdn=2
@@ -1094,12 +1152,30 @@ craw1   ld      (craw2+1&$ffff), a
         sub     $ff-(offsey+scrh*2<<3)
         rra
         ld      ixh, a
+      IF notabl=1
+craw2   ld      a, 0
+        ld      l, a
+        rrca
+        rrca
+        rrca                  ; A= pppRRrrr
+        xor     l
+        and     %00011000
+        xor     l             ; A= RRrRRppp
+        and     %00011111
+        or      %01000000
+        ld      h, a
+        ld      a, l
+        rlca
+        rlca
+        and     $e0
+      ELSE
 craw2   ld      a, (lookt&$ffff)
         ld      l, a          ; A=L= rrrRRppp
         and     %00011111
         ld      h, a          ;   H= 000RRppp
         set     6, h
         xor     l             ;   A= rrr00000
+      ENDIF
         ld      l, a          ;   L= rrr00000
         ld      a, (draw8+1)
       IF  offsex != 1
@@ -1282,7 +1358,7 @@ init    ld      (ini7+1&$ffff), sp
     IF clipup=1
         ld      hl, $5800+offsex  -cliphr+(offsey-1<<5)
         ld      de, $5800+offsex+1-cliphr+(offsey-1<<5)
-        ld      bc, (scrh+cliphr<<1)-1
+        ld      bc, (scrw+cliphr<<1)-1
       IF atrbar=0
         ld      (hl), b
       ELSE
@@ -1294,9 +1370,9 @@ init    ld      (ini7+1&$ffff), sp
         ld      hl, $5800+offsex  -cliphr+(offsey+2*scrh<<5)
         ld      de, $5800+offsex+1-cliphr+(offsey+2*scrh<<5)
       IF clipup=1
-        ld      c, (scrh+cliphr<<1)-1
+        ld      c, (scrw+cliphr<<1)-1
       ELSE
-        ld      bc, (scrh+cliphr<<1)-1
+        ld      bc, (scrw+cliphr<<1)-1
       ENDIF
       IF atrbar=0
         ld      (hl), b
@@ -1311,10 +1387,18 @@ init    ld      (ini7+1&$ffff), sp
         xor     a
   ELSE
     IF  scrw=15 && offsex=1
-        ld      a, scrh*2-1
         ld      de, $0020
+      IF atrbar>0
+        ld      a, 0+atrbar
+        ld      ($5800+(offsey<<5)), a
+        ld      ($5a7f+(offsey<<5)), a
+        ld      b, a
+        ld      c, a
+      ELSE
         ld      b, d
         ld      c, d
+      ENDIF
+        ld      a, scrh*2-1
         ld      hl, $5821+(offsey<<5)
 ini1    ld      sp, hl
         push    bc
@@ -1324,11 +1408,6 @@ ini1    ld      sp, hl
       IF atrbar=0
         ld      ($5800+(offsey<<5)), a
         ld      ($5a7f+(offsey<<5)), a
-      ELSE
-        ld      a, atrbar
-        ld      ($5800+(offsey<<5)), a
-        ld      ($5a7f+(offsey<<5)), a
-        xor     a
       ENDIF
     ELSE
         ld      a, scrh*2
@@ -1414,7 +1493,11 @@ ini7    ld      sp, 0
         ld      (port), a
         ld      hl, ini3&$ffff
         ld      de, $5b00
+      IF atrbar=0
         ld      c, ini4-ini3
+      ELSE
+        ld      bc, ini4-ini3
+      ENDIF
         ldir
         ld      hl, $db00
         call    $5b00
@@ -1493,17 +1576,22 @@ ini9    in      a, ($ff)
 ; Map file. Generated externally with TmxCompress.c from map.tmx
 map     incbin  map_compressed.bin
 mapend
-      IF smooth=0
-        block   $fd00-$&$ffff
+        block   final-$&$ffff
+    IF smooth=0
+      IF notabl=0
 lookt   incbin  file1.bin
+      ENDIF
         block   $fe80-$&$ffff
         incbin  file2.bin
         defb    $ff
-      ELSE
-        block   $fc81-$&$ffff
+    ELSE
+      IF notabl=0
         incbin  file3.bin
 lookt   incbin  file1.bin
+      ELSE
+        incbin  file4.bin
       ENDIF
+    ENDIF
         block   $ff00-$&$ffff
         defb    $ff
         block   $fff1-$&$ffff

@@ -2,13 +2,13 @@
         DEFINE  border_loading 0
       IF  smooth=0
         DEFINE  desc  $fe80
-        DEFINE  ramt  $fd00
+        DEFINE  ramt  $fd00+notabl
       ELSE
-        DEFINE  desc  $fc81
+        DEFINE  desc  $fc81+notabl
         DEFINE  ramt  desc
       ENDIF
         display "----------------------------"
-        display /A,0x7e50-stasp-main_size, " bytes free"
+        display /A,0x7e50-stasp-mainrw, " bytes free"
         display "____________________________"
         output  loader.bin
         org     $5b06+ini-prnbuf
@@ -28,7 +28,7 @@ ini     ld      de, desc
         ld      de, $5aff
         call    desc
         ld      hl, $8000-maplen
-        ld      de, engcomp_size
+        ld      de, engicm
         push    hl
         call    $07f4
         di
@@ -36,7 +36,7 @@ ini     ld      de, desc
         ld      de, ramt-maplen
         ld      bc, maplen
         ldir
-        ld      hl, $8000-maplen+engcomp_size-1
+        ld      hl, $8000-maplen+engicm-1
         ld      de, ramt-1-maplen
         call    desc
         ld      sp, $5b06
@@ -46,9 +46,9 @@ ini     ld      de, desc
         ld      bc, $101
         lddr
         ld      e, $7f
-        ld      bc, $180
+        ld      bc, $180-notabl
       ELSE
-        ld      bc, $300
+        ld      bc, $300-notabl
       ENDIF
         lddr
         ld      hl, $5ccb+prnbuf-ini
@@ -84,7 +84,7 @@ next    call    ramt-maplen-12
         ld      ($fffd), hl
         ld      hl, frame0
         ld      ($fff2), hl
-copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth
+copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+notabl
         ld      de, $7fff
         ld      bc, $23f8
         lddr
@@ -96,21 +96,25 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth
       ENDIF
         ld      hl, $ffff
         ld      ($fffe-stasp), hl
-        ld      hl, $8000+maincomp_size-1
-        ld      de, $8040+main_size-1
+        ld      hl, $8000+maincm-1
+        ld      de, $8040+mainrw-1
         call    desc
         ld      hl, $8040
         ld      de, $8000
         ld      sp, 0xfe50-stasp
         push    de
-        ld      bc, main_size
+        ld      bc, mainrw
         ldir
         ret
 fin
 screen  incbin  loading.zx7
 descom  
-      IF  smooth=0
+    IF  smooth=0
         incbin  file2.bin
-      ELSE
+    ELSE
+      IF notabl=0
         incbin  file3.bin
+      ELSE
+        incbin  file4.bin
       ENDIF
+    ENDIF

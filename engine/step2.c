@@ -3,8 +3,8 @@
 FILE *fi, *fi2;
 unsigned char mem[0x10000], sprites[0x8000], sblocks[0x81], sorder[0x81], subset[0x1200][0x81];
 char tmpstr[30], *fou;
-unsigned  saccum[0x81], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites,
-          nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, scrw, scrh, mapw, maph;
+unsigned saccum[0x81], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites, notabl,
+         nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, scrw, scrh, mapw, maph;
 int i, j, k, l;
 struct {
   int len;
@@ -44,6 +44,8 @@ int main(int argc, char *argv[]){
     fgets(tmpstr, 30, fi);
     if( fou= (char *) strstr(tmpstr, "smooth") )
       smooth= atoi(fou+6);
+    else if( fou= (char *) strstr(tmpstr, "notabl") )
+      notabl= atoi(fou+6)<<8;
   }
   fclose(fi);
   fi= fopen("defmap.asm", "r");
@@ -147,17 +149,17 @@ int main(int argc, char *argv[]){
   fi= fopen("block.bin", "wb+");
   fwrite(mem+0x5c08, 1, 0x23f8, fi);
   if( smooth ){
-    fwrite(mem+0xfd00, 1, 0x300, fi);
+    fwrite(mem+0xfd00+notabl, 1, 0x300-notabl, fi);
     if( blocks[2].len>0 )
       fwrite(mem+0x10000-stasp, 1, blocks[2].len<<1, fi);
-    fwrite(mem+0x10002-scode, 1, scode-2-0x37f-tmp, fi);
+    fwrite(mem+0x10002-scode, 1, scode-2-0x37f+notabl-tmp, fi);
   }
   else{
-    fwrite(mem+0xfd00, 1, 0x180, fi);
+    fwrite(mem+0xfd00+notabl, 1, 0x180-notabl, fi);
     fwrite(mem+0xfeff, 1, 0x101, fi);
     if( blocks[2].len>0 )
       fwrite(mem+blocks[2].addr, 1, blocks[2].len<<1, fi);
-    fwrite(mem+0x10002-scode, 1, scode-2-0x300-tmp, fi);
+    fwrite(mem+0x10002-scode, 1, scode-2-0x300+notabl-tmp, fi);
   }
   fi2= fopen("engine1.bin", "rb");
   fseek(fi2, 0, SEEK_END);
@@ -173,9 +175,9 @@ int main(int argc, char *argv[]){
   mem[point]= 0xfffe-stasp&0xff;
   mem[point+1]= 0xfffe-stasp>>8;
   if( smooth )
-    fwrite(mem+0x10002-scode1, 1, scode1-2-0x37f-tmp, fi);
+    fwrite(mem+0x10002-scode1, 1, scode1-2-0x37f+notabl-tmp, fi);
   else
-    fwrite(mem+0x10002-scode1, 1, scode1-2-0x300-tmp, fi);
+    fwrite(mem+0x10002-scode1, 1, scode1-2-0x300+notabl-tmp, fi);
   fi2= fopen("engine2.bin", "rb");
   fseek(fi2, 0, SEEK_END);
   scode2= ftell(fi2);
@@ -188,15 +190,15 @@ int main(int argc, char *argv[]){
   mem[point]= 0xfffe-stasp&0xff;
   mem[point+1]= 0xfffe-stasp>>8;
   if( smooth )
-    fwrite(mem+0x10002-scode2, 1, scode2-2-0x37f-tmp, fi),
-    scode-= 0x37f+tmp,
-    scode1-= 0x37f+tmp,
-    scode2-= 0x37f+tmp;
+    fwrite(mem+0x10002-scode2, 1, scode2-2-0x37f+notabl-tmp, fi),
+    scode-= 0x37f-notabl+tmp,
+    scode1-= 0x37f-notabl+tmp,
+    scode2-= 0x37f-notabl+tmp;
   else
-    fwrite(mem+0x10002-scode2, 1, scode2-2-0x300-tmp, fi),
-    scode-= 0x300+tmp,
-    scode1-= 0x300+tmp,
-    scode2-= 0x300+tmp;
+    fwrite(mem+0x10002-scode2, 1, scode2-2-0x300+notabl-tmp, fi),
+    scode-= 0x300-notabl+tmp,
+    scode1-= 0x300-notabl+tmp,
+    scode2-= 0x300-notabl+tmp;
   fclose(fi);
   fi= fopen("defload.asm", "wb+");
   fprintf(fi, "        DEFINE  smooth  %d\n"
@@ -209,8 +211,9 @@ int main(int argc, char *argv[]){
               "        DEFINE  frame0  %d\n"
               "        DEFINE  frame1  %d\n"
               "        DEFINE  bl2len  %d\n"
-              "        DEFINE  stasp   %d\n", smooth, tmp, scode-2, scode1-2,
-              scode2-2, init0, init1, frame0, frame1, blocks[2].len>0?blocks[2].len<<1:0, stasp);
+              "        DEFINE  stasp   %d\n"
+              "        DEFINE  notabl  %d\n", smooth, tmp, scode-2, scode1-2, scode2-2,
+              init0, init1, frame0, frame1, blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl);
   fclose(fi);
   fi= fopen("defs.h", "wb+");
   fprintf(fi, "#define smooth %d\n"
