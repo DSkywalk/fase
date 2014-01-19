@@ -1,3 +1,4 @@
+@echo off
 SETLOCAL
 set _lang=c
 if "%1"=="gfx" (
@@ -10,21 +11,26 @@ if "%1"=="gfx" (
 )
 if "%1"=="config" (
 :cont
-  util\sjasmplus engine0.asm
-  util\sjasmplus engine1.asm
-  util\sjasmplus engine2.asm
+  util\sjasmplus engine0.asm > nul
+  util\sjasmplus engine1.asm > nul
+  util\sjasmplus engine2.asm > nul
   util\step2
   util\zx7b block.bin block.zx7
 )
 if %_lang%==c (
+  echo.
   sdcc -mz80 --no-std-crt0 --code-loc 0x8000 main.c
-  util\hex2bin -p 00 main.ihx
+  echo File main.bin compiled from main.c
+  util\hex2bin -p 00 main.ihx > nul
 ) else (
   zxb main.bas
 )
 util\zx7b main.bin main.zx7
-copy /b map_compressed.bin+main.zx7+block.zx7 engine.zx7
-copy defload.asm ndefload.asm
+echo.
+copy /b map_compressed.bin+main.zx7+block.zx7 engine.zx7 > nul
+echo File engine.zx7 joined from map_compressed.bin, main.zx7 and block.zx7
+echo.
+copy defload.asm ndefload.asm > nul
 for /f %%i in ("engine.zx7") do echo  define engcomp_size %%~zi >> ndefload.asm
 for /f %%i in ("main.zx7") do echo  define maincomp_size %%~zi >> ndefload.asm
 for /f %%i in ("main.bin") do echo  define main_size %%~zi >> ndefload.asm

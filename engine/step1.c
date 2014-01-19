@@ -158,7 +158,7 @@ int main(int argc, char *argv[]){
               "        DEFINE  offsey %d\n",  tmode, pics, reppos, apics, smooth, clipup,
                                               clipdn, cliphr, safevr, safehr, offsex, offsey);
   fclose(ft);
-  printf("no index     %d bytes\n", pics*36);
+  printf("\nno index     %d bytes\n", pics*36);
   printf("index bitmap %d bytes\n", pics*5+reppos*32);
   printf("index attr   %d bytes\n", pics*33+apics*4);
   printf("full index   %d bytes\n", pics*2+reppos*32+apics*4);
@@ -252,6 +252,6 @@ salir:
   output[(64<<smooth)-1]= outpos-inipos;
   fwrite(output, 1, outpos, fo);
   fclose(fo);
-  printf("Files generated successfully\n");
+  printf("Files tiles.bin and sprites.bin generated in STEP 1\n");
   free(image);
 }

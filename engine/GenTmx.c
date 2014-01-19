@@ -79,5 +79,5 @@ int main(int argc, char* argv[]){
   fprintf(fo, "</data></layer>\n <objectgroup name=\"enems\" %s>\n", tmpstr);
   fprintf(fo, "</objectgroup></map>\n");
   fclose(fo);
-  printf("\nFile generated successfully\n");
+  printf("\nMap generated with dimensions (%d, %d) and screen size (%d, %d)\n", mapw, maph, scrw, scrh);
 }

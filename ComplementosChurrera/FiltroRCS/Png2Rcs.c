@@ -79,7 +79,7 @@ int main(int argc, char *argv[]){
       }
   if( argc==3 )
     fwrite(output, 1, height*36, fo),
-    printf("\nFile %s generated successfully\n", argv[2]);
+    printf("\nFile %s filtered from %s\n", argv[2], argv[1]);
   else{
     fwrite(output, 1, height<<5, fo);
     fclose(fo);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]){
       printf("\nCannot create output file: %s\n", argv[3]),
       exit(-1);
     fwrite(output, 1, height<<2, fo);
-    printf("\nFiles %s and %s generated successfully\n", argv[2], argv[3]);
+    printf("\nFiles %s and %s generated from %s\n", argv[2], argv[3], argv[1]);
   }
   fclose(fo);
   free(image);
