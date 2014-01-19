@@ -327,7 +327,7 @@ upba1
       ENDIF
         exx
       IF  tmode=3
-        xor     a
+        ld      a, mapbuf-1&$ff
         ld      (upba4+1), a
       ELSE
         ld      bc, mapbuf
@@ -710,41 +710,9 @@ draw16
 draw2   ld      sp, (sprites)
         pop     de
         ld      a, (hl)
-  IF smooth=0
+      IF smooth=0
         and     $fe
-    IF clipdn=0
-      IF safevr=1
-        cp      scrh*16-7
-        jr      c, draw3
-        ld      a, scrh*16-8
       ENDIF
-draw3   add     a, d
-    ELSE
-      IF safevr=1
-        cp      scrh*16+1
-        jr      c, draw3
-        ld      a, scrh*16
-      ENDIF
-draw3   add     a, d
-      IF clipdn=2
-        cp      1+((offsey+scrh*2-2)<<3)
-        jp      nc, craw1&$ffff
-      ENDIF
-    ENDIF
-    IF clipup=0
-      IF safevr=1
-        cp      offsey<<3
-        jr      nc, draw4
-        ld      a, offsey<<3
-      ENDIF
-    ELSE
-      IF clipup=2
-        cp      offsey<<3
-        jp      c, braw1&$ffff
-      ENDIF
-    ENDIF
-draw4
-  ELSE
     IF safevr=1
       IF clipdn=0
         cp      scrh*16-7
@@ -758,7 +726,7 @@ draw4
     ENDIF
 draw3   add     a, d
   IF clipup=0
-      IF safevr=1
+      IF safevr=1 && offsey>0
         cp      offsey<<3
         jr      nc, draw4
         ld      a, offsey<<3
@@ -778,7 +746,6 @@ draw4
         cp      1+((offsey+scrh*2-2)<<3)
         jp      nc, craw1&$ffff
       ENDIF
-  ENDIF
     IF notabl=1
         ld      l, a          ; A=L= RRrrrppp
       IF offsey=0
