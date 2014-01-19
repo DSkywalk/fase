@@ -24,13 +24,14 @@ del *.map *.obj
 cd engine
 util\SjAsmPlus dzx7b_rcs0.asm
 util\SjAsmPlus dzx7b_rcs1.asm
+util\SjAsmPlus dzx7b_rcs2.asm
 call fase gfx
 %z7z% a ..\FASE.0.13.zip ^
   fase.bat config.def readme.txt ^
-  file1.bin file2.bin file3.bin ^
+  file1.bin file2.bin file3.bin file4.bin ^
   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
   util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe^
   engine0.asm engine1.asm engine2.asm engine.asm loader.asm ^
   loading.png sprites.png tiles.png ^
-  main.c fase.h main.bas fase.bas
+  main.c fase.h
 cd ..

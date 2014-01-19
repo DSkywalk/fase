@@ -1,6 +1,6 @@
 #include  "fase.h"
 
-const unsigned char data[32]= {
+const unsigned char data[48]= {
   0x00, 0x42, 0x11, 0,
   0x08, 0x60, 0x60, 2,
   0x09, 0x58, 0x48, 3,
@@ -8,7 +8,11 @@ const unsigned char data[32]= {
   0x0b, 0x50, 0x6e, 2,
   0x0c, 0x56, 0x34, 3,
   0x0d, 0x32, 0x32, 1,
-  0x04, 0x52, 0x5e, 0};
+  0x0e, 0x52, 0x5e, 0,
+  0x0f, 0x12, 0x5e, 0,
+  0x08, 0x60, 0x30, 2,
+  0x09, 0x58, 0x04, 3,
+  0x0a, 0x42, 0x02, 1};
 
 int main(){
 
@@ -19,7 +23,7 @@ int main(){
   INIT;
 
   // pasar personajes a sprites
-  for ( i = 0; i < 32; i++ )
+  for ( i = 0; i < 48; i++ )
     sprites[i>>2][i&3]= data[i];
 
   // mostrar la primera pantalla al comienzo
@@ -31,7 +35,7 @@ int main(){
     FRAME;
 
     // movimiento de los enemigos
-    for ( i = 1; i < 8; i++ ){
+    for ( i = 1; i < 12; i++ ){
       if( sprites[i][3]&1 )
         if( sprites[i][2]>0 )
           sprites[i][2]--;

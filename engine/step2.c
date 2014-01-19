@@ -221,7 +221,7 @@ int main(int argc, char *argv[]){
               "#define scrw   %d\n"
               "#define scrh   %d\n"
               "#define mapw   %d\n"
-              "#define maph   %d\n", smooth, 0xfe50-stasp, scrw, scrh, mapw, maph);
+              "#define maph   %d\n", smooth, 0xfd80-stasp, scrw, scrh, mapw, maph);
   fclose(fi);
   printf("\nFile block.bin generated in STEP 2\n");
 }

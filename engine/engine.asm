@@ -139,7 +139,7 @@
 
 ; Paolo Ferraris' shortest loader, then we move all the code to $8000
         org     staspr+final-mapend-$
-staspr  defw    draw_sprites+3&$ffff
+staspr  defw    draw_sprites+1&$ffff
         nop
 do_sprites
         ld      (drawj+1&$ffff), sp
@@ -659,8 +659,8 @@ uppa5   ld      a, l
         jp      upba1
 
 draw_sprites
-        ld      a, 7
         ld      bc, 0
+        xor     a
 draw1   ld      (drawh+1&$ffff), a
         add     a, a
         add     a, a
@@ -998,8 +998,9 @@ drawg   ld      a, 0
         ld      (bc), a
         dec     c
 drawh   ld      a, 0
-        dec     a
-        jp      p, draw1
+        inc     a
+        cp      12
+        jp      nz, draw1
       IF  machine=1
         ld      (delete_sprites+1), bc
         ld      bc, $7ffd
