@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 FILE *fi, *fi2;
-unsigned char mem[0x10000], sprites[0x8000], sblocks[0x81], sorder[0x81], subset[0x1200][0x81];
-char tmpstr[30], *fou;
-unsigned saccum[0x81], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites, notabl,
-         nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, scrw, scrh, mapw, maph;
-int i, j, k, l;
+unsigned char mem[0x10000], sprites[0x8000], bullets[8], sblocks[0x89], sorder[0x89], subset[0x1200][0x89];
+char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet;
+unsigned  saccum[0x89], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites,
+          notabl, nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp;
+int i, j, k, l, bulimit;
 struct {
   int len;
   unsigned addr;
@@ -46,6 +46,8 @@ int main(int argc, char *argv[]){
       smooth= atoi(fou+6);
     else if( fou= (char *) strstr(tmpstr, "notabl") )
       notabl= atoi(fou+6)<<8;
+    else if( fou= (char *) strstr(tmpstr, "bullet") )
+      bullet= atoi(fou+6);
   }
   fclose(fi);
   fi= fopen("defmap.asm", "r");
@@ -62,19 +64,18 @@ int main(int argc, char *argv[]){
   }
   fclose(fi);
   fi= fopen("tiles.bin", "rb");
-  stiles= fread(mem+0x5c08, 1, 0x23f8, fi);
+  stiles= fread(mem+0x5c08+bullet*(8<<smooth), 1, 0x23f8-bullet*(8<<smooth), fi);
   fclose(fi);
   nsprites= smooth ? 0x80 : 0x40;
   ssprites-= nsprites;
   saccum[0]= 0;
-  for ( i= 0; i<nsprites; i++ )
-    sorder[i]= i,
-    sblocks[i]= sprites[i]>>1,
-    saccum[i+1]= saccum[i]+sprites[i];
+  for ( bulimit= 0; bulimit<nsprites; bulimit++ )
+    sorder[bulimit]= bulimit,
+    sblocks[bulimit]= sprites[bulimit]>>1,
+    saccum[bulimit+1]= saccum[bulimit]+sprites[bulimit];
   if( smooth ){
     ssprites-= sprites[--nsprites];
-    if( i==0x80)
-      --i;
+    --bulimit;
     blocks[0].len= (239-sprites[nsprites])>>1;
     blocks[0].addr= 0xff01+sprites[nsprites];
     mem[0xfefe]= 0x01;
@@ -85,8 +86,20 @@ int main(int argc, char *argv[]){
   else
     blocks[0].len= 239>>1,
     blocks[0].addr= 0xff01;
-  blocks[1].len= (0x23f8-stiles)>>1;
-  blocks[1].addr= 0x5c08+stiles;
+
+  if( bullet ){
+    fi= fopen("bullet.bin", "rb");
+    fread(bullets, 1, smooth ? 8 : 4, fi);
+    ssprites+= fread(sprites+(64<<smooth)+ssprites, 1, 0x200, fi);
+    fclose(fi);
+    nsprites= bulimit+(smooth ? 8 : 4);
+    for ( i= bulimit; i<nsprites; i++ )
+      sorder[i]= i,
+      sblocks[i]= bullets[i-bulimit]>>1,
+      saccum[i+1]= saccum[i]+bullets[i-bulimit];
+  }
+  blocks[1].len= (0x23f8-bullet*(8<<smooth)-stiles)>>1;
+  blocks[1].addr= 0x5c08+bullet*(8<<smooth)+stiles;
   blocks[2].len= (ssprites>>1)-blocks[0].len-blocks[1].len;
   stasp= blocks[2].len>0 ? stasp+(blocks[2].len<<1): stasp;
   blocks[2].addr= 0x10000-stasp;
@@ -95,8 +108,8 @@ int main(int argc, char *argv[]){
   mem[point]= 0xfffe-stasp&0xff;
   mem[point+1]= 0xfffe-stasp>>8;
   nblocks= blocks[2].len>0 ? 3 : 2;
-  while ( !sprites[--i] );
-  nsprites= ++i;
+//  while ( !sprites[--i] );
+//  nsprites= ++i;
   for ( i= 0; i < nblocks; i++ ){
     sum= blocks[i].len;
     for ( j= 0; j <= nsprites; j++ )
@@ -117,8 +130,12 @@ int main(int argc, char *argv[]){
         while ( !subset[j][k] ){
           if( j >= sblocks[k] ){
             j-= sblocks[k];
-            mem[0xfe00|sorder[k]<<1]= blocks[i].addr&0xff;
-            mem[0xfe01|sorder[k]<<1]= blocks[i].addr>>8;
+            if( sorder[k]<bulimit )
+              mem[0xfe00|sorder[k]<<1]= blocks[i].addr&0xff,
+              mem[0xfe01|sorder[k]<<1]= blocks[i].addr>>8;
+            else
+              mem[0x5c08+(sorder[k]-bulimit<<1)]= blocks[i].addr&0xff,
+              mem[0x5c09+(sorder[k]-bulimit<<1)]= blocks[i].addr>>8;
             for ( l= 0; l<sblocks[k]; l++ )
               mem[blocks[i].addr+(l<<1)]= sprites[saccum[sorder[k]]+64+smooth*64+(l<<1)],
               mem[blocks[i].addr+(l<<1)+1]= sprites[saccum[sorder[k]]+65+smooth*64+(l<<1)];
@@ -212,8 +229,10 @@ int main(int argc, char *argv[]){
               "        DEFINE  frame1  %d\n"
               "        DEFINE  bl2len  %d\n"
               "        DEFINE  stasp   %d\n"
-              "        DEFINE  notabl  %d\n", smooth, tmp, scode-2, scode1-2, scode2-2,
-              init0, init1, frame0, frame1, blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl);
+              "        DEFINE  notabl  %d\n"
+              "        DEFINE  bullet  %d\n",
+          smooth, tmp, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
+          blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet);
   fclose(fi);
   fi= fopen("defs.h", "wb+");
   fprintf(fi, "#define smooth %d\n"

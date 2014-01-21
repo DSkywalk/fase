@@ -30,7 +30,7 @@ call fase gfx
   fase.bat config.def readme.txt ^
   file1.bin file2.bin file3.bin file4.bin ^
   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
-  util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe^
+  util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe ^
   engine0.asm engine1.asm engine2.asm engine.asm loader.asm ^
   loading.png sprites.png tiles.png ^
   main.c fase.h

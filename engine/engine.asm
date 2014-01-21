@@ -17,7 +17,7 @@
         DEFINE  port    $5c01
         DEFINE  selbeg  $5c02
         DEFINE  selend  $5c03
-        DEFINE  tiladdr $5c08
+        DEFINE  tiladdr $5c08+bullet*(8<<smooth)
         DEFINE  sprites $fe00
       IF  smooth=0
         DEFINE  final   $fd00+(notabl<<8)
@@ -662,8 +662,6 @@ draw_sprites
         ld      bc, 0
         xor     a
 draw1   ld      (drawh+1&$ffff), a
-        add     a, a
-        add     a, a
         ld      l, a
         ld      h, enems >> 8
         ld      a, (hl)
@@ -965,8 +963,8 @@ drawg   ld      a, 0
         ld      (bc), a
         dec     c
 drawh   ld      a, 0
-        inc     a
-        cp      12
+        add     a, 4
+        cp      12<<2
         jp      nz, draw1
       IF  machine=1
         ld      (delete_sprites+1), bc

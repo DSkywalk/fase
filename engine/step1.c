@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 unsigned char *image, *pixel, output[0x10000];
-char tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey, notabl;
+char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
+      notabl, bullet;
 unsigned error, width, height, i, j, k, l, min, max, nmin, nmax, amin, amax,
           mask, pics, amask, apics, inipos, reppos, smooth, outpos, fondo, tinta;
 long long atr, celdas[4];
@@ -74,6 +75,8 @@ int main(int argc, char *argv[]){
       offsey= atoi(fou+6);
     else if( fou= (char *) strstr(tmpstr, "notabl") )
       notabl= atoi(fou+6);
+    else if( fou= (char *) strstr(tmpstr, "bullet") )
+      bullet= atoi(fou+6);
   }
   fclose(ft);
 
@@ -158,8 +161,10 @@ int main(int argc, char *argv[]){
               "        DEFINE  safehr %d\n"
               "        DEFINE  offsex %d\n"
               "        DEFINE  offsey %d\n"
-              "        DEFINE  notabl %d\n", tmode, pics, reppos, apics, smooth, clipup, clipdn,
-                                             cliphr, safevr, safehr, offsex, offsey, notabl);
+              "        DEFINE  notabl %d\n"
+              "        DEFINE  bullet %d\n",
+          tmode, pics, reppos, apics, smooth, clipup, clipdn, cliphr,
+          safevr, safehr, offsex, offsey, notabl, bullet);
   fclose(ft);
   printf("\nno index     %d bytes\n", pics*36);
   printf("index bitmap %d bytes\n", pics*5+reppos*32);
@@ -242,7 +247,7 @@ int main(int argc, char *argv[]){
         }
         else
           apics= pics,
-          amask= mask;
+          amask= mask,
           amin= min,
           amax= max;
       }
@@ -255,6 +260,70 @@ salir:
   output[(64<<smooth)-1]= outpos-inipos;
   fwrite(output, 1, outpos, fo);
   fclose(fo);
-  printf("Files tiles.bin and sprites.bin generated in STEP 1\n");
   free(image);
+
+// bullet
+
+  if( !bullet )
+    printf("Files tiles.bin and sprites.bin generated in STEP 1\n"),
+    exit(0);
+  inipos= 0;
+  outpos= 4<<smooth;
+  error= lodepng_decode32_file(&image, &width, &height, "bullet.png");
+  if( error )
+    printf("\nError %u: %s\n", error, lodepng_error_text(error)),
+    exit(-1);
+  fo= fopen("bullet.bin", "wb+");
+  if( !fo )
+    printf("\nCannot create bullet.bin\n"),
+    exit(-1);
+  for ( i= 0; i < 8; i+= 2-smooth ){
+    if( inipos )
+      output[(i>>(1-smooth))-1]= outpos-inipos;
+    output[inipos= outpos]= 0;
+    output[inipos+1]= 0xfc+offsey*8;
+    outpos+= 2;
+    nmin= nmax= 4;
+    for ( k= 0; k < 8; k++ ){
+      pics= mask= 0;
+      for ( l= 0; l < 8; l++ )
+        pics|= image[(k<<3 | l)<<2] ? 0 : 0x800000>>l+i;
+      for ( min= 0; min < 3 && !(pics&0xff<<(2-min<<3)); min++ );
+      for ( max= 3; max && !(pics&0xff<<(3-max<<3)); max-- );
+      if( k&1 ){
+        if( min>amin ) min= amin;
+        if( max<amax ) max= amax;
+        if( min<max ){
+          if( (nmin!=min) || (nmax!=max) )
+            output[reppos= outpos]= min+1-(nmin>2?0:nmin)<<1&6 | max-min-1,
+            outpos+= 2,
+            output[inipos]++,
+            output[reppos+1]= 0;
+          output[reppos+1]++;
+          for ( l= min; l < max; l++ )
+            output[outpos++]= apics>>(2-l<<3);
+          for ( l= max; l > min; l-- )
+            output[outpos++]= pics>>(3-l<<3);
+        }
+        else if( nmin==4 )
+          output[inipos+1]+= 2;
+        nmin= min;
+        nmax= max;
+      }
+      else
+        apics= pics,
+        amin= min,
+        amax= max;
+    }
+    if( (inipos+2)==outpos ){
+      outpos-= 2;
+      goto salgo;
+    }
+  }
+salgo:
+  output[(4<<smooth)-1]= outpos-inipos;
+  fwrite(output, 1, outpos, fo);
+  fclose(fo);
+  free(image);
+  printf("Files tiles.bin, sprites.bin and bullet.bin generated in STEP 1\n");
 }
