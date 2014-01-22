@@ -28,7 +28,7 @@
       MACRO updremove
         ld      a, h
         and     $07
-        jp      nz, .upd
+        jp      nz, .upd&$ffff
         ld      a, l
         sub     $20
         ld      l, a
@@ -493,9 +493,9 @@ delete_sprites
         ld      ixl, b
         inc     b
       IF smooth=0
-        jr      z, update_partial
+        jr      z, del7
       ELSE
-        jp      z, update_partial
+        jp      z, del7
       ENDIF
 del1    pop     hl
 del2    pop     bc
@@ -570,6 +570,72 @@ del6    ld      a, c
       ELSE
         jp      nz, del1
       ENDIF
+del7    pop     hl
+        inc     h
+      jp      z, update_partial&$ffff
+del8    pop     de
+        ld      (delf+1&$ffff), sp
+        dec     h
+        ld      sp, hl
+        ex      de, hl
+        pop     bc
+        ld      ixl, c
+del9    pop     bc
+        ld      a, c
+        rra
+        jr      nc, delc
+dela    and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+delb    pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+      IF smooth=1
+        updpaint
+      ENDIF
+        pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        dec     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        updpaint
+        djnz    delb
+        jr      dele
+delc    and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+deld    pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     h
+      IF smooth=1
+        updpaint
+      ENDIF
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        updpaint
+        djnz    deld
+dele    dec     ixl
+        jr      nz, del9
+delf    ld      sp, 0
+        pop     hl
+        inc     h
+      jp      nz, del8
 
 update_partial
       IF  machine=1
@@ -659,7 +725,155 @@ uppa5   ld      a, l
         jp      upba1
 
 draw_sprites
-        ld      bc, 0
+        ld      hl, 0
+        ld      (zrawg+1&$ffff), hl
+        ld      a, $31
+zraw1   ld      (zrawh+1&$ffff), a
+        ld      l, a
+        ld      h, enems >> 8
+        ld      a, (hl) ;y
+        cp      offsey<<3
+        jp      c, zrawh&$ffff
+        cp      scrh*16-7
+        jp      nc, zrawh&$ffff
+        dec     l
+        ld      a, (hl) ;x
+        cp      9 ; puede variar segun la bala
+        jp      c, zrawh&$ffff
+        cp      (scrw<<4)-8 ; puede variar segun la bala
+        jp      nc, zrawh&$ffff
+      IF smooth=0
+        and     $06
+      ELSE
+        and     $07
+        add     a, a
+      ENDIF
+        add     a, 8
+        ld      (zraw2+2&$ffff), a
+        ld      a, (hl) ;x
+        and     $f8
+        rra
+        rra
+        rra
+        ld      (zraw8+1&$ffff), a
+zraw2   ld      sp, ($5c00)
+        ld      (zrawf+1&$ffff), sp
+        pop     de
+        inc     l
+        ld      a, (hl) ;y
+      IF smooth=0
+        and     $fe
+      ENDIF
+zraw3   add     a, d
+zraw4
+    IF notabl=1
+        ld      l, a          ; A=L= RRrrrppp
+        rrca
+        rrca
+        rrca                  ; A= pppRRrrr
+        xor     l
+        and     %00011000
+        xor     l             ; A= RRrRRppp
+        and     %00011111
+        or      %01000000
+zraw6   ld      h, a
+        ld      a, l
+        rlca
+        rlca
+        and     $e0
+    ELSE
+        ld      (zraw5+1), a
+zraw5   ld      a, (lookt&$ffff)
+        ld      l, a          ; A=L= rrrRRppp
+        and     %00011111
+        ld      h, a          ;   H= 000RRppp
+        set     6, h
+        xor     l             ;   A= rrr00000
+    ENDIF
+zraw8   add     a, 0
+      IF  offsex != 1
+        add     a, offsex-1
+      ENDIF
+        ld      l, a
+      IF  machine=1
+        ld      a, (port)
+        or      h
+        ld      h, a
+      ENDIF
+
+      ld       (zrawff+1&$ffff), hl
+        ld      a, e
+zraw9   ex      af, af'
+        pop     bc
+        ld      a, c
+        rrca
+        jr      nc, zrawc
+zrawa   and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+zrawb   pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+      IF smooth=1
+        updpaint
+      ENDIF
+        pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        dec     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        updpaint
+        djnz    zrawb
+        jr      zrawe
+zrawc   and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+zrawd   pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     h
+      IF smooth=1
+        updpaint
+      ENDIF
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        updpaint
+        djnz    zrawd
+zrawe   ex      af, af'
+        dec     a
+        jp      nz, zraw9
+zrawg   ld      sp, 0
+zrawff  ld      hl, 0
+        push    hl
+zrawf   ld      hl, 0
+        push    hl
+        ld      (zrawg+1), sp
+zrawh   ld      a, 0
+        add     a, 2
+        cp      $41
+        jp      nz, zraw1
+        ld      hl, (zrawg+1)
+        ld      sp, hl
+        ld      bc, $fffe
+        push    bc
+        add     hl, bc
+        ld      b, h
+        ld      c, l
         xor     a
 draw1   ld      (drawh+1&$ffff), a
         ld      l, a
@@ -964,7 +1178,7 @@ drawg   ld      a, 0
         dec     c
 drawh   ld      a, 0
         add     a, 4
-        cp      12<<2
+      cp      8<<2
         jp      nz, draw1
       IF  machine=1
         ld      (delete_sprites+1), bc

@@ -8,7 +8,7 @@
         DEFINE  ramt  desc
       ENDIF
         display "----------------------------"
-        display /A,0x7e50-stasp-mainrw, " bytes free"
+        display /A,0x7d80-16-stasp-mainrw, " bytes free"
         display "____________________________"
         output  loader.bin
         org     $5b06+ini-prnbuf
@@ -101,7 +101,7 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
         call    desc
         ld      hl, $8040
         ld      de, $8000
-        ld      sp, 0xfd80-stasp
+        ld      sp, 0xfd80-16-stasp
         push    de
         ld      bc, mainrw
         ldir

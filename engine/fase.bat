@@ -10,9 +10,9 @@ rem  util\GenTmx 3 3 10 10 map.tmx
 )
 if "%1"=="config" (
 :cont
-  util\sjasmplus engine0.asm > nul
-  util\sjasmplus engine1.asm > nul
-  util\sjasmplus engine2.asm > nul
+  util\sjasmplus engine0.asm
+  util\sjasmplus engine1.asm
+  util\sjasmplus engine2.asm
   util\step2
   util\zx7b block.bin block.zx7
 )
