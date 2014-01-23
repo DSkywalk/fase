@@ -570,9 +570,15 @@ del6    ld      a, c
       ELSE
         jp      nz, del1
       ENDIF
-del7    pop     hl
+del7
+    IF bullet
+        pop     hl
         inc     h
-      jp      z, update_partial&$ffff
+      IF smooth=0
+        jr      z, update_partial&$ffff
+      ELSE
+        jp      z, update_partial&$ffff
+      ENDIF
 del8    pop     de
         ld      (delf+1&$ffff), sp
         dec     h
@@ -635,7 +641,12 @@ dele    dec     ixl
 delf    ld      sp, 0
         pop     hl
         inc     h
-      jp      nz, del8
+      IF smooth=0
+        jr      nz, del8
+      ELSE
+        jp      nz, del8
+      ENDIF
+    ENDIF
 
 update_partial
       IF  machine=1
@@ -725,6 +736,7 @@ uppa5   ld      a, l
         jp      upba1
 
 draw_sprites
+  IF bullet
         ld      hl, 0
         ld      (zrawg+1&$ffff), hl
         ld      a, $31
@@ -732,16 +744,19 @@ zraw1   ld      (zrawh+1&$ffff), a
         ld      l, a
         ld      h, enems >> 8
         ld      a, (hl) ;y
-        cp      offsey<<3
+        cp      bulmiy
         jp      c, zrawh&$ffff
-        cp      scrh*16-7
+        cp      bulmay+scrh*16-7
         jp      nc, zrawh&$ffff
         dec     l
         ld      a, (hl) ;x
-        cp      9 ; puede variar segun la bala
+        add     a, 4
+      IF safehr && !cliphr
+        cp      8
         jp      c, zrawh&$ffff
-        cp      (scrw<<4)-8 ; puede variar segun la bala
+        cp      (scrw<<4)+1
         jp      nc, zrawh&$ffff
+      ENDIF
       IF smooth=0
         and     $06
       ELSE
@@ -751,6 +766,7 @@ zraw1   ld      (zrawh+1&$ffff), a
         add     a, 8
         ld      (zraw2+2&$ffff), a
         ld      a, (hl) ;x
+        add     a, 4
         and     $f8
         rra
         rra
@@ -865,7 +881,7 @@ zrawf   ld      hl, 0
         ld      (zrawg+1), sp
 zrawh   ld      a, 0
         add     a, 2
-        cp      $41
+        cp      $31+bulmax*2
         jp      nz, zraw1
         ld      hl, (zrawg+1)
         ld      sp, hl
@@ -874,6 +890,9 @@ zrawh   ld      a, 0
         add     hl, bc
         ld      b, h
         ld      c, l
+  ELSE
+        ld      bc, 0
+  ENDIF
         xor     a
 draw1   ld      (drawh+1&$ffff), a
         ld      l, a
@@ -1178,7 +1197,7 @@ drawg   ld      a, 0
         dec     c
 drawh   ld      a, 0
         add     a, 4
-      cp      8<<2
+        cp      sprmax<<2
         jp      nz, draw1
       IF  machine=1
         ld      (delete_sprites+1), bc

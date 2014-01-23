@@ -3,7 +3,7 @@
 #include <stdlib.h>
 unsigned char *image, *pixel, output[0x10000];
 char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
-      notabl, bullet;
+      notabl, bullet, bulmax, sprmax;
 unsigned error, width, height, i, j, k, l, min, max, nmin, nmax, amin, amax,
           mask, pics, amask, apics, inipos, reppos, smooth, outpos, fondo, tinta;
 long long atr, celdas[4];
@@ -77,6 +77,10 @@ int main(int argc, char *argv[]){
       notabl= atoi(fou+6);
     else if( fou= (char *) strstr(tmpstr, "bullet") )
       bullet= atoi(fou+6);
+    else if( fou= (char *) strstr(tmpstr, "bulmax") )
+      bulmax= atoi(fou+6);
+    else if( fou= (char *) strstr(tmpstr, "sprmax") )
+      sprmax= atoi(fou+6);
   }
   fclose(ft);
 
@@ -162,9 +166,11 @@ int main(int argc, char *argv[]){
               "        DEFINE  offsex %d\n"
               "        DEFINE  offsey %d\n"
               "        DEFINE  notabl %d\n"
-              "        DEFINE  bullet %d\n",
+              "        DEFINE  bullet %d\n"
+              "        DEFINE  bulmax %d\n"
+              "        DEFINE  sprmax %d\n",
           tmode, pics, reppos, apics, smooth, clipup, clipdn, cliphr,
-          safevr, safehr, offsex, offsey, notabl, bullet);
+          safevr, safehr, offsex, offsey, notabl, bullet, bulmax, sprmax);
   fclose(ft);
   printf("\nno index     %d bytes\n", pics*36);
   printf("index bitmap %d bytes\n", pics*5+reppos*32);
@@ -284,8 +290,8 @@ salir:
     output[inipos+1]= 0xfc+offsey*8;
     outpos+= 2;
     nmin= nmax= 4;
-    for ( k= 0; k < 8; k++ ){
-      pics= mask= 0;
+    for ( mask= k= 0; k < 8; k++ ){
+      pics= 0;
       for ( l= 0; l < 8; l++ )
         pics|= image[(k<<3 | l)<<2] ? 0 : 0x800000>>l+i;
       for ( min= 0; min < 3 && !(pics&0xff<<(2-min<<3)); min++ );
@@ -299,6 +305,7 @@ salir:
             outpos+= 2,
             output[inipos]++,
             output[reppos+1]= 0;
+          mask++;
           output[reppos+1]++;
           for ( l= min; l < max; l++ )
             output[outpos++]= apics>>(2-l<<3);
@@ -321,6 +328,12 @@ salir:
     }
   }
 salgo:
+  ft= fopen("define.asm", "a");
+  fseek(ft, 0, SEEK_END);
+  fprintf(ft, "        DEFINE  bulmiy %d\n"
+              "        DEFINE  bulmay %d\n",  0x100+offsey*8-output[inipos+1],
+                                              output[inipos+1]-0xfc-offsey*8+(mask<<1));
+  fclose(ft);
   output[(4<<smooth)-1]= outpos-inipos;
   fwrite(output, 1, outpos, fo);
   fclose(fo);
