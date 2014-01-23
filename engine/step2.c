@@ -4,7 +4,7 @@ FILE *fi, *fi2;
 unsigned char mem[0x10000], sprites[0x8000], bullets[8], sblocks[0x89], sorder[0x89], subset[0x1200][0x89];
 char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet;
 unsigned  saccum[0x89], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites,
-          notabl, nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp;
+          notabl, nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, blen;
 int i, j, k, l, bulimit;
 struct {
   int len;
@@ -102,16 +102,11 @@ int main(int argc, char *argv[]){
   blocks[1].addr= 0x5c08+bullet*(8<<smooth)+stiles;
   blocks[2].len= (ssprites>>1)-blocks[0].len-blocks[1].len;
   stasp= blocks[2].len>0 ? stasp+(blocks[2].len<<1): stasp;
-  blocks[2].addr= 0x10000-stasp;
-  mem[0xffff-stasp]= 0xff;
-  mem[0xfffe-stasp]= 0xff;
-  mem[point]= 0xfffe-stasp&0xff;
-  mem[point+1]= 0xfffe-stasp>>8;
   nblocks= blocks[2].len>0 ? 3 : 2;
-//  while ( !sprites[--i] );
-//  nsprites= ++i;
   for ( i= 0; i < nblocks; i++ ){
-    sum= blocks[i].len;
+    if( i==nblocks-1 )
+      blocks[2].addr= 0x10000-stasp;
+    blen= sum= blocks[i].len;
     for ( j= 0; j <= nsprites; j++ )
       subset[0][j] = 1;
     for ( j= 1; j <= sum; j++ )
@@ -130,6 +125,7 @@ int main(int argc, char *argv[]){
         while ( !subset[j][k] ){
           if( j >= sblocks[k] ){
             j-= sblocks[k];
+            blen-= sblocks[k];
             if( sorder[k]<bulimit )
               mem[0xfe00|sorder[k]<<1]= blocks[i].addr&0xff,
               mem[0xfe01|sorder[k]<<1]= blocks[i].addr>>8;
@@ -151,9 +147,14 @@ int main(int argc, char *argv[]){
             k--;
         }
     nsprites= nnsprites;
+    if( blen )
+      stasp+= blen<<1,
+      blocks[nblocks-1].len+= blen;
   }
-  mem[0x4000]= 0x00;
-  mem[0x4001]= 0x80;
+  mem[0xffff-stasp]= 0xff;
+  mem[0xfffe-stasp]= 0xff;
+  mem[point]= 0xfffe-stasp&0xff;
+  mem[point+1]= 0xfffe-stasp>>8;
   fclose(fi);
   fi= fopen("map_compressed.bin", "rb");
   fseek(fi, 0, SEEK_END);
