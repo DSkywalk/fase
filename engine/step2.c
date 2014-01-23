@@ -2,9 +2,9 @@
 #include <stdlib.h>
 FILE *fi, *fi2;
 unsigned char mem[0x10000], sprites[0x8000], bullets[8], sblocks[0x89], sorder[0x89], subset[0x1200][0x89];
-char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet;
+char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet, bulmax, sprmax;
 unsigned  saccum[0x89], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites,
-          notabl, nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, blen;
+          tmpbuf, notabl, nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, blen;
 int i, j, k, l, bulimit;
 struct {
   int len;
@@ -48,6 +48,10 @@ int main(int argc, char *argv[]){
       notabl= atoi(fou+6)<<8;
     else if( fou= (char *) strstr(tmpstr, "bullet") )
       bullet= atoi(fou+6);
+    else if( fou= (char *) strstr(tmpstr, "bulmax") )
+      bulmax= atoi(fou+6);
+    else if( fou= (char *) strstr(tmpstr, "sprmax") )
+      sprmax= atoi(fou+6);
   }
   fclose(fi);
   fi= fopen("defmap.asm", "r");
@@ -63,6 +67,18 @@ int main(int argc, char *argv[]){
       maph= atoi(fou+6);
   }
   fclose(fi);
+  l= 64<<smooth;
+  for ( sum= tmpbuf= i= 0; i < 64<<smooth; i++ ){
+    sum= sprites[i]+2;
+    k= sprites[l];
+    l+= 2;
+    for ( j= 0; j<k; j++ )
+      sum-= sprites[l+1]*((sprites[l]&12)==12?3:sprites[l]+4>>2)*2,
+      l+= 2+sprites[l+1]*((sprites[l]&12)==12?3:sprites[l]+4>>2)*4;
+    if( tmpbuf<sum )
+      tmpbuf= sum;
+  }
+  tmpbuf= tmpbuf*sprmax+bulmax*4+2;
   fi= fopen("tiles.bin", "rb");
   stiles= fread(mem+0x5c08+bullet*(8<<smooth), 1, 0x23f8-bullet*(8<<smooth), fi);
   fclose(fi);
@@ -86,7 +102,6 @@ int main(int argc, char *argv[]){
   else
     blocks[0].len= 239>>1,
     blocks[0].addr= 0xff01;
-
   if( bullet ){
     fi= fopen("bullet.bin", "rb");
     fread(bullets, 1, smooth ? 8 : 4, fi);
@@ -231,9 +246,10 @@ int main(int argc, char *argv[]){
               "        DEFINE  bl2len  %d\n"
               "        DEFINE  stasp   %d\n"
               "        DEFINE  notabl  %d\n"
-              "        DEFINE  bullet  %d\n",
+              "        DEFINE  bullet  %d\n"
+              "        DEFINE  tmpbuf  %d\n",
           smooth, tmp, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
-          blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet);
+          blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet, tmpbuf);
   fclose(fi);
   fi= fopen("defs.h", "wb+");
   fprintf(fi, "#define smooth %d\n"
@@ -241,7 +257,7 @@ int main(int argc, char *argv[]){
               "#define scrw   %d\n"
               "#define scrh   %d\n"
               "#define mapw   %d\n"
-              "#define maph   %d\n", smooth, 0xfd80-16-stasp, scrw, scrh, mapw, maph);
+              "#define maph   %d\n", smooth, 0x10000-tmpbuf-stasp, scrw, scrh, mapw, maph);
   fclose(fi);
   printf("\nFile block.bin generated in STEP 2\n");
 }
