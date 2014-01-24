@@ -73,8 +73,8 @@ int main(int argc, char *argv[]){
     k= sprites[l];
     l+= 2;
     for ( j= 0; j<k; j++ )
-      sum-= sprites[l+1]*((sprites[l]&12)==12?3:sprites[l]+4>>2)*2,
-      l+= 2+sprites[l+1]*((sprites[l]&12)==12?3:sprites[l]+4>>2)*4;
+      sum-= sprites[l+1]*(sprites[l]&12?sprites[l]>>2:2)*2,
+      l+= 2+sprites[l+1]*(sprites[l]&12?sprites[l]>>2:2)*4;
     if( tmpbuf<sum )
       tmpbuf= sum;
   }

@@ -501,8 +501,8 @@ del1    pop     hl
 del2    pop     bc
         ld      a, c
         and     %00001100
-        jr      z, del5
-        jp      po, del4
+        jr      z, del4
+        jp      po, del5
 del3    updremove
         pop     de
         dec     h
@@ -1054,12 +1054,8 @@ draw9   ex      af, af'
         ld      l, a
         ld      a, e
         and     %00001100
-      IF smooth=0
-        jr      z, drawc
-      ELSE
-        jp      z, drawc&$ffff
-      ENDIF
-        jp      po, drawb&$ffff
+        jr      z, drawb
+        jp      po, drawc&$ffff
 drawa   pop     de
         ld      a, (hl)
         dec     bc
@@ -1282,8 +1278,8 @@ braw3   ex      af, af'
         ld      e, a
         ld      a, c
         and     %00001100
-        jr      z, braw6
-        jp      po, braw5&$ffff
+        jr      z, braw5
+        jp      po, braw6&$ffff
 braw4   ld      hl, 12
         add     hl, sp
         ld      sp, hl
@@ -1323,8 +1319,8 @@ braw9   ld      ixl, b
         ld      a, c
 brawa   ld      bc, 0
         and     %00001100
-        jp      z, drawc
-        jp      po, drawb
+        jp      z, drawb
+        jp      po, drawc
         jp      drawa
 braw8
       IF offsey&7
@@ -1401,8 +1397,8 @@ craw3   ex      af, af'
         ld      l, a
         ld      a, e
         and     %00001100
-        jp      z, craw6&$ffff
-        jp      po, craw5&$ffff
+        jr      z, craw5
+        jp      po, craw6&$ffff
 craw4   pop     de
         ld      a, (hl)
         dec     bc

@@ -234,7 +234,7 @@ int main(int argc, char *argv[]){
           if( max<amax ) max= amax;
           if( min<max ){
             if( (nmin!=min) || (nmax!=max) )
-              output[reppos= outpos]= min+1-(nmin>2?0:nmin)&3 | (max-min==3?3:max-min-1)<<2,
+              output[reppos= outpos]= min+1-(nmin>2?0:nmin)&3 | (max-min==2?0:max-min)<<2,
               outpos+= 2,
               output[inipos]++,
               output[reppos+1]= 0;
