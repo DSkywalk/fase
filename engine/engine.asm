@@ -495,14 +495,60 @@ delete_sprites
       IF smooth=0
         jr      z, del7
       ELSE
-        jp      z, del7
+        jp      z, del7&$ffff
       ENDIF
 del1    pop     hl
 del2    pop     bc
         ld      a, c
+      IF smooth
+        bit     0, h
+        jp      z, del25
         and     %00001100
+        jr      z, wel4
+        jp      po, wel5
+wel3    pop     de
+        dec     h
+        ld      (hl), e
+        inc     l
+        ld      (hl), d
+        inc     l
+        pop     de
+        ld      (hl), e
+        updremove
+        dec     h
+        ld      (hl), d
+        dec     l
+        pop     de
+        ld      (hl), e
+        dec     l
+        ld      (hl), d
+        djnz    wel3
+        jp      del6&$ffff
+wel4    pop     de
+        dec     h
+        ld      (hl), e
+        inc     l
+        ld      (hl), d
+        updremove
+        dec     h
+        pop     de
+        ld      (hl), e
+        dec     l
+        ld      (hl), d
+        djnz    wel4
+        jr      del6
+wel5    pop     de
+        dec     h
+        ld      (hl), e
+        updremove
+        dec     h
+        ld      (hl), d
+        djnz    wel5
+        jr      del6
+      ENDIF
+del25   and     %00001100
         jr      z, del4
-        jp      po, del5
+        jp      po, del5&$ffff
 del3    updremove
         pop     de
         dec     h
@@ -512,9 +558,6 @@ del3    updremove
         inc     l
         pop     de
         ld      (hl), e
-      IF smooth=1
-        updremove
-      ENDIF
         dec     h
         ld      (hl), d
         dec     l
@@ -530,9 +573,6 @@ del4    updremove
         ld      (hl), e
         inc     l
         ld      (hl), d
-      IF smooth=1
-        updremove
-      ENDIF
         dec     h
         pop     de
         ld      (hl), e
@@ -544,9 +584,6 @@ del5    updremove
         pop     de
         dec     h
         ld      (hl), e
-      IF smooth=1
-        updremove
-      ENDIF
         dec     h
         ld      (hl), d
         djnz    del5
@@ -1042,6 +1079,133 @@ draw8   add     a, 0
       ENDIF
         ld      a, e
         ld      (drawg+1&$ffff), a
+draw85
+    IF smooth=1
+        bit     0, h
+        jp      z, draw9&$ffff
+        ex      af, af'
+        pop     de
+        ld      ixl, d
+        ld      iyh, d
+        ld      iyl, e
+        ld      a, e
+        and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+        ld      a, e
+wraw95  and     %00001100
+        jr      z, wrawb
+        jp      po, wrawc&$ffff
+wrawa   pop     de
+        ld      a, (hl)
+        dec     bc
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     l
+        pop     de
+        ld      a, (hl)
+        dec     c
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     l
+        pop     de
+        ld      a, (hl)
+        dec     bc
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     h
+        updpaint
+        pop     de
+        ld      a, (hl)
+        dec     c
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        dec     l
+        pop     de
+        ld      a, (hl)
+        dec     bc
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        dec     l
+        pop     de
+        ld      a, (hl)
+        dec     c
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     h
+        dec     ixl
+        jr      nz, wrawa
+        jp      drawd&$ffff
+wrawb   pop     de
+        ld      a, (hl)
+        dec     bc
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     l
+        pop     de
+        ld      a, (hl)
+        dec     c
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     h
+        updpaint
+        pop     de
+        ld      a, (hl)
+        dec     bc
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        dec     l
+        pop     de
+        ld      a, (hl)
+        dec     c
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     h
+        dec     ixl
+        jr      nz, wrawb
+        jp      drawd&$ffff
+wrawc   pop     de
+        ld      a, (hl)
+        dec     bc
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     h
+        updpaint
+        pop     de
+        ld      a, (hl)
+        dec     c
+        ld      (bc), a
+        and     d
+        or      e
+        ld      (hl), a
+        inc     h
+        dec     ixl
+        jr      nz, wrawc
+        jp      drawd&$ffff
+    ENDIF
 draw9   ex      af, af'
         pop     de
         ld      ixl, d
@@ -1053,7 +1217,7 @@ draw9   ex      af, af'
         dec     a
         ld      l, a
         ld      a, e
-        and     %00001100
+draw95  and     %00001100
         jr      z, drawb
         jp      po, drawc&$ffff
 drawa   pop     de
@@ -1080,9 +1244,6 @@ drawa   pop     de
         or      e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updpaint
-      ENDIF
         pop     de
         ld      a, (hl)
         dec     c
@@ -1127,9 +1288,6 @@ drawb   pop     de
         or      e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updpaint
-      ENDIF
         pop     de
         ld      a, (hl)
         dec     bc
@@ -1158,9 +1316,6 @@ drawc   pop     de
         or      e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updpaint
-      ENDIF
         pop     de
         ld      a, (hl)
         dec     c
@@ -1180,7 +1335,7 @@ drawe   dec     bc
         ld      (bc), a
         ex      af, af'
         dec     a
-        jp      nz, draw9
+        jp      nz, draw85
 drawf   ld      a, h
         dec     bc
         ld      (bc), a
@@ -1318,10 +1473,11 @@ braw9   ld      ixl, b
         ex      af, af'
         ld      a, c
 brawa   ld      bc, 0
-        and     %00001100
-        jp      z, drawb
-        jp      po, drawc
-        jp      drawa
+      IF smooth
+        bit     0, h
+        jp      nz, wraw95
+      ENDIF
+        jp      draw95
 braw8
       IF offsey&7
         ld      hl, $f820
@@ -1337,7 +1493,7 @@ braw8
         ex      af, af'
         dec     a
         ld      (drawg+1), a
-        jp      nz, draw9
+        jp      nz, draw85
         jp      drawh
     ENDIF
 
