@@ -17,7 +17,7 @@ if "%1"=="config" (
   util\zx7b block.bin block.zx7
 )
 echo.
-rem sdcc -mz80 --no-std-crt0 --code-loc 0x8000 main.c
+sdcc -mz80 --no-std-crt0 --code-loc 0x8000 --data-loc 0xa000 main.c
 echo File main.bin compiled from main.c
 util\hex2bin -p 00 main.ihx > nul
 util\zx7b main.bin main.zx7

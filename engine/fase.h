@@ -3,9 +3,7 @@
 #define FRAME \
     __asm               \
         push    ix      \
-        push    bc      \
         call    0xfff1  \
-        pop     bc      \
         pop     ix      \
     __endasm;
 #define dzx7b(src, dst) \
