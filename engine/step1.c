@@ -4,8 +4,9 @@
 unsigned char *image, *pixel, output[0x10000];
 char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
       notabl, bullet, bulmax, sprmax;
-unsigned error, width, height, i, j, k, l, min, max, nmin, nmax, amin, amax,
-          mask, pics, amask, apics, inipos, reppos, smooth, outpos, fondo, tinta;
+unsigned error, width, height, i, j, l, min, max, nmin, nmax, amin, amax,
+          mask, pics, amask, apics, inipos, iniposback, reppos, smooth, outpos, fondo, tinta;
+int k;
 long long atr, celdas[4];
 FILE *fo, *ft;
 
@@ -216,8 +217,6 @@ int main(int argc, char *argv[]){
     exit(-1);
   for ( i= 0; i < 16; i++ )
     for ( j= 0; j < 8; j+= 2-smooth ){
-      if( inipos )
-        output[((j|i<<3)>>(1-smooth))-1]= outpos-inipos;
       output[inipos= outpos]= 0;
       output[inipos+1]= 0xf8+offsey*8;
       outpos+= 2;
@@ -257,13 +256,61 @@ int main(int argc, char *argv[]){
           amin= min,
           amax= max;
       }
-      if( (inipos+2)==outpos ){
-        outpos-= 2;
-        goto salir;
+      if( smooth ){
+        iniposback= inipos;
+        output[inipos= outpos]= 0;
+        output[inipos+1]= 0xf8+offsey*8-1;
+        outpos+= 2;
+        nmin= nmax= 4;
+        for ( k= -1; k < 17; k++ ){
+          pics= mask= 0;
+          if( k>-1 && k<16 )
+            for ( l= 0; l < 16; l++ )
+              pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l+j : 0,
+              mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l+j;
+          for ( min= 0; min < 3 && !(mask&0xff<<(2-min<<3)); min++ );
+          for ( max= 3; max && !(mask&0xff<<(3-max<<3)); max-- );
+          if( ~k&1 ){
+            if( min>amin ) min= amin;
+            if( max<amax ) max= amax;
+            if( min<max ){
+              if( (nmin!=min) || (nmax!=max) )
+                output[reppos= outpos]= min+1-(nmin>2?0:nmin)&3 | (max-min==2?0:max-min)<<2,
+                outpos+= 2,
+                output[inipos]++,
+                output[reppos+1]= 0;
+              output[reppos+1]++;
+              for ( l= min; l < max; l++ )
+                output[outpos++]= apics>>(2-l<<3),
+                output[outpos++]= amask>>(2-l<<3)^0xff;
+              for ( l= max; l > min; l-- )
+                output[outpos++]= pics>>(3-l<<3),
+                output[outpos++]= mask>>(3-l<<3)^0xff;
+            }
+            else if( nmin==4 )
+              output[inipos+1]+= 2;
+            nmin= min;
+            nmax= max;
+          }
+          else
+            apics= pics,
+            amask= mask,
+            amin= min,
+            amax= max;
+        }
+        if( inipos-iniposback<=outpos-inipos )
+          output[(j|i<<3)>>1-smooth]= inipos-iniposback,
+          outpos= inipos;
+        else{
+          output[(j|i<<3)>>1-smooth]= outpos-inipos;
+          for ( l= iniposback; l<inipos; l++ )
+            output[l]= output[l+inipos-iniposback];
+          outpos-= inipos-iniposback;
+        }
       }
+      else
+        output[(j|i<<3)>>1-smooth]= outpos-inipos;
     }
-salir:
-  output[(64<<smooth)-1]= outpos-inipos;
   fwrite(output, 1, outpos, fo);
   fclose(fo);
   free(image);
@@ -284,8 +331,6 @@ salir:
     printf("\nCannot create bullet.bin\n"),
     exit(-1);
   for ( i= 0; i < 8; i+= 2-smooth ){
-    if( inipos )
-      output[(i>>(1-smooth))-1]= outpos-inipos;
     output[inipos= outpos]= 0;
     output[inipos+1]= 0xfc+offsey*8;
     outpos+= 2;
@@ -322,19 +367,14 @@ salir:
         amin= min,
         amax= max;
     }
-    if( (inipos+2)==outpos ){
-      outpos-= 2;
-      goto salgo;
-    }
+    output[i>>1-smooth]= outpos-inipos;
   }
-salgo:
   ft= fopen("define.asm", "a");
   fseek(ft, 0, SEEK_END);
   fprintf(ft, "        DEFINE  bulmiy %d\n"
               "        DEFINE  bulmay %d\n",  0x100+offsey*8-output[inipos+1],
                                               output[inipos+1]-0xfc-offsey*8+(mask<<1));
   fclose(ft);
-  output[(4<<smooth)-1]= outpos-inipos;
   fwrite(output, 1, outpos, fo);
   fclose(fo);
   free(image);

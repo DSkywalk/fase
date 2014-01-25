@@ -26,7 +26,7 @@ util\SjAsmPlus dzx7b_rcs0.asm
 util\SjAsmPlus dzx7b_rcs1.asm
 util\SjAsmPlus dzx7b_rcs2.asm
 call fase gfx
-%z7z% a ..\FASE.0.13.zip ^
+%z7z% a ..\FASE.0.99.zip ^
   fase.bat config.def readme.txt ^
   file1.bin file2.bin file3.bin file4.bin ^
   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
