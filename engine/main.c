@@ -7,14 +7,11 @@ const unsigned char data[20]= {
   0x0a, 0x22, 0x02, 1+2*4,
   0x0b, 0x50, 0x6e, 2+1*4};
 
-char dirbul[4], num_bullets= 0;
-
+char i, j, x= 0, y= 0, spacepressed= 0, dirbul[4], num_bullets= 0;
 void remove_bullet( char k );
+void update_screen();
 
 main(){
-
-  // variables
-  int i, x= 0, y= 0, spacepressed= 0;
 
   // inicializar engine
   INIT;
@@ -34,28 +31,34 @@ main(){
     FRAME;
 
     // movimiento de los enemigos
-    for ( i = 1; i < 5; i++ ){
-      if( sprites[i][3]&1 )
-        if( sprites[i][2]>0 )
-          sprites[i][2]--;
+    for ( i = 1; i < 5; i++ )
+      if( sprites[i][0]<0x80 ){
+        for ( j= 0; j < num_bullets; j++ )
+          if( ( (sprites[i][1]<bullets[j][0]?bullets[j][0]-sprites[i][1]:sprites[i][1]-bullets[j][0])
+              + (sprites[i][2]<bullets[j][1]?bullets[j][1]-sprites[i][2]:sprites[i][2]-bullets[j][1]))<10 )
+            sprites[i][0]-= 0x80,
+            remove_bullet( j );
+        if( sprites[i][3]&1 )
+          if( sprites[i][2]>0 )
+            sprites[i][2]--;
+          else
+            sprites[i][3]^= 1;
         else
-          sprites[i][3]^= 1;
-      else
-        if( sprites[i][2]<scrh*16 )
-          sprites[i][2]++;
+          if( sprites[i][2]<scrh*16 )
+            sprites[i][2]++;
+          else
+            sprites[i][3]^= 1;
+        if( sprites[i][3]&2 )
+          if( sprites[i][1]>0 )
+            sprites[i][1]--;
+          else
+            sprites[i][3]^= 2;
         else
-          sprites[i][3]^= 1;
-      if( sprites[i][3]&2 )
-        if( sprites[i][1]>0 )
-          sprites[i][1]--;
-        else
-          sprites[i][3]^= 2;
-      else
-        if( sprites[i][1]<scrw*16 )
-          sprites[i][1]++;
-        else
-          sprites[i][3]^= 2;
-    }
+          if( sprites[i][1]<scrw*16 )
+            sprites[i][1]++;
+          else
+            sprites[i][3]^= 2;
+      }
 
     // movimiento de las balas
     for ( i = 0; i < num_bullets; i++ ){
@@ -95,28 +98,32 @@ main(){
         sprites[0][1]++;
       else if( x < mapw-1 )
         sprites[0][1]= 0,
-        screen= y*mapw + ++x;
+        x++,
+        update_screen();
     }
     else if( ~KeybYUIOP & 0x02 ){ // O
       if( sprites[0][1]>0 )
         sprites[0][1]--;
       else if( x )
         sprites[0][1]= scrw*16,
-        screen= y*mapw + --x;
+        x--,
+        update_screen();
     }
     if( ~KeybGFDSA & 0x01 ){ // A
       if( sprites[0][2]<scrh*16 )
         sprites[0][2]++;
       else if( y < maph-1 )
         sprites[0][2]= 0,
-        screen= ++y*mapw + x;
+        y++,
+        update_screen();
     }
     else if( ~KeybTREWQ & 0x01 ){ // Q
       if( sprites[0][2]>0 )
         sprites[0][2]--;
       else if( y )
         sprites[0][2]= scrh*16,
-        screen= --y*mapw + x;
+        y--,
+        update_screen();
     }
     if( ~KeybBNMs_ & 0x01 && !spacepressed && num_bullets<4 ){ // Space
       bullets[num_bullets][0]= sprites[0][1];
@@ -130,11 +137,17 @@ main(){
 }
 
 void remove_bullet( char k ){
-  char j;
   num_bullets--;
-  for ( j= k; j < num_bullets; j++ )
-    dirbul[j]= dirbul[j+1],
-    bullets[j][0]= bullets[j+1][0],
-    bullets[j][1]= bullets[j+1][1];
-  bullets[j][1]= 255;
+  while ( k<num_bullets )
+    dirbul[k]= dirbul[k+1],
+    bullets[k][0]= bullets[k+1][0],
+    bullets[k][1]= bullets[++k][1];
+  bullets[k][1]= 255;
+}
+
+void update_screen(){
+  screen= y*mapw + x;
+  for ( j= 1; j < 5; j++ )
+    if( sprites[j][0]>0x7f )
+      sprites[j][0]-= 0x80;
 }

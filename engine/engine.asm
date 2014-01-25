@@ -1933,14 +1933,14 @@ mapend
 lookt   incbin  file1.bin
       ENDIF
         block   $fe80-$&$ffff
-        incbin  file2.bin
+        block   $7f
         defb    $ff
     ELSE
       IF notabl=0
-        incbin  file3.bin
+        block   $7f
 lookt   incbin  file1.bin
       ELSE
-        incbin  file4.bin
+        block   $7f
       ENDIF
     ENDIF
         block   $ff00-$&$ffff

@@ -109,12 +109,5 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
 fin
 screen  incbin  loading.zx7
 descom  
-    IF  smooth=0
-        incbin  file2.bin
-    ELSE
-      IF notabl=0
-        incbin  file3.bin
-      ELSE
-        incbin  file4.bin
-      ENDIF
-    ENDIF
+        org     desc
+        include dzx7b_rcs.asm
