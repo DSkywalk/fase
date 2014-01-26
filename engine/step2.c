@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
   fread(&point, 1, 2, fi);
   fseek(fi, (scode&1)+2, SEEK_SET);
   scode&= 0xfffe;
-  fread(mem+0x10002-scode, 1, 0x1000, fi);
+  fread(mem+0x10002-scode, 1, 0x2000, fi);
   fclose(fi);
   init0= mem[0xfffd] | mem[0xfffe]<<8;
   frame0= mem[0xfff2] | mem[0xfff3]<<8;
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]){
   fread(&point, 1, 2, fi2);
   fseek(fi2, (scode1&1)+2, SEEK_SET);
   scode1&= 0xfffe;
-  fread(mem+0x10002-scode1, 1, 0x1000, fi2);
+  fread(mem+0x10002-scode1, 1, 0x2000, fi2);
   fclose(fi2);
   init1= mem[0xfffd] | mem[0xfffe]<<8;
   frame1= mem[0xfff2] | mem[0xfff3]<<8;
@@ -218,7 +218,7 @@ int main(int argc, char *argv[]){
   fread(&point, 1, 2, fi2);
   fseek(fi2, (scode2&1)+2, SEEK_SET);
   scode2&= 0xfffe;
-  fread(mem+0x10002-scode2, 1, 0x1000, fi2);
+  fread(mem+0x10002-scode2, 1, 0x2000, fi2);
   fclose(fi2);
   mem[point]= 0xfffe-stasp&0xff;
   mem[point+1]= 0xfffe-stasp>>8;
