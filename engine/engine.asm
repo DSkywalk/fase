@@ -25,6 +25,34 @@
         DEFINE  final   $fc81+(notabl<<8)
       ENDIF
 
+  MACRO multsub first, second
+    IF  data & first
+        add     hl, hl
+      IF  data & second
+        add     hl, de
+      ENDIF
+    ENDIF
+  ENDM
+
+  MACRO mult8x8 data
+    IF  data = 0
+        ld      hl, 0
+    ELSE
+        ld      h, 0
+        ld      l, e
+      IF  data != 1 && data != 2 && data != 4 && data != 8 && data != 16 && data != 32 && data != 64 && data != 128
+        ld      d, h
+      ENDIF
+        multsub %10000000, %01000000
+        multsub %11000000, %00100000
+        multsub %11100000, %00010000
+        multsub %11110000, %00001000
+        multsub %11111000, %00000100
+        multsub %11111100, %00000010
+        multsub %11111110, %00000001
+    ENDIF
+  ENDM
+
       MACRO updremove
         ld      a, h
         and     $07
@@ -307,7 +335,13 @@ desca   ld      a, b            ; save b (byte reading) on a
         pop     hl              ; restore source address (compressed data)
         ld      b, a            ; restore b register
         jr      desc5           ; jump to main loop
-descb   ld      a, scrh
+descb IF  tmode=3
+        ld      a, mapbuf-1&$ff
+      ELSE
+        ld      a, mapbuf&$ff
+      ENDIF
+        ld      (upba15+1), a
+        ld      a, scrh
         ld      (upba2-1), a
         ld      a, scrw
         ld      (upba3-1), a
@@ -327,10 +361,10 @@ upba1
       ENDIF
         exx
       IF  tmode=3
-        ld      a, mapbuf-1&$ff
+upba15  ld      a, 0
         ld      (upba4+1), a
       ELSE
-        ld      bc, mapbuf
+upba15  ld      bc, mapbuf&$ff00
       ENDIF
         ld      a, 0
 upba2   ex      af, af'
@@ -742,6 +776,23 @@ uppa5   ld      a, l
         inc     a
         ld      (upba2-1), a
         ld      a, c            ; A= yyyyxxxx
+        rlca
+        rlca
+        rlca
+        rlca
+        and     %00001111
+        ld      e, a
+        mult8x8 scrw
+        ld      a, c
+        and     %00001111
+        add     a, l
+      IF  tmode=3
+        add     a, mapbuf-1&$ff
+      ELSE
+        add     a, mapbuf&$ff
+      ENDIF
+        ld      (upba15+1), a
+        ld      a, c
         and     $f0             ; A= yyyy0000
       IF  offsey>0
         add     a, offsey<<3

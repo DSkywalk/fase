@@ -8,6 +8,7 @@ const unsigned char data[20]= {
   0x0b, 0x50, 0x6e, 2+1*4};
 
 char i, j, x= 0, y= 0, spacepressed= 0, dirbul[4], num_bullets= 0;
+unsigned char tmpx, tmpy;
 void remove_bullet( char k );
 void update_screen();
 
@@ -37,7 +38,11 @@ main(){
           if( ( (sprites[i][1]<bullets[j][0]?bullets[j][0]-sprites[i][1]:sprites[i][1]-bullets[j][0])
               + (sprites[i][2]<bullets[j][1]?bullets[j][1]-sprites[i][2]:sprites[i][2]-bullets[j][1]))<10 )
             sprites[i][0]-= 0x80,
-            remove_bullet( j );
+            remove_bullet( j ),
+            tmpx= sprites[i][1]>>4,
+            tmpy= sprites[i][2]>>4,
+            tiles[tmpy*scrw+tmpx]= 68,
+            tilepaint(tmpx, tmpy, tmpx, tmpy);
         if( sprites[i][3]&1 )
           if( sprites[i][2]>0 )
             sprites[i][2]--;
