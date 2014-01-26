@@ -5,8 +5,8 @@ unsigned char *image, *pixel, output[0x10000];
 char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
       notabl, bullet, bulmax, sprmax;
 unsigned error, width, height, i, j, l, min, max, nmin, nmax, amin, amax,
-          mask, pics, amask, apics, inipos, iniposback, reppos, smooth, outpos, fondo, tinta;
-int k;
+          pics, apics, inipos, iniposback, reppos, smooth, outpos, fondo, tinta;
+int k, mask, amask;
 long long atr, celdas[4];
 FILE *fo, *ft;
 
@@ -350,7 +350,7 @@ int main(int argc, char *argv[]){
             outpos+= 2,
             output[inipos]++,
             output[reppos+1]= 0;
-          mask++;
+          mask+= 2;
           output[reppos+1]++;
           for ( l= min; l < max; l++ )
             output[outpos++]= apics>>(2-l<<3);
@@ -367,13 +367,64 @@ int main(int argc, char *argv[]){
         amin= min,
         amax= max;
     }
-    output[i>>1-smooth]= outpos-inipos;
+    if( smooth ){
+      iniposback= inipos;
+      output[inipos= outpos]= 0;
+      output[inipos+1]= 0xfc+offsey*8;
+      outpos+= 2;
+      nmin= nmax= 4;
+      for ( amask= k= -1; k < 9; k++ ){
+        pics= 0;
+        if( k>-1 && k<8 )
+          for ( l= 0; l < 8; l++ )
+            pics|= image[(k<<3 | l)<<2] ? 0 : 0x800000>>l+i;
+        for ( min= 0; min < 3 && !(pics&0xff<<(2-min<<3)); min++ );
+        for ( max= 3; max && !(pics&0xff<<(3-max<<3)); max-- );
+        if( ~k&1 ){
+          if( min>amin ) min= amin;
+          if( max<amax ) max= amax;
+          if( min<max ){
+            if( (nmin!=min) || (nmax!=max) )
+              output[reppos= outpos]= min+1-(nmin>2?0:nmin)<<1&6 | max-min-1,
+              outpos+= 2,
+              output[inipos]++,
+              output[reppos+1]= 0;
+            amask+= 2;
+            output[reppos+1]++;
+            for ( l= min; l < max; l++ )
+              output[outpos++]= apics>>(2-l<<3);
+            for ( l= max; l > min; l-- )
+              output[outpos++]= pics>>(3-l<<3);
+          }
+          else if( nmin==4 )
+            output[inipos+1]+= 2;
+          nmin= min;
+          nmax= max;
+        }
+        else
+          apics= pics,
+          amin= min,
+          amax= max;
+      }
+      if( inipos-iniposback<=outpos-inipos )
+        output[i>>1-smooth]= inipos-iniposback,
+        outpos= inipos;
+      else{
+        mask= amask;
+        output[i>>1-smooth]= outpos-inipos;
+        for ( l= iniposback; l<inipos; l++ )
+          output[l]= output[l+inipos-iniposback];
+        outpos-= inipos-iniposback;
+      }
+    }
+    else
+      output[i>>1-smooth]= outpos-inipos;
   }
   ft= fopen("define.asm", "a");
   fseek(ft, 0, SEEK_END);
   fprintf(ft, "        DEFINE  bulmiy %d\n"
               "        DEFINE  bulmay %d\n",  0x100+offsey*8-output[inipos+1],
-                                              output[inipos+1]-0xfc-offsey*8+(mask<<1));
+                                              output[inipos+1]-0xfc-offsey*8+mask);
   fclose(ft);
   fwrite(output, 1, outpos, fo);
   fclose(fo);

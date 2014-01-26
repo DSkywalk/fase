@@ -534,7 +534,7 @@ delete_sprites
 del1    pop     hl
 del2    pop     bc
         ld      a, c
-      IF smooth
+      IF smooth=1
         bit     0, h
         jp      z, del25
         and     %00001100
@@ -657,6 +657,57 @@ del8    pop     de
         ex      de, hl
         pop     bc
         ld      ixl, c
+      IF smooth=1
+        bit     0, h
+        jp      z, del9&$ffff
+wel9    pop     bc
+        ld      a, c
+        rra
+        jr      nc, welc
+wela    and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+welb    pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        updpaint
+        pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        dec     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        djnz    welb
+        jr      wele
+welc    and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+weld    pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     h
+        updpaint
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        djnz    weld
+wele    dec     ixl
+        jr      nz, wel9
+        jp      delf&$ffff
+      ENDIF
 del9    pop     bc
         ld      a, c
         rra
@@ -674,9 +725,6 @@ delb    pop     de
         xor     d
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updpaint
-      ENDIF
         pop     de
         ld      a, (hl)
         xor     e
@@ -698,9 +746,6 @@ deld    pop     de
         xor     e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updpaint
-      ENDIF
         ld      a, (hl)
         xor     d
         ld      (hl), a
@@ -834,7 +879,7 @@ zraw1   ld      (zrawh+1&$ffff), a
         ld      a, (hl) ;y
         cp      bulmiy
         jp      c, zrawh&$ffff
-        cp      bulmay+scrh*16-7
+        cp      11+scrh*16-2*bulmay
         jp      nc, zrawh&$ffff
         dec     l
         ld      a, (hl) ;x
@@ -904,9 +949,69 @@ zraw8   add     a, 0
         or      h
         ld      h, a
       ENDIF
-
-      ld       (zrawff+1&$ffff), hl
+        ld       (zrawff+1&$ffff), hl
+    IF smooth=0
         ld      a, e
+    ELSE
+      IF  machine=1
+        rrca
+        ld      a, e
+        jp      nc, zraw9&$ffff
+      ELSE
+        bit     0, h
+        ld      a, e
+        jp      z, zraw9&$ffff
+      ENDIF
+araw9   ex      af, af'
+        pop     bc
+        ld      a, c
+        rrca
+        jr      nc, arawc
+arawa   and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+arawb   pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        updpaint
+        pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        dec     l
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        djnz    arawb
+        jr      arawe
+arawc   and     $03
+        add     a, l
+        dec     a
+        ld      l, a
+arawd   pop     de
+        ld      a, (hl)
+        xor     e
+        ld      (hl), a
+        inc     h
+        updpaint
+        ld      a, (hl)
+        xor     d
+        ld      (hl), a
+        inc     h
+        djnz    arawd
+arawe   ex      af, af'
+        dec     a
+        jr      nz, araw9
+        jr      zrawg
+    ENDIF
 zraw9   ex      af, af'
         pop     bc
         ld      a, c
@@ -925,9 +1030,6 @@ zrawb   pop     de
         xor     d
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updpaint
-      ENDIF
         pop     de
         ld      a, (hl)
         xor     e
@@ -949,9 +1051,6 @@ zrawd   pop     de
         xor     e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updpaint
-      ENDIF
         ld      a, (hl)
         xor     d
         ld      (hl), a
@@ -1524,7 +1623,7 @@ braw9   ld      ixl, b
         ex      af, af'
         ld      a, c
 brawa   ld      bc, 0
-      IF smooth
+      IF smooth=1
         bit     0, h
         jp      nz, wraw95
       ENDIF

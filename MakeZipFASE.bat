@@ -22,9 +22,6 @@ move /Y zx7b.exe engine\util
 move /Y GenTmx.exe engine\util
 del *.map *.obj
 cd engine
-util\SjAsmPlus dzx7b_rcs0.asm
-util\SjAsmPlus dzx7b_rcs1.asm
-util\SjAsmPlus dzx7b_rcs2.asm
 call fase gfx
 %z7z% a ..\FASE.0.99.zip ^
   fase.bat config.def readme.txt file1.bin ^
