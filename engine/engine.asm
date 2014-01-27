@@ -17,6 +17,7 @@
         DEFINE  port    $5c01
         DEFINE  selbeg  $5c02
         DEFINE  selend  $5c03
+        DEFINE  drwout  $5c06
         DEFINE  tiladdr $5c08+bullet*(8<<smooth)
         DEFINE  sprites $fe00
       IF  smooth=0
@@ -1500,8 +1501,20 @@ drawh   ld      a, 0
         add     a, 4
         cp      sprmax<<2
         jp      nz, draw1
-      IF  machine=1
+    IF  machine=1
         ld      (delete_sprites+1), bc
+        ld      hl, (drwout)
+        ld      a, h
+        inc     a
+        ld      sp, screen-1
+        jr      z, drawhh
+        call    $162c
+        ld      a, ($5bff)
+        xor     $ff
+        jr      nz, drawhh
+        dec     a
+        ld      (drwout+1), a
+drawhh  ld      ($5bff), a
         ld      bc, $7ffd
         ld      a, (port)
         rla
@@ -1510,11 +1523,18 @@ drawh   ld      a, 0
         ld      a, $10
 drawi   out     (c), a
 drawj   ld      sp, 0
-      ELSE
+        ret
+    ELSE
 drawj   ld      sp, 0
         ld      (delete_sprites+1), bc
-      ENDIF
-        ret
+        ld      hl, (drwout)
+        ld      a, h
+        inc     a
+        ret     z
+        ld      a, $ff
+        ld      (drwout+1), a
+        jp      (hl)
+    ENDIF
 
     IF clipup=2
 braw1   ld      (brawa+1&$ffff), bc  
@@ -1933,6 +1953,7 @@ ini1    ld      (hl), atrbar
         dec     a
         ld      (screen), a
         ld      (selbeg), a
+        ld      (drwout+1), a
       IF clipdn=1
         ld      sp, $4020+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
       ELSE
@@ -2005,6 +2026,7 @@ ini7    ld      sp, 0
         ld      a, $ff
         ld      (screen), a
         ld      (selbeg), a
+        ld      (drwout+1), a
         dec     a
         ld      i, a
         im      2
@@ -2045,6 +2067,7 @@ ini4
         dec     a
         ld      (screen), a
         ld      (selbeg), a
+        ld      (drwout+1), a
         dec     a
         ld      i, a
         im      2

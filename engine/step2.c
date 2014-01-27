@@ -251,13 +251,16 @@ int main(int argc, char *argv[]){
           smooth, tmp, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
           blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet, tmpbuf);
   fclose(fi);
-  fi= fopen("defs.h", "wb+");
+  fi= fopen("define.h", "wb+");
   fprintf(fi, "#define smooth %d\n"
               "#define stack  %d\n"
               "#define scrw   %d\n"
               "#define scrh   %d\n"
               "#define mapw   %d\n"
               "#define maph   %d\n", smooth, 0x10000-tmpbuf-stasp, scrw, scrh, mapw, maph);
+  fclose(fi);
+  fi= fopen("define.s", "wb+");
+  fprintf(fi, "dzx7a   .equ   0x%x\n", smooth ? 0xfc81+notabl : 0xfe80);
   fclose(fi);
   printf("\nFile block.bin generated in STEP 2\n");
 }

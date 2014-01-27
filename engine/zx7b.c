@@ -216,6 +216,8 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
       write_bit(1);
 
       /* sequence length */
+  if( (optimal[input_index].len-1 & 0xff)== 0xff)
+    printf("muymal\n");
       write_elias_gamma(optimal[input_index].len-1);
 
       /* sequence offset */
@@ -281,7 +283,7 @@ Optimal* optimize(unsigned char *input_data, size_t input_size) {
           break;
         }
         for ( len= 2; len <= MAX_LEN; len++ ){
-          if( len > best_len && ((len&0xff)!=0xff) ){
+          if( len > best_len && len&0xff ){
             best_len= len;
             bits= optimal[i-len].bits + count_bits(offset, len);
             if( optimal[i].bits > bits )

@@ -1,4 +1,5 @@
 #include  "fase.h"
+#include  "ending.h"
 
 const unsigned char data[20]= {
   0x00, 0x42, 0x11, 0+3*4,
@@ -7,12 +8,17 @@ const unsigned char data[20]= {
   0x0a, 0x22, 0x02, 1+2*4,
   0x0b, 0x50, 0x6e, 2+1*4};
 
-char i, j, x= 0, y= 0, spacepressed= 0, dirbul[4], num_bullets= 0;
+char i, j, killed, x, y, spacepressed, dirbul[4], num_bullets;
 unsigned char tmpx, tmpy;
 void remove_bullet( char k );
 void update_screen();
+void update_scoreboard();
 
 main(){
+
+start:
+  killed= x= y= spacepressed= num_bullets= shadow= 0;
+  update_scoreboard();
 
   // inicializar engine
   INIT;
@@ -23,9 +29,9 @@ main(){
   for ( i = 0; i < 4; i++ )
     bullets[i][1]= 255;
 
-  // mostrar la primera pantalla al comienzo
+  // mostrar la primera pantalla al comienzo y marcador
   screen= 0;
-
+  
   while(1){
 
     // esto hace que el engine procese un frame generando el escenario
@@ -36,13 +42,27 @@ main(){
       if( sprites[i][0]<0x80 ){
         for ( j= 0; j < num_bullets; j++ )
           if( ( (sprites[i][1]<bullets[j][0]?bullets[j][0]-sprites[i][1]:sprites[i][1]-bullets[j][0])
-              + (sprites[i][2]<bullets[j][1]?bullets[j][1]-sprites[i][2]:sprites[i][2]-bullets[j][1]))<10 )
-            sprites[i][0]-= 0x80,
-            remove_bullet( j ),
-            tmpx= sprites[i][1]>>4,
-            tmpy= sprites[i][2]>>4,
-            tiles[tmpy*scrw+tmpx]= 68,
+              + (sprites[i][2]<bullets[j][1]?bullets[j][1]-sprites[i][2]:sprites[i][2]-bullets[j][1]))<10 ){
+            sprites[i][0]-= 0x80;
+            remove_bullet( j );
+            tmpx= sprites[i][1]>>4;
+            tmpy= sprites[i][2]>>4;
+            tiles[tmpy*scrw+tmpx]= 68;
             tilepaint(tmpx, tmpy, tmpx, tmpy);
+            killed++;
+            if( killed==10 ){
+              RamPage= 0x10;
+              DZX7B((unsigned int)&ending_zx7[ending_zx7_size-1], 0x5aff);
+              PAUSE(100);
+              __asm
+                  ld      hl, #-6
+                  add     hl, sp
+                  ld      sp, hl
+              __endasm;
+              goto start;
+            }
+            drwout= (unsigned int)update_scoreboard;
+          }
         if( sprites[i][3]&1 )
           if( sprites[i][2]>0 )
             sprites[i][2]--;
@@ -155,4 +175,14 @@ void update_screen(){
   for ( j= 1; j < 5; j++ )
     if( sprites[j][0]>0x7f )
       sprites[j][0]-= 0x80;
+}
+
+void update_scoreboard(){
+  unsigned int scr, dst;
+  char count;
+  scr= 0x3d80+killed*8;
+  dst= 0x50de|shadow<<8;
+  for ( count= 0; count<8; count++ )
+    zxmem[dst]= zxmem[scr++]^0xff,
+    dst+= 0x100;
 }
