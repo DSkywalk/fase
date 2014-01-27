@@ -15,9 +15,9 @@ if "%1"=="config" (
   util\sjasmplus engine2.asm
   util\step2
   util\zx7b block.bin block.zx7
+  sdasz80 -o lib.s
 )
 echo.
-sdasz80 -o lib.s
 sdcc -mz80 --no-std-crt0 --code-loc 0x8000 --data-loc 0xa000 main.c lib.rel
 echo File main.bin compiled from main.c
 util\hex2bin -p 00 main.ihx > nul

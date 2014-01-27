@@ -14,6 +14,13 @@ void unpack (unsigned int address, unsigned int destination) {
   #endasm
 }
 
+#ifndef SCR_W
+#define SCR_W 15
+#endif
+
+#ifndef SCR_H
+#define SCR_H 10
+#endif
 
 #ifdef COMPRESSED_MAPS
 void __FASTCALL__ descomprimir_map ( unsigned char pantalla) {
@@ -31,7 +38,7 @@ desc1:  sbc     hl, bc
         inc     de
         dec     a
         jp      p, desc1
-        ld      de, DMAP_BUFFER+15*10-1 ;SCR_W*SCR_H-1
+        ld      de, DMAP_BUFFER+SCR_W*SCR_H-1
         ld      b, $80          ; marker bit
 desc2:  ld      a, 256 / 2^DMAP_BITSYMB
 desc3:  call    gbit3           ; load DMAP_BITSYMB bits (literal)
@@ -66,7 +73,7 @@ desc6:  call    nc, gbit3       ; (Elias gamma coding)
         inc     a               ; adjust length
         ld      c, a            ; save lenth to c
         xor     a
-        ld      de, 15          ; SCR_W
+        ld      de, SCR_W
         call    gbit3           ; get two bits
         call    gbit3
         jr      z, desc9        ; 00 = 1
@@ -75,17 +82,17 @@ desc6:  call    nc, gbit3       ; (Elias gamma coding)
         jr      z, descb        ; 010 = 15
         bit     2, a
         jr      nz, desc7
-#if   (15>15)                   ; SCR_W>15
+#if   (SCR_W>15)
         call    gbit3           ; [011, 100, 101] xx = from 2 to 13
         dec     a
         call    gbit3
         jr      desca
 desc7:  call    gbit3           ; [110, 111] xxxxxx = from 14-15, 17-142
         jr      nc, desc7
-        cp      scrw-14
+        cp      SCR_W-14
         sbc     a, -14
 #else
-  #if   (15==15)                ; SCR_W==15
+  #if   (SCR_W==15)
         add     a, $7c          ; [011, 100, 101] xx = from 2 to 13
         dec     e
 desc7:  dec     e               ; [110, 111] xxxxxx = 14 and from 16 to 142
@@ -96,7 +103,7 @@ desc8:  call    gbit3
   #else
         call    gbit3           ; [011, 100, 101] xx = from 2 to 11 and from 13 to 14
         call    gbit3
-        cp      scrw+2
+        cp      SCR_W+2
         sbc     a, 2
         jr      desc9
 desc7:  call    gbit3           ; [110, 111] xxxxxx = from 15 to 142
