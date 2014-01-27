@@ -31,52 +31,82 @@ desc1:  sbc     hl, bc
         inc     de
         dec     a
         jp      p, desc1
-        ld      de, DMAP_BUFFER+149
+        ld      de, DMAP_BUFFER+15*10-1 ;SCR_W*SCR_H-1
         ld      b, $80          ; marker bit
 desc2:  ld      a, 256 / 2^DMAP_BITSYMB
 desc3:  call    gbit3           ; load DMAP_BITSYMB bits (literal)
         jr      nc, desc3
 #if   (DMAP_BITHALF==1)
+  #if   (DMAP_BITSYMB==1)
+        rrca
+        jr      nc, desc4
+        xor     a
+        call    gbit3
+        inc     a
+  #else
         rrca                    ; half bit implementation (ie 48 tiles)
         call    c, gbit1
+  #endif
 #else
         and     a
 #endif
-        ld      (de), a         ; write literal
-desc4:  dec     e               ; test end of file (map is always 150 bytes)
+desc4:  ld      (de), a         ; write literal
+desc5:  dec     e               ; test end of file (map is always 150 bytes)
         ret     z
         call    gbit3           ; read one bit
         rra
         jr      nc, desc2       ; test if literal or sequence
         push    de              ; if sequence put de in stack
         ld      a, 1            ; determine number of bits used for length
-desc5:  call    nc, gbit3       ; (Elias gamma coding)
+desc6:  call    nc, gbit3       ; (Elias gamma coding)
         and     a
         call    gbit3
         rra
-        jr      nc, desc5       ; check end marker
+        jr      nc, desc6       ; check end marker
         inc     a               ; adjust length
         ld      c, a            ; save lenth to c
         xor     a
-        ld      de, 15          ; initially point to 15
+        ld      de, 15          ; SCR_W
         call    gbit3           ; get two bits
         call    gbit3
-        jr      z, desc8        ; 00 = 1
+        jr      z, desc9        ; 00 = 1
         dec     a
         call    gbit3
-        jr      z, desc9        ; 010 = 15
+        jr      z, descb        ; 010 = 15
         bit     2, a
-        jr      nz, desc6
+        jr      nz, desc7
+#if   (15>15)                   ; SCR_W>15
+        call    gbit3           ; [011, 100, 101] xx = from 2 to 13
+        dec     a
+        call    gbit3
+        jr      desca
+desc7:  call    gbit3           ; [110, 111] xxxxxx = from 14-15, 17-142
+        jr      nc, desc7
+        cp      scrw-14
+        sbc     a, -14
+#else
+  #if   (15==15)                ; SCR_W==15
         add     a, $7c          ; [011, 100, 101] xx = from 2 to 13
         dec     e
-desc6:  dec     e               ; [110, 111] xxxxxx = 14 and from 16 to 142
-desc7:  call    gbit3
-        jr      nc, desc7
-        jr      z, desc9
+desc7:  dec     e               ; [110, 111] xxxxxx = 14 and from 16 to 142
+desc8:  call    gbit3
+        jr      nc, desc8
+        jr      z, descb
         add     a, e
-desc8:  inc     a
-        ld      e, a
-desc9:  ld      a, b            ; save b (byte reading) on a
+  #else
+        call    gbit3           ; [011, 100, 101] xx = from 2 to 11 and from 13 to 14
+        call    gbit3
+        cp      scrw+2
+        sbc     a, 2
+        jr      desc9
+desc7:  call    gbit3           ; [110, 111] xxxxxx = from 15 to 142
+        jr      nc, desc7
+        add     a, 14
+  #endif
+#endif
+desc9:  inc     a
+desca:  ld      e, a
+descb:  ld      a, b            ; save b (byte reading) on a
         ld      b, d            ; b= 0 because lddr moves bc bytes
         ex      (sp), hl        ; store source, restore destination
         ex      de, hl          ; HL = destination + offset + 1
@@ -85,10 +115,10 @@ desc9:  ld      a, b            ; save b (byte reading) on a
         pop     hl              ; restore source address (compressed data)
         ld      b, a            ; restore b register
         inc     e               ; prepare test of end of file
-        jr      desc4           ; jump to main loop
-#if   (DMAP_BITHALF==1)
+        jr      desc5           ; jump to main loop
+#if   (DMAP_BITHALF==1 && DMAP_BITSYMB>1)
 gbit1:  sub     $80 - (2^(DMAP_BITSYMB-2))
-        defb    $da             ; half bit implementation (ie 48 tiles)
+        defb    $da             ; second part of half bit implementation
 #endif
 gbit2:  ld      b, (hl)         ; load another group of 8 bits
         dec     hl

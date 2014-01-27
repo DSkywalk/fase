@@ -59,7 +59,7 @@ desc6:  call    nc, gbit3       ; (Elias gamma coding)
         dec     a
         call    gbit3
         jr      desca
-desc7   call    gbit3           ; [110, 111] xxxxxx = from 14-15, 17-142
+desc7:  call    gbit3           ; [110, 111] xxxxxx = from 14-15, 17-142
         jr      nc, desc7
         cp      scrw-14
         sbc     a, -14
@@ -95,7 +95,6 @@ descb:  ld      a, b            ; save b (byte reading) on a
         ld      b, a            ; restore b register
         inc     e               ; prepare test of end of file
         jr      desc5           ; jump to main loop
-
       IF bithlf=1 && bitsym>1
 gbit1:  sub     $80 - (1 << bitsym - 2)
         defb    $da             ; second part of half bit implementation
