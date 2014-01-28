@@ -299,7 +299,7 @@ int main(int argc, char* argv[]){
     if( mem[i]>j )
       j= mem[i];
   for ( bitsymb= 0, i= j; i ; bitsymb++, i>>= 1 );
-  bithalf= !(1<<bitsymb-2 & j);
+  bithalf= !(1<<(bitsymb==1 ? 0 :bitsymb-2) & j);
   bithalf && bitsymb--;
   out= (unsigned char *) malloc (maph*mapw*scrh*scrw);
   for ( tmpi= i= 0; i<maph; i++ )

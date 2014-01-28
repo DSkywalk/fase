@@ -25,7 +25,7 @@ del *.map *.obj
 cd engine
 call fase gfx
 %z7z% a ..\FASE.0.99.zip ^
-  fase.bat config.def readme.txt file1.bin ^
+  fase.bat config.def readme.html help1.png help2.png file1.bin ^
   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
   util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe ^
   engine0.asm engine1.asm engine2.asm engine.asm loader.asm ^
