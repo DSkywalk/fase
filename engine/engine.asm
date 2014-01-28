@@ -1410,9 +1410,9 @@ drawx   ld      ($5bff), a
         ld      bc, $7ffd
         ld      a, (port)
         rla
-        ld      a, $18
-        jr      c, drawy
         ld      a, $10
+        jr      c, drawy
+        ld      a, $18
 drawy   out     (c), a
 drawz   ld      sp, 0
         ret
