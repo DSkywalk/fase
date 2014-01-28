@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type="text/css">
+#main{
+  margin:0 auto;
+  padding:5px;
+  width:800px;
+  border:15px solid #eee;
+  font-size:20px;
+}
+li{
+  font-weight:bold;
+}
+  </style>
+  <title>FASE (Fucking Awesome Spectrum Engine)</title>
+</head>
+<body>
+<div id="main">
+<h1>Introduction</h1>
+FASE is a ZX Spectrum engine that helps you to create a specific type of game.
+The game must be a platform game without scrolling at 50fps. The major advantage
+in this engine is a very fast sprite painting routine, that allows you a big
+number of simultaneos sprites on screen without flickering. The engine is
+located in the upper side of the memory and the contened memory is occupied by
+graphics data, so you have from 0x8000 to write your own code. The demo code
+is written with SDCC compiler, but you can use the compiler or the language that
+you want, the only restriction is that your code must start at 0x8000.
+<h1>Multi Machine</h1>
+The engine detect your machine at loader stage and put the code that offers better
+non-flickering results depends on your machine. There are three cases:
+<ol>
+<li>Machines with floating bus like Sinclair 48K</li>
+In this case we need a precise synchronization in the frame time (69888 cycles).
+The exact point is below the playing area, and the only way to do this is by
+putting special values at the video memory and detect reading in the floating
+bus. By this reason in this mode you'll see a bar, the "sync bar", that has a
+size of 32x1 cells (256x8 pixels).
+<li>Machines with 128K memory paging</li>
+Now the trick is very different. We use double buffering because we have a
+second screen (shadow video) at page 7. So the key is to show always the
+other screen while writting into the hidden one. That is, if we show the
+page 5 (normal screen) we write on page 7 (shadow screen) and vice versa.
+<br/>
+In this case we make the sync at the start of the frame via interrupt code.
+<li>Rest of machines</li>
+This is the worst case because we have only about 14400 cycles to paint
+flicker free sprites. We do the sync at start of the frame (as in 128K mode)
+but always write on the same screen. The good news is that there are few
+cases, always non original Sinclair machines (also called clones). If you
+want to try it just for curiosity, launch your emulator in 128K mode and
+choose 48K basic in the menu.
+</ol>
+<h1>How to use</h1>
+Basically you must provide three kinds of elements. Graphics elements like
+sprites, tiles, bullet an map. Also code elements as your convenience, we put
+a simple demo in main.c but you must need more files when your game grows in
+complexity. And finally configuration elements. The configuration elements
+are part of the engine itself, but we facilitate the task by grouping the
+most part on config.def file (the rest are in engine.asm and loader.asm).
+<br/>
+<br/>
+When all elements are ready you must compile the project, generating a file
+called game.tap. There are 3 ways of generate game.tap. Just execute
+fase.bat with zero or one of these parameters:
+<ol>
+<li>fase gfx</li>
+Will compile all files. Type this if you modify map.tmx or any png file or
+tmode constant in config.def. You can modify the png files with any image
+editor (I use GIMP) and map.tmx with Tiled (www.mapeditor.org/). To ensure
+legal ZX Spectrum colors filter it with PosterizeZX:
+http://retrolandia.net/foro/showthread.php?tid=78&pid=452#pid452
+<li>fase config</li>
+If you change one of the options into config.def (except tmode)
+<li>fase</li>
+Without parameters just compile main.c (or main.bas) and generate game.tap
+</ol>
+<h1>Modifing graphics</h1>
+Just modify png files as in the example with your favorite image editor, I
+use GIMP. They are sprites.png, tiles.png, bullet.png and loading.png. We
+use the same format that <a href="http://www.mojontwins.com/juegos_mojonos/la-churrera-english/">Churrera</a>.
+That is 256x32 sprites image in black/with with separate mask in black/red,
+and 256x[multiple of 16] tiles image, with a limit of 256 tiles. Remember
+that your pallette is limited to the 15 ZX Spectrum colors, if you are not
+sure pass your file by PosterizeZX (in util folder).
+<br/><br/>
+www.mapeditor.org/
+
+
+</div></body></html>
