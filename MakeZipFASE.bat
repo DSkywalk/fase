@@ -28,7 +28,7 @@ call fase gfx
   fase.bat config.def readme.html help1.png help2.png file1.bin ^
   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
   util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe ^
-  engine0.asm engine1.asm engine2.asm engine.asm loader.asm ^
-  loading.png sprites.png tiles.png ^
+  engine0.asm engine1.asm engine2.asm engine.asm loader.asm dzx7b_rcs.asm ^
+  loading.png sprites.png tiles.png bullet.png map.tmx ^
   main.c fase.h ending.h lib.s
 cd ..
