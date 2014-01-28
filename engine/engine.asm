@@ -240,9 +240,9 @@ desc1   sbc     hl, bc
         ld      bc, $7ffd
         ld      a, (port)
         rla
-        ld      e, $18
+        ld      e, $10
         jr      c, desc2
-        ld      e, $17
+        ld      e, $1f
 desc2   out     (c), e
         ld      a, do4-2-do3
         ld      (do3+1), a
@@ -689,9 +689,9 @@ uppa3   ld      hl, selend      ; test if we need to repaint a rectangular
         ld      bc, $7ffd       ; values to use in the next frame
         ld      a, (port)
         rla
-        ld      e, $18
+        ld      e, $10
         jr      c, uppa4
-        ld      e, $17
+        ld      e, $1f
 uppa4   out     (c), e
         ld      (update_partial+1), a
         ld      a, l
