@@ -16,7 +16,7 @@ int main(int argc, char* argv[]){
   int (*func)(int)= &scr2rcs;
   if( argv[1][0] == '-' )
     func= &rcs2scr, argv++, argc--;
-  if( argc==3 )
+  if( argc!=3 )
     printf("\nInvalid number of parameters\n"),
     exit(-1);
   fi= fopen(argv[1], "rb");
