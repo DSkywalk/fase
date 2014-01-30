@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+//#define CHURRERA
 #define MAX_OFFSET  142
 #define MAX_LEN   65536
 
@@ -339,10 +340,19 @@ int main(int argc, char* argv[]){
       fwrite(output_data, 1, output_size, fo);
     }
   }
+#ifdef CHURRERA
+  printf("#define DMAP_BITSYMB %d\n"
+         "#define DMAP_BITHALF %d\n"
+         "#define MAP_W %d\n"
+         "#define MAP_H %d\n"
+         "#define SCR_W %d\n"
+         "#define SCR_H %d\n", bitsymb, bithalf, mapw, maph, scrw, scrh);
+#else
   printf("        define  bitsym  %d\n"
          "        define  bithlf  %d\n"
          "        define  mapw    %d\n"
          "        define  maph    %d\n"
          "        define  scrw    %d\n"
          "        define  scrh    %d\n", bitsymb, bithalf, mapw, maph, scrw, scrh);
+#endif
 }
