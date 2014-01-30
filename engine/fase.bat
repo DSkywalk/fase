@@ -1,5 +1,6 @@
 @echo off
 SETLOCAL
+set _lang=c
 if "%1"=="gfx" (
   util\Png2Rcs loading.png loading.rcs
   util\zx7b loading.rcs loading.zx7
@@ -17,10 +18,14 @@ if "%1"=="config" (
   util\zx7b block.bin block.zx7
   sdasz80 -o lib.s
 )
-echo.
-sdcc -mz80 --no-std-crt0 --code-loc 0x8000 --data-loc 0xa000 main.c lib.rel
-echo File main.bin compiled from main.c
-util\hex2bin -p 00 main.ihx > nul
+if %_lang%==c (
+  echo.
+  sdcc -mz80 --no-std-crt0 --code-loc 0x8000 --data-loc 0xa000 main.c lib.rel
+  echo File main.bin compiled from main.c
+  util\hex2bin -p 00 main.ihx > nul
+) else (
+  util\zxb main.bas
+)
 util\zx7b main.bin main.zx7
 echo.
 copy /b map_compressed.bin+main.zx7+block.zx7 engine.zx7 > nul
