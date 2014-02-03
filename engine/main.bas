@@ -1,96 +1,236 @@
 #include <keys.bas>
 #include "fase.bas"
 
-  DisableInt
-
-  DIM datos(31) as UBYTE = { _
+dim dirbul(3) as ubyte
+dim datos(19) as ubyte = { _
     $00, $42, $11, 0, _
     $08, $60, $60, 2, _
     $09, $a8, $48, 3, _
     $0a, $22, $02, 1, _
-    $0b, $d0, $6e, 2, _
-    $0c, $b6, $34, 3, _
-    $0d, $32, $32, 1, _
-    $04, $52, $5e, 0 }
+    $0b, $d0, $6e, 2}
+dim i, j, x, y, spacepressed, killed, numbullets as byte
+dim tmpx, tmpy as ubyte
 
-  DIM i, x, y AS UBYTE
+sub FASTCALL pausa( time as uinteger )
+  asm
+loop1:  ld      bc, 21
+loop2:  djnz    loop2
+        dec     c
+        jr      nz, loop2
+        dec     hl
+        ld      a, l
+        or      h
+        jr      nz, loop1
+        ret
+  end asm
+end sub
 
-  FOR i = 0 TO 31
-    SETSPRITE(i>>2, i&3, datos(i))
-  NEXT i
+function abso( a as ubyte, b as ubyte ) as uinteger
+  if b<a then
+    return a-b
+  else
+    return b-a
+  end if
+end function
 
-  INIT
+sub updatescreen()
+  scr= y*mapw + x
+  for j = 1 to 4
+    if GetSpriteV(j) > $7f then
+      SetSpriteV(j, GetSpriteV(j)-$80)
+    end if
+  next j
+end sub
+
+sub updatescoreboard()
+updatescor:
+  dim scr, dst as uinteger
+  dim count as ubyte
+  scr= $3d80+CAST(uinteger, killed)*8
+  dst= $50de|CAST(uinteger, shadow)<<8
+  for count = 0 to 7
+    poke dst, (peek scr ~ $ff)
+    scr= scr+1
+    dst= dst+$100
+  next count
+end sub
+
+sub removebullet( k as ubyte )
+  if numbullets then
+    numbullets= numbullets-1
+    while k < numbullets
+      dirbul(k)= dirbul(k+1)
+      SetBulletX(k, GetBulletX(k+1))
+      SetBulletY(k, GetBulletY(k+1))
+      k= k+1
+    end while
+    SetBulletY(k, 255)
+  end if
+end sub
+
+  DisableInt
+
+start:
+  killed= 0
+  x= 0
+  y= 0
+  spacepressed= 0
+  numbullets= 0
+  shadow= 0
+
+  updatescoreboard()
+
+  Init
+
+  for i = 0 to 4
+    SetSpriteV(i, datos(i*4))
+    SetSpriteX(i, datos(i*4+1))
+    SetSpriteY(i, datos(i*4+2))
+    SetSpriteZ(i, datos(i*4+3))
+  next i
+  for i = 0 to 3
+    SetBulletY(i, 255)
+  next i
 
   scr= 0
 
-  WHILE 1
+  while 1
 
-    FRAME
+    Frame
 
-    FOR i = 1 TO 8
-      IF GETSPRITE(i, 3) & 1 THEN
-        IF GETSPRITE(i, 2) > 0 THEN
-          SETSPRITE(i, 2, GETSPRITE(i, 2)-1)
-        ELSE
-          SETSPRITE(i, 3, GETSPRITE(i, 3) bXOR 1)
-        END IF
-      ELSE
-        IF GETSPRITE(i, 2) < $90 THEN
-          SETSPRITE(i, 2, GETSPRITE(i, 2)+1)
-        ELSE
-          SETSPRITE(i, 3, GETSPRITE(i, 3) bXOR 1)
-        END IF
-      END IF
-      IF GETSPRITE(i, 3) & 2 THEN
-        IF GETSPRITE(i, 1) > $08 THEN
-          SETSPRITE(i, 1, GETSPRITE(i, 1)-1)
-        ELSE
-          SETSPRITE(i, 3, GETSPRITE(i, 3) bXOR 2)
-        END IF
-      ELSE
-        IF GETSPRITE(i, 1) < $e8 THEN
-          SETSPRITE(i, 1, GETSPRITE(i, 1)+1)
-        ELSE
-          SETSPRITE(i, 3, GETSPRITE(i, 3) bXOR 2)
-        END IF
-      END IF
-    NEXT i
+    for i = 1 to 4
+      if GetSpriteV(i) < $80 then
+        for j = 0 to numbullets-1
+          if abso(GetSpriteX(i), GetBulletX(j))+abso(GetSpriteY(i), GetBulletY(j)) < 10 then
+            SetSpriteV(i, GetSpriteV(i)-$80)
+            removebullet(j)
+            tmpx= GetSpriteX(i)>>4
+            tmpy= GetSpriteY(i)>>4
+            SetTile(tmpy*scrw+tmpx, 68)
+            TilePaint(tmpx, tmpy, tmpx, tmpy)
+            killed= killed+1
+            if killed=10 then
+              Exit
+              dzx7b(@image-1, $5aff)
+              pausa(100)
+              goto start
+            end if
+            drwout= @updatescor-15
+          end if
+        next j
+        if GetSpriteZ(i) & 1 then
+          if GetSpriteY(i) > 0 then
+            SetSpriteY(i, GetSpriteY(i)-1)
+          else
+            SetSpriteZ(i, GetSpriteZ(i) ~ 1)
+          end if
+        else
+          if GetSpriteY(i) < scrh*16 then
+            SetSpriteY(i, GetSpriteY(i)+1)
+          else
+            SetSpriteZ(i, GetSpriteZ(i) ~ 1)
+          end if
+        end if
+        if GetSpriteZ(i) & 2 then
+          if GetSpriteX(i) > 0 then
+            SetSpriteX(i, GetSpriteX(i)-1)
+          else
+            SetSpriteZ(i, GetSpriteZ(i) ~ 2)
+          end if
+        else
+          if GetSpriteX(i) < scrw*16 then
+            SetSpriteX(i, GetSpriteX(i)+1)
+          else
+            SetSpriteZ(i, GetSpriteZ(i) ~ 2)
+          end if
+        end if
+      end if
+    next i
 
-    IF multikeys(KEYP) THEN
-      IF GETSPRITE(0, 1) < $ee THEN
-        SETSPRITE(0, 1, GETSPRITE(0, 1)+1)
-      ELSEIF x < 11 THEN
-        SETSPRITE(0, 1, $02)
+    for i = 0 to numbullets-1
+      if dirbul(i) & 3 then
+        if dirbul(i) & 1 then
+          if GetBulletX(i) < scrw*16 then
+            SetBulletX(i, GetBulletX(i)+2)
+          else
+            removebullet(i)
+          end if
+        else
+          if GetBulletX(i) > 2 then
+            SetBulletX(i, GetBulletX(i)-2)
+          else
+            removebullet(i)
+          end if
+        end if
+      end if
+      if dirbul(i) & 12 then
+        if dirbul(i) & 4 then
+          if GetBulletY(i) < scrh*16 then
+            SetBulletY(i, GetBulletY(i)+2)
+          else
+            removebullet(i)
+          end if
+        else
+          if GetBulletY(i) > 2 then
+            SetBulletY(i, GetBulletY(i)-2)
+          else
+            removebullet(i)
+          end if
+        end if
+      end if
+    next i
+
+    if multikeys(KEYP) then
+      if GetSpriteX(0) < scrw*16 then
+        SetSpriteX(0, GetSpriteX(0)+1)
+      elseif x < mapw-1 then
+        SetSpriteX(0, 0)
         x= x + 1
-        scr= y*12 + x
-      END IF
-    END IF
-    IF multikeys(KEYO) THEN
-      IF GETSPRITE(0, 1) > $02 THEN
-        SETSPRITE(0, 1, GETSPRITE(0, 1)-1)
-      ELSEIF x > 0 THEN
-        SETSPRITE(0, 1, $ee)
+        updatescreen()
+      end if
+    end if
+    if multikeys(KEYO) then
+      if GetSpriteX(0) > 0 then
+        SetSpriteX(0, GetSpriteX(0)-1)
+      elseif x then
+        SetSpriteX(0, scrw*16)
         x= x - 1
-        scr= y*12 + x
-      END IF
-    END IF
-    IF multikeys(KEYA) THEN
-      IF GETSPRITE(0, 2) < $a0 THEN
-        SETSPRITE(0, 2, GETSPRITE(0, 2)+1)
-      ELSEIF y < 1 THEN
-        SETSPRITE(0, 2, $01)
+        updatescreen()
+      end if
+    end if
+    if multikeys(KEYA) then
+      if GetSpriteY(0) < scrh*16 then
+        SetSpriteY(0, GetSpriteY(0)+1)
+      elseif y < maph-1 then
+        SetSpriteY(0, 0)
         y= y + 1
-        scr= y*12 + x
-      END IF
-    END IF
-    IF multikeys(KEYQ) THEN
-      IF GETSPRITE(0, 2) > $01 THEN
-        SETSPRITE(0, 2, GETSPRITE(0, 2)-1)
-      ELSEIF y > 0 THEN
-        SETSPRITE(0, 2, $a0)
+        updatescreen()
+      end if
+    end if
+    if multikeys(KEYQ) then
+      if GetSpriteY(0) > 0 then
+        SetSpriteY(0, GetSpriteY(0)-1)
+      elseif y then
+        SetSpriteY(0, scrh*16)
         y= y - 1
-        scr= y*12 + x
-      END IF
-    END IF
+        updatescreen()
+      end if
+    end if
+    if multikeys(KEYSPACE) and (not spacepressed) and numbullets<4 then
+      SetBulletX(numbullets, GetSpriteX(0))
+      SetBulletY(numbullets, GetSpriteY(0))
+      i= (multikeys(KEYQ)<<3&8 | multikeys(KEYA)<<2&4 | multikeys(KEYO|KEYP)&3) & 15
+      if i then
+        dirbul(numbullets)= i
+      else
+        dirbul(numbullets)= 1
+      end if
+      numbullets= numbullets+1
+    end if
+    spacepressed= multikeys(KEYSPACE)
+  end while
 
-  END WHILE
+  asm
+        incbin  "ending.rcs.zx7b"
+  end asm
+image:

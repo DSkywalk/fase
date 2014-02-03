@@ -73,7 +73,9 @@ prnbuf  ld      a, $17
         ld      hl, init1
         ld      ($fffd), hl
         ld      hl, frame1
-        ld      ($fff2), hl
+        ld      ($fffa), hl
+        ld      a, $c3
+        ld      ($fff6), a
         jr      copied
 next    call    ramt-maplen-12
         jr      z, copied
@@ -83,7 +85,7 @@ next    call    ramt-maplen-12
         ld      hl, init0
         ld      ($fffd), hl
         ld      hl, frame0
-        ld      ($fff2), hl
+        ld      ($fffa), hl
 copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+notabl
         ld      de, $7fff
         ld      bc, $23f8
@@ -107,7 +109,7 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
         ldir
         ret
 fin
-screen  incbin  loading.zx7
+screen  incbin  loading.zx7b
 descom  
         org     desc
         include dzx7b_rcs.asm

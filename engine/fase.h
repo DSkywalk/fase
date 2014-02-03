@@ -3,9 +3,10 @@
 #define FRAME \
     __asm               \
         push    ix      \
-        call    0xfff1  \
+        call    0xfff9  \
         pop     ix      \
     __endasm;
+#define EXIT __asm__ ("call 0xfff6")
 #define tilepaint(from_x, from_y, to_x, to_y) repaint= from_x|from_y<<4|to_x<<8|to_y<<12
 unsigned char __at (0x5b00) sprites[12][4];
 unsigned char __at (0x5b30) bullets[8][2];

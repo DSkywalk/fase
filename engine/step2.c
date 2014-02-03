@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
   fread(mem+0x10002-scode, 1, 0x2000, fi);
   fclose(fi);
   init0= mem[0xfffd] | mem[0xfffe]<<8;
-  frame0= mem[0xfff2] | mem[0xfff3]<<8;
+  frame0= mem[0xfffa] | mem[0xfffb]<<8;
   fi= fopen("config.def", "r");
   while ( !feof(fi) ){
     fgets(tmpstr, 30, fi);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
   if( smooth ){
     ssprites-= sprites[--nsprites];
     --bulimit;
-    blocks[0].len= (239-sprites[nsprites])>>1;
+    blocks[0].len= (243-sprites[nsprites])>>1;
     blocks[0].addr= 0xff01+sprites[nsprites];
     mem[0xfefe]= 0x01;
     mem[0xfeff]= 0xff;
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]){
       mem[0xff01+l]= sprites[saccum[nsprites]+64+smooth*64+l];
   }
   else
-    blocks[0].len= 239>>1,
+    blocks[0].len= 243>>1,
     blocks[0].addr= 0xff01;
   if( bullet ){
     fi= fopen("bullet.bin", "rb");
@@ -176,8 +176,12 @@ int main(int argc, char *argv[]){
   tmp= ftell(fi);
   fclose(fi);
   fi2= fopen("engine2.bin", "rb");
-  fseek(fi2, -14, SEEK_END);
-  fread(mem+0xfff2, 1, 13, fi2);
+  fseek(fi2, -10, SEEK_END);
+  fread(mem+0xfff6, 1, 9, fi2);
+  fclose(fi2);
+  fi2= fopen("engine1.bin", "rb");
+  fseek(fi2, -9, SEEK_END);
+  fread(mem+0xfff7, 1, 2, fi2);
   fclose(fi2);
   fi= fopen("block.bin", "wb+");
   fwrite(mem+0x5c08, 1, 0x23f8, fi);
@@ -204,7 +208,7 @@ int main(int argc, char *argv[]){
   fread(mem+0x10002-scode1, 1, 0x2000, fi2);
   fclose(fi2);
   init1= mem[0xfffd] | mem[0xfffe]<<8;
-  frame1= mem[0xfff2] | mem[0xfff3]<<8;
+  frame1= mem[0xfffa] | mem[0xfffb]<<8;
   mem[point]= 0xfffe-stasp&0xff;
   mem[point+1]= 0xfffe-stasp>>8;
   if( smooth )
@@ -257,7 +261,9 @@ int main(int argc, char *argv[]){
               "#define scrw   %d\n"
               "#define scrh   %d\n"
               "#define mapw   %d\n"
-              "#define maph   %d\n", smooth, 0x10000-tmpbuf-stasp, scrw, scrh, mapw, maph);
+              "#define maph   %d\n"
+              "#define dzx7a  %d\n",  smooth, 0x10000-tmpbuf-stasp, scrw, scrh,
+                                      mapw, maph, smooth ? 0xfc81+notabl : 0xfe80);
   fclose(fi);
   fi= fopen("define.s", "wb+");
   fprintf(fi, "dzx7a   .equ   0x%x\n", smooth ? 0xfc81+notabl : 0xfe80);

@@ -2,11 +2,11 @@
 #include  "ending.h"
 
 const unsigned char data[20]= {
-  0x00, 0x42, 0x11, 0+3*4,
-  0x08, 0x60, 0x60, 2+0*4,
-  0x09, 0x58, 0x48, 3+1*4,
-  0x0a, 0x22, 0x02, 1+2*4,
-  0x0b, 0x50, 0x6e, 2+1*4};
+  0x00, 0x42, 0x11, 0,
+  0x08, 0x60, 0x60, 2,
+  0x09, 0x58, 0x48, 3,
+  0x0a, 0x22, 0x02, 1,
+  0x0b, 0x50, 0x6e, 2};
 
 char i, j, killed, x, y, spacepressed, dirbul[4], num_bullets;
 unsigned char tmpx, tmpy;
@@ -51,7 +51,7 @@ start:
             tilepaint(tmpx, tmpy, tmpx, tmpy);
             killed++;
             if( killed==10 ){
-              RamPage= 0x10;
+              EXIT;
               DZX7B((unsigned int)&ending_zx7[ending_zx7_size-1], 0x5aff);
               PAUSE(100);
               __asm

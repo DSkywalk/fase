@@ -185,12 +185,9 @@ do3     jr      z, do5
         jr      do0
       ENDIF
       IF  machine=1             ; if not 48k sync with interrupt
-        ld      hl, flag&$ffff
-        inc     (hl)
-        xor     a
+        ld      hl, do1
         ei
-do1     cp      (hl)
-        jr      nz, do1
+do1     jp      (hl)
         ld      bc, $7ffd
         ld      a, (port&$ffff) ; toggle port value between 00 and 80 every frame
         xor     $80
@@ -202,12 +199,9 @@ do2     out     (c), a
 do3     jr      update_complete
       ENDIF
       IF  machine=2
-        ld      hl, flag&$ffff  ; if not floating bus or 128k sync with
-        inc     (hl)            ; the interrupt, so we'll have more cycles of
-        xor     a               ; flickering
-        ei
-do1     cp      (hl)
-        jr      nz, do1
+        ld      hl, do1         ; if not floating bus or 128k sync with
+        ei                      ; the interrupt, so we'll have more cycles of
+do1     jp      (hl)            ; flickering
 do3     jr      update_complete
       ENDIF
 do5     ld      a, update_complete-2-do3&$ff
@@ -1956,6 +1950,8 @@ ini4    push    bc
         pop     bc
         ret
 ini5
+exit    ld      a, $10
+        jr      ini4
     ENDIF
       IF  machine=2
         ld      (do3+1), a
@@ -2020,13 +2016,15 @@ lookt   incbin  file1.bin
 ; Sprite address table and small ISR to sync with the interrupt
         block   $100
         defb    $ff
-        block   $fff1-$&$ffff
-        jp      do_sprites
-        push    af
-        xor     a
-        ld      (flag&$ffff), a
-        pop     af
+        block   $fff4-$&$ffff
+        inc     hl
         ret
-flag    defb    0
+        defb    $c9
+      IF machine=1
+        defw    exit
+      ELSE
+        defw    0
+      ENDIF
+        jp      do_sprites
         jp      init
         defb    $18
