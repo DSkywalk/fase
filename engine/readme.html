@@ -24,8 +24,9 @@ in this engine is a very fast sprite painting routine, that allows you a big
 number of simultaneos sprites on screen without flickering. The engine is
 located in the upper side of the memory and the contened memory is occupied by
 graphics data, so you have from 0x8000 to write your own code. The demo code
-is written with <a href="http://sdcc.sourceforge.net/">SDCC</a> compiler, but
-you can use the compiler or the language that you want, the only restriction
+is written with <a href="http://sdcc.sourceforge.net/">SDCC</a> and with
+<a href="http://www.boriel.com/en/software/the-zx-basic-compiler/">ZXBasic</a>,
+but you can use the compiler or the language that you want, the only restriction
 is that your code must start at 0x8000.
 <h1>Multi Machine</h1>
 The engine detect your machine at loader stage and put the code that offers better
@@ -55,10 +56,10 @@ choose 48K basic in the menu.
 <h1>How to use</h1>
 Basically you must provide three kinds of elements. Graphics elements like
 sprites, tiles, bullet an map. Also code elements as your convenience, we put
-a simple demo in main.c but you must need more files when your game grows in
-complexity. And finally configuration elements. The configuration elements
-are part of the engine itself, but we facilitate the task by grouping the
-most part on config.def file (the rest are in engine.asm and loader.asm).
+a simple demo in main.c (and main.bas) but you must need more files when your
+game grows in complexity. And finally configuration elements. The configuration
+elements are part of the engine itself, but we facilitate the task by grouping
+the most part on config.def file (the rest are in engine.asm and loader.asm).
 <br/>
 <br/>
 When all elements are ready you must compile the project, generating a file
@@ -95,10 +96,10 @@ different tiles with the same colors, in both cases you'll save many bytes in me
 compilation you'll see a message with the different size of the tileset depending on the
 tile mode. There are 4 tile modes, depending if you index bitmap, attribute, both or none.
 <h1>Modifing code</h1>
-You have a complete example in SDCC. The only requirement is that your compiler generates Z80
-machine code starting at 0x8000, and that it communicates with the engine by the small memory
-area located between 0x5b00 and 0x5c07. In the demo, the interface definition is located into
-fase.h and it's based on mapped variables, for example:
+You have a complete example in SDCC and ZXBasic. The only requirement is that your compiler
+generates Z80 machine code starting at 0x8000, and that it communicates with the engine by
+the small memory area located between 0x5b00 and 0x5c07. In the C demo, the interface definition
+is located into fase.h and it's based on mapped variables, for example:
 <pre>
   unsigned char __at (0x5b00) sprites[12][4];
 </pre>
@@ -111,6 +112,13 @@ drwout) every time that you need to call the function:
 </pre>
 Also don't assume that the video memory is on 0x4000. You must add shadow<<8 to the address
 before write because in 128K mode there is another screen between 0xc000 and 0xdaff.
+<br/><br/>
+In the BASIC demo the interace definition is into fase.bas, has some mapped variables but
+the interace mainly is done by macros to peek and poke commands. Both BASIC and C demos have
+identical behaviour, you only must specify the language to use in line 3 of fase.bat. Compilers
+are not included in this package. In case of SDCC the compiler executable must be in the path.
+With ZXBasic it's preferable to download the zip package and unpack it into a child folder
+called zxb.
 <br/><br/>
 Take care about heavy task if you want mantain the 50fps. Sprite painting is about 3500 cycles
 per sprite, so if for example you have four sprites that's 14000 cycles of almost 70000
@@ -240,6 +248,6 @@ before reading the assembly code in engine.asm.
   He borrows the graphics on the demo, are the same that "Nightmare in Hallowen"
 </ul>
 <br/>
-FASE 0.99 / 2014-01-28
+FASE 1.00 / 2014-02-04
 </div>
 <br/></body></html>

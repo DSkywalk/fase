@@ -43,7 +43,6 @@ sub updatescreen()
 end sub
 
 sub updatescoreboard()
-updatescor:
   dim scr, dst as uinteger
   dim count as ubyte
   scr= $3d80+CAST(uinteger, killed)*8
@@ -115,7 +114,7 @@ start:
               pausa(100)
               goto start
             end if
-            drwout= @updatescor-15
+            drwout= @updatescoreboard
           end if
         next j
         if GetSpriteZ(i) & 1 then

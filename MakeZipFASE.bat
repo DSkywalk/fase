@@ -24,11 +24,11 @@ copy /Y bin2c.exe engine\util
 del *.map *.obj
 cd engine
 call fase gfx
-%z7z% a ..\FASE.0.99.zip ^
+%z7z% a ..\FASE.1.00.zip ^
   fase.bat config.def readme.html help1.png help2.png file1.bin ^
   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
   util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe ^
   engine0.asm engine1.asm engine2.asm engine.asm loader.asm dzx7b_rcs.asm ^
   loading.png sprites.png tiles.png bullet.png map.tmx ^
-  main.c fase.h ending.h lib.s
+  main.c main.bas fase.h fase.bas ending.h ending.rcs.zx7b lib.s
 cd ..

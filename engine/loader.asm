@@ -54,16 +54,16 @@ ini     ld      de, desc
         ld      hl, $5ccb+prnbuf-ini
         ld      de, $5b06
         push    de
-        ld      c, fin-prnbuf
+        ld      c, screen-prnbuf
         ldir
         ret
 prnbuf  ld      a, $17
         ld      bc, $7ffd
         out     (c), a
-        ld      ($fffb), a
+        ld      ($fff8), a
         ld      a, $10
         out     (c), a
-        ld      a, ($fffb)
+        ld      a, ($fff8)
         cp      $17
         ld      de, ramt-1-maplen
         jr      z, next
@@ -108,8 +108,6 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
         ld      bc, mainrw
         ldir
         ret
-fin
-screen  incbin  loading.zx7b
-descom  
-        org     desc
+screen  incbin  loading.rcs.zx7b
+descom  org     desc
         include dzx7b_rcs.asm
