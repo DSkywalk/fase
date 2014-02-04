@@ -115,10 +115,9 @@ before write because in 128K mode there is another screen between 0xc000 and 0xd
 <br/><br/>
 In the BASIC demo the interace definition is into fase.bas, has some mapped variables but
 the interace mainly is done by macros to peek and poke commands. Both BASIC and C demos have
-identical behaviour, you only must specify the language to use in line 3 of fase.bat. Compilers
-are not included in this package. In case of SDCC the compiler executable must be in the path.
-With ZXBasic it's preferable to download the zip package and unpack it into a child folder
-called zxb.
+identical behaviour, you only must specify the language to use in line 3 of fase.bat. Default
+compiler is ZXBasic because it's included in the package. In case of SDCC you must download
+and install it, with the compiler executable in the path.
 <br/><br/>
 Take care about heavy task if you want mantain the 50fps. Sprite painting is about 3500 cycles
 per sprite, so if for example you have four sprites that's 14000 cycles of almost 70000
@@ -248,6 +247,6 @@ before reading the assembly code in engine.asm.
   He borrows the graphics on the demo, are the same that "Nightmare in Hallowen"
 </ul>
 <br/>
-FASE 1.00 / 2014-02-04
+FASE 1.01 / 2014-02-04
 </div>
 <br/></body></html>

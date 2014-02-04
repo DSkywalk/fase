@@ -1,6 +1,6 @@
 @echo off
 SETLOCAL
-set _lang=c
+set _lang=basic
 if "%1"=="gfx" (
   util\Png2Rcs loading.png loading.rcs
   util\zx7b loading.rcs loading.rcs.zx7b
