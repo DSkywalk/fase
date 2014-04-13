@@ -216,8 +216,6 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
       write_bit(1);
 
       /* sequence length */
-  if( (optimal[input_index].len-1 & 0xff)== 0xff)
-    printf("muymal\n");
       write_elias_gamma(optimal[input_index].len-1);
 
       /* sequence offset */

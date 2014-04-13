@@ -206,7 +206,7 @@ int main(int argc, char *argv[]){
 // sprites
 
   inipos= 0;
-  outpos= 64<<smooth;
+  outpos= 0;//64<<smooth;
   error= lodepng_decode32_file(&image, &width, &height, "sprites.png");
   if( error )
     printf("\nError %u: %s\n", error, lodepng_error_text(error)),
@@ -215,20 +215,48 @@ int main(int argc, char *argv[]){
   if( !fo )
     printf("\nCannot create sprites.bin\n"),
     exit(-1);
-  for ( i= 0; i < 16; i++ )
-    for ( j= 0; j < 8; j+= 2-smooth ){
+  for ( i= 0; i < 16; i++ ){
+    output[inipos= outpos]= 0;
+    output[inipos+1]= 0xf8+offsey*8;
+    outpos+= 2;
+    nmin= nmax= 4;
+    for ( k= 0; k < 16; k++ ){
+      pics= mask= 0;
+      for ( l= 0; l < 16; l++ )
+        if( image[3+(i>>3<<12 | (i&7)<<5 | k<<8 | l)*4] )
+          pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x8000>>l : 0;
+        else
+          mask|= 0x8000>>l;
+// printf("%x, %x", pics, mask);
+// exit(1);
+      if( k&1 )
+        output[outpos++]= apics>>8,
+        output[outpos++]= amask>>8^0xff,
+        output[outpos++]= apics,
+        output[outpos++]= amask^0xff,
+        output[outpos++]= pics,
+        output[outpos++]= mask^0xff,
+        output[outpos++]= pics>>8,
+        output[outpos++]= mask>>8^0xff;
+      else
+        apics= pics,
+        amask= mask;
+    }
+/*    if( smooth ){
+      iniposback= inipos;
       output[inipos= outpos]= 0;
-      output[inipos+1]= 0xf8+offsey*8;
+      output[inipos+1]= 0xf8+offsey*8-1;
       outpos+= 2;
       nmin= nmax= 4;
-      for ( k= 0; k < 16; k++ ){
+      for ( k= -1; k < 17; k++ ){
         pics= mask= 0;
-        for ( l= 0; l < 16; l++ )
-          pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l+j : 0,
-          mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l+j;
+        if( k>-1 && k<16 )
+          for ( l= 0; l < 16; l++ )
+            pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l : 0,
+            mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l;
         for ( min= 0; min < 3 && !(mask&0xff<<(2-min<<3)); min++ );
         for ( max= 3; max && !(mask&0xff<<(3-max<<3)); max-- );
-        if( k&1 ){
+        if( ~k&1 ){
           if( min>amin ) min= amin;
           if( max<amax ) max= amax;
           if( min<max ){
@@ -256,61 +284,19 @@ int main(int argc, char *argv[]){
           amin= min,
           amax= max;
       }
-      if( smooth ){
-        iniposback= inipos;
-        output[inipos= outpos]= 0;
-        output[inipos+1]= 0xf8+offsey*8-1;
-        outpos+= 2;
-        nmin= nmax= 4;
-        for ( k= -1; k < 17; k++ ){
-          pics= mask= 0;
-          if( k>-1 && k<16 )
-            for ( l= 0; l < 16; l++ )
-              pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l+j : 0,
-              mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l+j;
-          for ( min= 0; min < 3 && !(mask&0xff<<(2-min<<3)); min++ );
-          for ( max= 3; max && !(mask&0xff<<(3-max<<3)); max-- );
-          if( ~k&1 ){
-            if( min>amin ) min= amin;
-            if( max<amax ) max= amax;
-            if( min<max ){
-              if( (nmin!=min) || (nmax!=max) )
-                output[reppos= outpos]= min+1-(nmin>2?0:nmin)&3 | (max-min==2?0:max-min)<<2,
-                outpos+= 2,
-                output[inipos]++,
-                output[reppos+1]= 0;
-              output[reppos+1]++;
-              for ( l= min; l < max; l++ )
-                output[outpos++]= apics>>(2-l<<3),
-                output[outpos++]= amask>>(2-l<<3)^0xff;
-              for ( l= max; l > min; l-- )
-                output[outpos++]= pics>>(3-l<<3),
-                output[outpos++]= mask>>(3-l<<3)^0xff;
-            }
-            else if( nmin==4 )
-              output[inipos+1]+= 2;
-            nmin= min;
-            nmax= max;
-          }
-          else
-            apics= pics,
-            amask= mask,
-            amin= min,
-            amax= max;
-        }
-        if( inipos-iniposback<=outpos-inipos )
-          output[(j|i<<3)>>1-smooth]= inipos-iniposback,
-          outpos= inipos;
-        else{
-          output[(j|i<<3)>>1-smooth]= outpos-inipos;
-          for ( l= iniposback; l<inipos; l++ )
-            output[l]= output[l+inipos-iniposback];
-          outpos-= inipos-iniposback;
-        }
+      if( inipos-iniposback<=outpos-inipos )
+        output[i]= inipos-iniposback,
+        outpos= inipos;
+      else{
+        output[i]= outpos-inipos;
+        for ( l= iniposback; l<inipos; l++ )
+          output[l]= output[l+inipos-iniposback];
+        outpos-= inipos-iniposback;
       }
-      else
-        output[(j|i<<3)>>1-smooth]= outpos-inipos;
     }
+    else*/
+      output[j]= outpos-inipos;
+  }
   fwrite(output, 1, outpos, fo);
   fclose(fo);
   free(image);
