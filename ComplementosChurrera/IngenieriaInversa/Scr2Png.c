@@ -27,10 +27,14 @@ int main(int argc, char *argv[]){
     exit(-1);
   else if( argc==3 )
     size+= fread(input+0x1801, 1, 0x300, fi);
-  else
-    fclose(fi),
-    fi= fopen(argv[3], "rb"),
+  else{
+    fclose(fi);
+    fi= fopen(argv[3], "rb");
+    if( !fi )
+      printf("\nInput file not found: %s\n", argv[3]),
+      exit(-1);
     size+= fread(input+0x1800, 1, 0x301, fi);
+  }
   switch( size ){
     case 0x900:
     case 0x1200:
