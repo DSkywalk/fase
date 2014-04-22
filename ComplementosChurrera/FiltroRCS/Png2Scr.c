@@ -87,7 +87,7 @@ int main(int argc, char *argv[]){
     if( !fo )
       printf("\nCannot create output file: %s\n", argv[3]),
       exit(-1);
-    fwrite(output, 1, height<<2, fo);
+    fwrite(output+height*32, 1, height<<2, fo);
     printf("\nFiles %s and %s generated from %s\n", argv[2], argv[3], argv[1]);
   }
   fclose(fo);
