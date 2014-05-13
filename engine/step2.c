@@ -265,8 +265,5 @@ int main(int argc, char *argv[]){
               "#define dzx7a  %d\n",  smooth, 0x10000-tmpbuf-stasp, scrw, scrh,
                                       mapw, maph, smooth ? 0xfc81+notabl : 0xfe80);
   fclose(fi);
-  fi= fopen("define.s", "wb+");
-  fprintf(fi, "dzx7a   .equ   0x%x\n", smooth ? 0xfc81+notabl : 0xfe80);
-  fclose(fi);
   printf("\nFile block.bin generated in STEP 2\n");
 }

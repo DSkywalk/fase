@@ -1,6 +1,6 @@
 #include  "fase.h"
-#include  "ending.h"
 
+extern unsigned char *ending;
 const unsigned char data[20]= {
   0x00, 0x42, 0x11, 0,
   0x08, 0x60, 0x60, 2,
@@ -17,21 +17,24 @@ void update_scoreboard();
 main(){
 
 start:
-  killed= x= y= spacepressed= num_bullets= shadow= 0;
+  killed= x= y= spacepressed= num_bullets= *shadow= 0;
   update_scoreboard();
 
   // inicializar engine
   INIT;
 
   // pasar datos a sprites y balas
-  for ( i = 0; i < 20; i++ )
-    sprites[i>>2][i&3]= data[i];
+  for ( i = 0; i < 5; i++ )
+    sprites[i].n= data[0 | i<<2],
+    sprites[i].x= data[1 | i<<2],
+    sprites[i].y= data[2 | i<<2],
+    sprites[i].f= data[3 | i<<2];
   for ( i = 0; i < 4; i++ )
-    bullets[i][1]= 255;
+    bullets[i].y= 255;
 
   // mostrar la primera pantalla al comienzo y marcador
-  screen= 0;
-  
+  *screen= 0;
+
   while(1){
 
     // esto hace que el engine procese un frame generando el escenario
@@ -39,78 +42,73 @@ start:
 
     // movimiento de los enemigos
     for ( i = 1; i < 5; i++ )
-      if( sprites[i][0]<0x80 ){
+      if( sprites[i].n<0x80 ){
         for ( j= 0; j < num_bullets; j++ )
-          if( ( (sprites[i][1]<bullets[j][0]?bullets[j][0]-sprites[i][1]:sprites[i][1]-bullets[j][0])
-              + (sprites[i][2]<bullets[j][1]?bullets[j][1]-sprites[i][2]:sprites[i][2]-bullets[j][1]))<10 ){
-            sprites[i][0]-= 0x80;
+          if( ( (sprites[i].x<bullets[j].x?bullets[j].x-sprites[i].x:sprites[i].x-bullets[j].x)
+              + (sprites[i].y<bullets[j].y?bullets[j].y-sprites[i].y:sprites[i].y-bullets[j].y))<10 ){
+            sprites[i].n-= 0x80;
             remove_bullet( j );
-            tmpx= sprites[i][1]>>4;
-            tmpy= sprites[i][2]>>4;
+            tmpx= sprites[i].x>>4;
+            tmpy= sprites[i].y>>4;
             tiles[tmpy*scrw+tmpx]= 68;
             tilepaint(tmpx, tmpy, tmpx, tmpy);
             killed++;
             if( killed==10 ){
               EXIT;
-              DZX7B((unsigned int)&ending_zx7[ending_zx7_size-1], 0x5aff);
-              PAUSE(100);
-              __asm
-                  ld      hl, #-6
-                  add     hl, sp
-                  ld      sp, hl
-              __endasm;
+              Dzx7b((unsigned int) (&ending-1), 0x5aff);
+              Pause(100);
               goto start;
             }
-            drwout= (unsigned int)update_scoreboard;
+            *drwout= (unsigned int)update_scoreboard;
           }
-        if( sprites[i][3]&1 )
-          if( sprites[i][2]>0 )
-            sprites[i][2]--;
+        if( sprites[i].f&1 )
+          if( sprites[i].y>0 )
+            sprites[i].y--;
           else
-            sprites[i][3]^= 1;
+            sprites[i].f^= 1;
         else
-          if( sprites[i][2]<scrh*16 )
-            sprites[i][2]++;
+          if( sprites[i].y<scrh*16 )
+            sprites[i].y++;
           else
-            sprites[i][3]^= 1;
-        if( sprites[i][3]&2 )
-          if( sprites[i][1]>0 )
-            sprites[i][1]--;
+            sprites[i].f^= 1;
+        if( sprites[i].f&2 )
+          if( sprites[i].x>0 )
+            sprites[i].x--;
           else
-            sprites[i][3]^= 2;
+            sprites[i].f^= 2;
         else
-          if( sprites[i][1]<scrw*16 )
-            sprites[i][1]++;
+          if( sprites[i].x<scrw*16 )
+            sprites[i].x++;
           else
-            sprites[i][3]^= 2;
+            sprites[i].f^= 2;
       }
 
     // movimiento de las balas
     for ( i = 0; i < num_bullets; i++ ){
       if( dirbul[i]&3 ){
         if( dirbul[i]&1 ){
-          if( bullets[i][0]<scrw*16 )
-            bullets[i][0]+= 2;
+          if( bullets[i].x<scrw*16 )
+            bullets[i].x+= 2;
           else
             remove_bullet( i );
         }
         else{
-          if( bullets[i][0]>2 )
-            bullets[i][0]-= 2;
+          if( bullets[i].x>2 )
+            bullets[i].x-= 2;
           else
             remove_bullet( i );
         }
       }
       if( dirbul[i]&12 ){
         if( dirbul[i]&4 ){
-          if( bullets[i][1]<scrh*16 )
-            bullets[i][1]+= 2;
+          if( bullets[i].y<scrh*16 )
+            bullets[i].y+= 2;
           else
             remove_bullet( i );
         }
         else{
-          if( bullets[i][1]>2 )
-            bullets[i][1]-= 2;
+          if( bullets[i].y>2 )
+            bullets[i].y-= 2;
           else
             remove_bullet( i );
         }
@@ -118,71 +116,79 @@ start:
     }
 
     // movimiento del protagonista
-    if( ~KeybYUIOP & 0x01 ){ // P
-      if( sprites[0][1]<scrw*16 )
-        sprites[0][1]++;
+    if( inKey(KeybYUIOP) & 0x01 ){ // P
+      if( sprites[0].x<scrw*16 )
+        sprites[0].x++;
       else if( x < mapw-1 )
-        sprites[0][1]= 0,
+        sprites[0].x= 0,
         x++,
         update_screen();
     }
-    else if( ~KeybYUIOP & 0x02 ){ // O
-      if( sprites[0][1]>0 )
-        sprites[0][1]--;
+    else if( inKey(KeybYUIOP) & 0x02 ){ // O
+      if( sprites[0].x>0 )
+        sprites[0].x--;
       else if( x )
-        sprites[0][1]= scrw*16,
+        sprites[0].x= scrw*16,
         x--,
         update_screen();
     }
-    if( ~KeybGFDSA & 0x01 ){ // A
-      if( sprites[0][2]<scrh*16 )
-        sprites[0][2]++;
+    if( inKey(KeybGFDSA) & 0x01 ){ // A
+      if( sprites[0].y<scrh*16 )
+        sprites[0].y++;
       else if( y < maph-1 )
-        sprites[0][2]= 0,
+        sprites[0].y= 0,
         y++,
         update_screen();
     }
-    else if( ~KeybTREWQ & 0x01 ){ // Q
-      if( sprites[0][2]>0 )
-        sprites[0][2]--;
+    else if( inKey(KeybTREWQ) & 0x01 ){ // Q
+      if( sprites[0].y>0 )
+        sprites[0].y--;
       else if( y )
-        sprites[0][2]= scrh*16,
+        sprites[0].y= scrh*16,
         y--,
         update_screen();
     }
-    if( ~KeybBNMs_ & 0x01 && !spacepressed && num_bullets<4 ){ // Space
-      bullets[num_bullets][0]= sprites[0][1];
-      bullets[num_bullets][1]= sprites[0][2];
-      i= ~(KeybTREWQ<<3&8 | KeybGFDSA<<2&4 | KeybYUIOP&3) & 15;
+    if( inKey(KeybBNMs_) & 0x01 && !spacepressed && num_bullets<4 ){ // Space
+      bullets[num_bullets].x= sprites[0].x;
+      bullets[num_bullets].y= sprites[0].y;
+      i= inKey(KeybTREWQ)<<3&8 | inKey(KeybGFDSA)<<2&4 | inKey(KeybYUIOP)&3;
       dirbul[num_bullets]= i ? i : 1;
       num_bullets++;
     }
-    spacepressed= ~KeybBNMs_ & 0x01;
+    spacepressed= inKey(KeybBNMs_) & 0x01;
   }
 }
 
 void remove_bullet( char k ){
-  num_bullets--;
-  while ( k<num_bullets )
-    dirbul[k]= dirbul[k+1],
-    bullets[k][0]= bullets[k+1][0],
-    bullets[k][1]= bullets[++k][1];
-  bullets[k][1]= 255;
+  if( num_bullets ){
+    num_bullets--;
+    while ( k<num_bullets )
+      dirbul[k]= dirbul[k+1],
+      bullets[k].x= bullets[k+1].x,
+      bullets[k].y= bullets[++k].y;
+    bullets[k].y= 255;
+  }
 }
 
 void update_screen(){
-  screen= y*mapw + x;
+  *screen= y*mapw + x;
   for ( j= 1; j < 5; j++ )
-    if( sprites[j][0]>0x7f )
-      sprites[j][0]-= 0x80;
+    if( sprites[j].n>0x7f )
+      sprites[j].n-= 0x80;
 }
 
 void update_scoreboard(){
   unsigned int scr, dst;
   char count;
   scr= 0x3d80+killed*8;
-  dst= 0x50de|shadow<<8;
+  dst= 0x50de|*shadow<<8;
   for ( count= 0; count<8; count++ )
     zxmem[dst]= zxmem[scr++]^0xff,
     dst+= 0x100;
 }
+
+    #asm
+        BINARY  "ending.rcs.zx7b"
+._ending
+    #endasm
+

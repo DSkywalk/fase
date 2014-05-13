@@ -99,9 +99,9 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
         ld      hl, $ffff
         ld      ($fffe-stasp), hl
         ld      hl, $8000+maincm-1
-        ld      de, $8040+mainrw-1
+        ld      de, $8200+mainrw-1
         call    desc
-        ld      hl, $8040
+        inc     hl
         ld      de, $8000
         ld      sp, 0x10000-tmpbuf-stasp
         push    de

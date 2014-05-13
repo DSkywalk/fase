@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
            "  zx7b <input_file> <output_file>\n\n"
            "  <input_file>    Raw input file\n"
            "  <output_file>   Compressed output file\n\n"
-           "Example: zx7b Cobra.scr Cobra.zx7\n"),
+           "Example: zx7b Cobra.scr Cobra.zx7b\n"),
     exit(0);
   if( argc!=3 )
     printf("\nInvalid number of parameters\n"),
