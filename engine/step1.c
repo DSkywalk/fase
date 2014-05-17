@@ -223,9 +223,14 @@ int main(int argc, char *argv[]){
       nmin= nmax= 4;
       for ( k= 0; k < 16; k++ ){
         pics= mask= 0;
-        for ( l= 0; l < 16; l++ )
-          pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l+j : 0,
-          mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l+j;
+        if( height==32 )
+          for ( l= 0; l < 16; l++ )
+            pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l+j : 0,
+            mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l+j;
+        else
+          for ( l= 0; l < 16; l++ )
+            pics|= image[(i<<4 | k<<8 | l)<<2 ] ? 0x800000>>l+j : 0,
+            mask|= image[(i<<4 | k<<8 | l)*4+3] ? 0x800000>>l+j : 0;
         for ( min= 0; min < 3 && !(mask&0xff<<(2-min<<3)); min++ );
         for ( max= 3; max && !(mask&0xff<<(3-max<<3)); max-- );
         if( k&1 ){
@@ -265,9 +270,14 @@ int main(int argc, char *argv[]){
         for ( k= -1; k < 17; k++ ){
           pics= mask= 0;
           if( k>-1 && k<16 )
-            for ( l= 0; l < 16; l++ )
-              pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l+j : 0,
-              mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l+j;
+            if( height==32 )
+              for ( l= 0; l < 16; l++ )
+                pics|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | l)<<2] ? 0x800000>>l+j : 0,
+                mask|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | 16 | l)<<2] ? 0 : 0x800000>>l+j;
+            else
+              for ( l= 0; l < 16; l++ )
+                pics|= image[(i<<4 | k<<8 | l)<<2 ] ? 0x800000>>l+j : 0,
+                mask|= image[(i<<4 | k<<8 | l)*4+3] ? 0x800000>>l+j : 0;
           for ( min= 0; min < 3 && !(mask&0xff<<(2-min<<3)); min++ );
           for ( max= 3; max && !(mask&0xff<<(3-max<<3)); max-- );
           if( ~k&1 ){

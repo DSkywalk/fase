@@ -15,7 +15,6 @@ if "%1"=="config" (
   util\sjasmplus engine2.asm > nul
   util\step2
   util\zx7b block.bin block.zx7b
-  sdasz80 -o lib.s
 )
 echo.
 call z88dkenv.bat
