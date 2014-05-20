@@ -1,0 +1,121 @@
+<!DOCTYPE HTML>
+  <html><head><title>
+    game.html</title></head>
+  <body/>
+  <script type="text/javascript" src="game.js"></script>
+  <script type="text/javascript">
+function initgame(){
+  kb= [];
+  repaint= scrn= 0xff;
+  sprites= [];
+  bullets= [];
+  tiles= [];
+  for ( i = 0; i < 12; i++ )
+    sprites[i]= {},
+    sprites[i].n= 0x80,
+    sprites[i].x= sprites[i].y= sprites[i].f= 0;
+  for ( i = 0; i < 8; i++ )
+    bullets[i]= {},
+    bullets[i].x= bullets[i].y= 0;
+  j= map.length;
+  size= i= 0;
+  while ( map[++i][0].charCodeAt(0)!=10 )
+    if( parseInt(map[i]) )
+      size++;
+  length= i;
+  mapw= i-size;
+  scrw= (size+1)/mapw;
+  while ( parseInt(map[2+i])+parseInt(map[1+i++]) );
+  scrh= i/length;
+  maph= (j/length+1)/(scrh+1);
+  cv= document.createElement('canvas');
+  cv2= document.createElement('canvas');
+  cv2.width= cv.width= 256;
+  cv2.height= cv.height= 192;
+  document.body.appendChild(cv);
+  ct= cv.getContext('2d');
+  ct2= cv2.getContext('2d');
+  ct2.fillRect(0, 0, 256, 192);
+  itiles= new Image();
+  itiles.src= 'tiles.png';
+  isprites= new Image();
+  isprites.src= 'sprites.png';
+  ibullet= new Image();
+  ibullet.src= 'bullet.png';
+  onresize();
+  document.onresize= document.body.onresize= onresize;
+  document.onkeydown= kdown;
+  document.onkeyup= kup;
+  image_number= 3;
+  itiles.onload= isprites.onload= ibullet.onload= function(){
+    if( !--image_number )
+      init();
+  }
+}
+
+function tilepaint( from_x, from_y, to_x, to_y ){
+  repaint= from_x | from_y<<4 | to_x<<8 | to_y<<12;
+}
+
+function FRAME(){
+  if( scrn!=0xff ){
+    for ( i= 0; i<scrh; i++ )
+      for ( j= 0; j<scrw; j++ )
+        k= map[(parseInt(scrn/mapw)*(scrh+1)+i)*length+(scrn%mapw)*(scrw+1)+j]-1,
+        tiles[i*scrw+j]= k,
+        ct2.drawImage(itiles, k<<4&0xf0, k&0xf0, 16, 16, j*2+offsex<<3, i*2+offsey<<3, 16, 16);
+    scrn= 0xff;
+  }
+  else if( (repaint>>8) >= (repaint&0xff) ){
+    for ( i= repaint>>12&15; i<=(repaint>>4&15); i++ )
+      for ( j= repaint>>8&15; j<=(repaint&15); j++ )
+        k= tiles[i*scrw+j],
+        ct2.drawImage(itiles, k<<4&0xf0, k&0xf0, 16, 16, j*2+offsex<<3, i*2+offsey<<3, 16, 16);
+    repaint= 0xff;
+  }
+  ct.drawImage(cv2, 0, 0);
+  for ( i = 0; i < sprmax; i++ )
+    if( ~sprites[i].n&0x80 )
+      ct.drawImage( isprites, sprites[i].n<<4, 0, 16, 16,
+                    offsex*8+sprites[i].x-8, offsey*8+sprites[i].y-8, 16, 16);
+  for ( i = 0; i < bulmax; i++ )
+    if( bullets[i].y<0xff )
+      ct.drawImage(ibullet, 0, 0, 8, 8, offsex*8+bullets[i].x-4, offsey*8+bullets[i].y-4, 8, 8);
+}
+
+function kdown(ev) {
+  kb[ev.keyCode>>3]|= 0x80 >> (ev.keyCode & 7);
+}
+
+function kup(ev) {
+  kb[ev.keyCode>>3]&= ~(0x80 >> (ev.keyCode & 7));
+}
+
+function onresize(ev){
+  ratio= innerWidth / innerHeight;
+  if( ratio>1.33 )
+    cv.style.height= (height= innerHeight - 50) + 'px',
+    cv.style.width= (width= parseInt(tmp= height*1.33)) + 'px',
+    cv.style.marginTop= (marginTop= 25) + 'px',
+    cv.style.marginLeft= (marginLeft= innerWidth-tmp >> 1) + 'px';
+  else
+    cv.style.width= (width= innerWidth - 50) + 'px',
+    cv.style.height= (height= parseInt(width/1.33)) + 'px',
+    cv.style.marginLeft= (marginLeft= 25) + 'px',
+    cv.style.marginTop= (marginTop= 25) + 'px';
+}
+
+function ajax(f){
+  var xhr= new XMLHttpRequest();
+  xhr.onreadystatechange=function(){
+    if( xhr&&xhr.readyState==4 )
+      map= xhr.responseXML.getElementsByTagName('data')[0].textContent.split(','),
+      initgame();
+  };
+  xhr.open('GET', f, true);
+  xhr.send(null);
+}
+
+ajax('map.tmx');
+
+</script></html>

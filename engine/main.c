@@ -55,7 +55,7 @@ start:
       if( sprites[i].n<0x80 ){
         for ( j= 0; j < num_bullets; j++ )
           if( abs(bullets[j].x-sprites[i].x) + abs(bullets[j].y-sprites[i].y) < 10 ){
-            sprites[i].n-= 0x80;
+            sprites[i].n+= 0x80;
             remove_bullet( j );
             tmpx= sprites[i].x>>4;
             tmpy= sprites[i].y>>4;

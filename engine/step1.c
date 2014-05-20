@@ -348,7 +348,7 @@ int main(int argc, char *argv[]){
     for ( mask= k= 0; k < 8; k++ ){
       pics= 0;
       for ( l= 0; l < 8; l++ )
-        pics|= image[(k<<3 | l)<<2] ? 0 : 0x800000>>l+i;
+        pics|= image[(k<<3 | l)*4+3] ? 0x800000>>l+i : 0;
       for ( min= 0; min < 3 && !(pics&0xff<<(2-min<<3)); min++ );
       for ( max= 3; max && !(pics&0xff<<(3-max<<3)); max-- );
       if( k&1 ){
@@ -387,7 +387,7 @@ int main(int argc, char *argv[]){
         pics= 0;
         if( k>-1 && k<8 )
           for ( l= 0; l < 8; l++ )
-            pics|= image[(k<<3 | l)<<2] ? 0 : 0x800000>>l+i;
+            pics|= image[(k<<3 | l)*4+3] ? 0x800000>>l+i : 0;
         for ( min= 0; min < 3 && !(pics&0xff<<(2-min<<3)); min++ );
         for ( max= 3; max && !(pics&0xff<<(3-max<<3)); max-- );
         if( ~k&1 ){
