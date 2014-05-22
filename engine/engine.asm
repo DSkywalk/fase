@@ -194,7 +194,7 @@ do1     jp      (hl)
         ld      (port&$ffff), a
         ld      a, $18          ; also toggle between bank 5 & 7 for the screen
         jr      z, do2          ; and 7 & 0 for the current paging at $c000
-        ld      a, $17          ; so we always show a screen and modify the other
+        dec     a               ; so we always show a screen and modify the other
 do2     out     (c), a
 do3     jr      update_complete
       ENDIF
