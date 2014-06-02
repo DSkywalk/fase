@@ -88,7 +88,7 @@ void salida(int n){
 
 int main(int argc, char *argv[]){
   if( argc==1 )
-    printf("\nGfxCnv v1.11. Chars, tiles and sprites generator by AntonioVillena,11 Nov 2013\n\n"
+    printf("\nGfxCnv v1.20. Chars, tiles and sprites generator by AntonioVillena, 2 Jun 2014\n\n"
            "  GfxCnv <in_chars> <in_tiles> <in_sprites> <out_tileset> <out_sprites>\n\n"
            "  <input_chars>     Normally chars.png\n"
            "  <input_tiles>     Normally tiles.png\n"
@@ -163,6 +163,8 @@ int main(int argc, char *argv[]){
   if( error )
     printf("\nError %u: %s\n", error, lodepng_error_text(error)),
     exit(-1);
+  if( width != 256 || (height != 16 && height != 32) )
+    printf("\nError. Incorrect size on %s, must be 256x16 or 256x32", argv[3]);
   fclose(fo);
   fo= fopen(argv[5], "wb+");
   if( !fo )
@@ -182,8 +184,14 @@ int main(int argc, char *argv[]){
       for ( k= 0; k < 16; k++ ){
         tinta= fondo= 0;
         for ( l= 0; l < 8; l++ )
-          tinta|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | l)<<2] ? 128>>l : 0,
-          fondo|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | 16 | l)<<2] ? 128>>l : 0;
+          if( height==32 )
+            for ( l= 0; l < 16; l++ )
+              tinta|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | l)<<2] ? 128>>l : 0,
+              fondo|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | 16 | l)<<2] ? 128>>l : 0;
+          else
+            for ( l= 0; l < 16; l++ )
+              tinta|= image[(i<<4 | k<<8 | j<<3 | l)<<2] ? 128>>l : 0,
+              fondo|= image[(i<<4 | k<<8 | j<<3 | l)*4+3] ? 0 : 128>>l;
         fprintf(fo, "        defb %d, %d\n", tinta, fondo);
       }
       for ( k= 0; k < 8; k++ )
