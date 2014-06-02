@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 int scr2rcs( int i ){ return i&0x1800 | i<<8&0x700 | i<<2&0xe0 | i>>6&0x1f;  }
 int rcs2scr( int i ){ return i&0x1800 | i>>8&7     | i>>2&0x38 | i<<6&0x7c0; }
 int main(int argc, char* argv[]){
