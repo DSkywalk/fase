@@ -1,6 +1,6 @@
-#include "lodepng.c"
 #include <stdio.h>
 #include <stdlib.h>
+#include "lodepng.h"
 unsigned char *image, *pixel, colors[][3]= {
       {  0,   0,   0},
       {  0,   0, 192},

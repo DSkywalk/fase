@@ -1,6 +1,6 @@
-#include "lodepng.c"
 #include <stdio.h>
 #include <stdlib.h>
+#include "lodepng.h"
 unsigned char *pixel, image[0xc000], input[0x900];
 unsigned error, width, height, i, j, k, l, fondo, tinta, brillo, color;
 FILE *fi;
@@ -88,6 +88,5 @@ int main(int argc, char *argv[]){
   if( error= lodepng_encode32_file(argv[5], image, 256, 32) )
     printf("Error %u: %s\n", error, lodepng_error_text(error)),
     exit(-1);
-  free(image);
   printf("\nFiles generated successfully\n");
 }
