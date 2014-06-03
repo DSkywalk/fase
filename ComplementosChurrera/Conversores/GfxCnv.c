@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "lodepng.h"
+#include "lodepng.c"
 unsigned char *image, *pixel, output[0x600];
 unsigned error, width, height, i, j, k, l, fondo, tinta, outpos= 0;
 long long atr, celdas[4];
@@ -185,13 +185,11 @@ int main(int argc, char *argv[]){
         tinta= fondo= 0;
         for ( l= 0; l < 8; l++ )
           if( height==32 )
-            for ( l= 0; l < 16; l++ )
-              tinta|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | l)<<2] ? 128>>l : 0,
-              fondo|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | 16 | l)<<2] ? 128>>l : 0;
+            tinta|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | l)<<2] ? 128>>l : 0,
+            fondo|= image[(i>>3<<12 | (i&7)<<5 | k<<8 | j<<3 | 16 | l)<<2] ? 128>>l : 0;
           else
-            for ( l= 0; l < 16; l++ )
-              tinta|= image[(i<<4 | k<<8 | j<<3 | l)<<2] ? 128>>l : 0,
-              fondo|= image[(i<<4 | k<<8 | j<<3 | l)*4+3] ? 0 : 128>>l;
+            tinta|= image[(i<<4 | k<<8 | j<<3 | l)<<2] ? 128>>l : 0,
+            fondo|= image[(i<<4 | k<<8 | j<<3 | l)*4+3] ? 0 : 128>>l;
         fprintf(fo, "        defb %d, %d\n", tinta, fondo);
       }
       for ( k= 0; k < 8; k++ )
