@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "lodepng.h"
+#include "../lodepng.c"
 unsigned char *image, *pixel, output[0x5b00];
 unsigned error, width, height, i, j, k, l, m, fondo, tinta;
 long long atr, celda;

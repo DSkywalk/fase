@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "lodepng.h"
+#include "../lodepng.c"
 unsigned char *pixel, image[0xc000], input[0x900];
 unsigned error, width, height, i, j, k, l, fondo, tinta, brillo, color;
 FILE *fi;
