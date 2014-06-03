@@ -1,6 +1,6 @@
 CC = gcc
 TARGETS = bin2map gfxcnv gfxinv map2tmx png2rcs rcs png2scr posterizezx tmxcnv tmxcompress
-CFLAGS = -std=c99 -static -Ilodepng
+CFLAGS = -std=c99 -static
 
 all: $(TARGETS)
 
@@ -18,7 +18,7 @@ map2tmx: Conversores/Map2Tmx.c
 	@ $(CC) -o map2tmx Conversores/Map2Tmx.c $(CFLAGS)
 rcs: FiltroRCS/rcs.c
 	@ echo "compile: rcs"
-	@ $(CC) -o png2rcs FiltroRCS/rcs.c $(CFLAGS)
+	@ $(CC) -o rcs FiltroRCS/rcs.c $(CFLAGS)
 png2rcs: FiltroRCS/Png2Rcs.c
 	@ echo "compile: png2rcs"
 	@ $(CC) -o png2rcs FiltroRCS/Png2Rcs.c $(CFLAGS)
