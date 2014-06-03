@@ -3,7 +3,7 @@
 #include <string.h>
 typedef struct{
   unsigned char xi, yi, xe, ye, speed;
-  short type;
+  short type, name;
 } enem;
 typedef struct{
   unsigned char xy, type;
@@ -21,9 +21,9 @@ int main(int argc, char* argv[]){
   char *fou, *token;
   FILE *fi, *fo;
   int size= 0, scrw, scrh, mapw, maph, lock, numlock= 0, tmpi, elem, sum,
-      tog= 0, i, j, k, l, type, gid, x, y, name, mapx, mapy, baddies= 0;
+      tog= 0, i, j, k, l, type, gid, x, y, name, mapx, mapy, speed, baddies= 0;
   if( argc==1 )
-    printf("\nTmxCnv v1.12, TMX to H generator by Antonio Villena, 30 Dec 2013\n\n"
+    printf("\nTmxCnv v1.20, TMX to H generator by Antonio Villena, 3 Jun 2014\n\n"
            "  TmxCnv <input_tmx> <output_map_h> [<output_enems_h>]\n\n"
            "  <input_tmx>       Origin .TMX file\n"
            "  <output_map_h>    Generated .H map output file\n"
@@ -153,8 +153,11 @@ int main(int argc, char* argv[]){
         while ( token != NULL ){
           if( strstr(token, "name") )
             name= atoi(token+6);
-          else if ( strstr(token, "type") )
-            type= atoi(token+6);
+          else if ( strstr(token, "type") ){
+            speed= atoi(token+6);
+            if( strchr(token+6, '.') )
+              type= atoi(strchr(token+6, '.')+1);
+          }
           else if ( strstr(token, "gid") )
             gid= atoi(token+5);
           else if ( strstr(token, "x") )
@@ -170,62 +173,51 @@ int main(int argc, char* argv[]){
         while ( y > scrh )
           mapy++,
           y-= scrh+1;
-        if( name>100 ){
+        if( name ){
           for ( k= 0
-              ; k<3 && enems[mapy*mapw+mapx][k].type && enems[mapy*mapw+mapx][k].type!=name
+              ; k<3 && enems[mapy*mapw+mapx][k].name && enems[mapy*mapw+mapx][k].name!=name
               ; k++ );
           if( k==3 )
             printf("\nError: More than 3 enemies in screen (%d, %d).\n", mapx, mapy),
             exit(-1);
           enac= &enems[mapy*mapw+mapx][k];
-          if( enac->type )
-            enac->type= (gid-61)>>2;
+          enac->name= name;
+          enac->speed= speed ? speed : 1;
+          if( type )
+            enac->type= type;
           else
-            enac->type= name;
+            enac->type= (gid-61)>>2;
           if( gid-61&2 )
             enac->xe= x,
-            enac->ye= y+1;
-          else{
-            enac->xi= x;
-            enac->yi= y+1;
-            enac->speed= type ? type : 1;
-            if( ((gid-61)>>2)-4 )
-              baddies++;
-          }
+            enac->ye= y+1,
+            enac->yi || baddies++;
+          else
+            enac->xi= x,
+            enac->yi= y+1,
+            enac->ye || baddies++;
         }
         else{
-          if( name ){
+          if( gid>48 ){
             for ( k= 0 ; k<3 && enems[mapy*mapw+mapx][k].type ; k++ );
             if( k==3 )
               printf("\nError: More than 3 enemies in screen (%d, %d).\n", mapx, mapy),
               exit(-1);
             enac= &enems[mapy*mapw+mapx][k];
-            baddies++;
-            enac->type= name;
-            enac->xi= x;
-            enac->yi= y+1;
-            enac->xe= x;
-            enac->ye= y+1;
-            enac->speed= type ? type : 1;
-          }
-          else if( type || gid>48 ){
-            for ( k= 0 ; k<3 && enems[mapy*mapw+mapx][k].type ; k++ );
-            if( k==3 )
-              printf("\nError: More than 3 enemies in screen (%d, %d).\n", mapx, mapy),
-              exit(-1);
-            enac= &enems[mapy*mapw+mapx][k];
-            if( enac->yi+enac->ye )
-              enac->type= (gid-61)>>2;
+            enac->speed= speed ? speed : 1;
+            if( enac->yi+enac->ye ){
+              if( type )
+                enac->type= type;
+              else
+                enac->type= (gid-61)>>2;
+            }
             if( gid-61&2 )
               enac->xe= x,
-              enac->ye= y+1;
-            else{
-              enac->xi= x;
-              enac->yi= y+1;
-              enac->speed= type ? type : 1;
-              if( ((gid-61)>>2)-4 )
-                baddies++;
-            }
+              enac->ye= y+1,
+              enac->yi || baddies++;
+            else
+              enac->xi= x,
+              enac->yi= y+1,
+              enac->ye || baddies++;
           }
           else
             hotspots[mapy*mapw+mapx].xy= y | x<<4,
@@ -247,6 +239,12 @@ int main(int argc, char* argv[]){
       for ( j= 0; j<mapw; j++ )
         for ( k= 0; k<3; k++ ){
           enac= &enems[i*mapw+j][k];
+          if( enac->xe+enac->ye==0 )
+            enac->xe= enac->xi,
+            enac->ye= enac->yi;
+          else if( enac->xi+enac->yi==0 )
+            enac->xi= enac->xe,
+            enac->yi= enac->ye;
           if( !enac->yi )
             enac->yi= 1;
           if( !enac->ye )

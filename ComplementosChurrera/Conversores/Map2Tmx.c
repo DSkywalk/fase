@@ -7,7 +7,7 @@ int main(int argc, char* argv[]){
   int size, scrw, scrh, mapw, maph, lock, i, j, k, l;
   unsigned char type, xi, xe, yi, ye, speed;
   if( argc==1 )
-    printf("\nMap2Tmx v1.11, MAP file (Mappy) to TMX (Tiled) by Antonio Villena, 11 Nov 2013\n\n"
+    printf("\nMap2Tmx v1.20, MAP file (Mappy) to TMX (Tiled) by Antonio Villena, 3 Jun 2014\n\n"
            "  Map2Tmx       <map_width> <map_height> <screen_width> <screen_height>\n"
            "                <lock> <output_tmx> [<input_map>] [<input_ene>]\n\n"
            "  <map_width>       Map width\n"
@@ -87,8 +87,14 @@ int main(int argc, char* argv[]){
           fread(&speed, 1, 1, fi);
           fread(mem, 2, 1, fi);
           if( type>4 )
-            fprintf(fo, "<object name=\"%d\" type=\"%d\" gid=\"73\" x=\"%d\" y=\"%d\"/>\n",
-                    type, speed, (xi+j*(scrw+1))<<4, (1+yi+i*(scrh+1))<<4);
+            if( xi==xe && yi==ye )
+              fprintf(fo, "<object name=\"%d\" type=\"%d.%d\" gid=\"73\" x=\"%d\" y=\"%d\"/>\n",
+                      l++, speed, type, (xi+j*(scrw+1))<<4, (1+yi+i*(scrh+1))<<4);
+            else
+              fprintf(fo, "<object name=\"%d\" type=\"%d.%d\" gid=\"73\" x=\"%d\" y=\"%d\"/>\n"
+                          "<object name=\"%d\" type=\"%d.%d\" gid=\"75\" x=\"%d\" y=\"%d\"/>\n",
+                      l++, speed, type, (xi+j*(scrw+1))<<4, (1+yi+i*(scrh+1))<<4,
+                      l,   speed, type, (xe+j*(scrw+1))<<4, (1+ye+i*(scrh+1))<<4);
           else if( type )
             fprintf(fo, "<object name=\"%d\" type=\"%d\" gid=\"%d\" x=\"%d\" y=\"%d\"/>\n"
                         "<object name=\"%d\" type=\"%d\" gid=\"%d\" x=\"%d\" y=\"%d\"/>\n",
