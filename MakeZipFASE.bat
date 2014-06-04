@@ -20,7 +20,6 @@ move /Y step1.exe engine\util
 move /Y step2.exe engine\util
 move /Y zx7b.exe engine\util
 move /Y GenTmx.exe engine\util
-copy /Y bin2c.exe engine\util
 del *.map *.obj
 cd engine
 call fase gfx
@@ -30,6 +29,6 @@ call fase gfx
   util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe ^
   engine0.asm engine1.asm engine2.asm engine.asm loader.asm dzx7b_rcs.asm ^
   loading.png sprites.png tiles.png bullet.png map.tmx ^
-  main.c main.bas fase.h fase.bas ending.h ending.rcs.zx7b lib.s ^
+  main.c main.bas fase.h fase.bas ending.h ending.rcs.zx7b ^
   zxb
 cd ..
