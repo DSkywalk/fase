@@ -6,7 +6,7 @@
 #define maxvy   600
 
 extern unsigned char *ending;
-const unsigned char data[20]= {
+/* const */ unsigned char data[20]= {
   0x00, 0x42, 0x11, 0,
   0x08, 0x60, 0x60, 2,
   0x09, 0x58, 0x48, 3,

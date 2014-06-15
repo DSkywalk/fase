@@ -1,6 +1,6 @@
-#include "lodepng.c"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../ComplementosChurrera/lodepng.c"
 unsigned char *image, *pixel, output[0x10000];
 char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
       notabl, bullet, bulmax, sprmax;
@@ -18,7 +18,7 @@ int tospec(int r, int g, int b){
   return ((r|g|b)==255 ? 8 : 0) | g>>7<<2 | r>>7<<1 | b>>7;
 }
 
-celdagen(){
+void celdagen(void){
   pixel= &image[(((j|i<<8)<<4) | k<<8 | l)<<2];
   if( !(check(pixel[0]) && check(pixel[1]) && check(pixel[2]))
     || ((char)pixel[0]*-1 | (char)pixel[1]*-1 | (char)pixel[2]*-1)==65 )
@@ -35,7 +35,7 @@ celdagen(){
   celdas[k>>3<<1 | l>>3]|= fondo != tospec(pixel[0], pixel[1], pixel[2]);
 }
 
-atrgen(){
+void atrgen(void){
   atr<<= 8;
   if( fondo==tinta ){
     if( tinta )

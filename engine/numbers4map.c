@@ -1,6 +1,6 @@
-#include "lodepng.c"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../ComplementosChurrera/lodepng.c"
 unsigned char *image;
 unsigned error, width, height, i, j, k, l, m;
 FILE *fo;

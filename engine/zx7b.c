@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   fclose(ofp);
 
   /* done! */
-  printf("\nFile %s compressed from %s (%d to %d bytes)\n", argv[2], argv[1], input_size, output_size);
+  printf("\nFile %s compressed from %s (%d to %d bytes)\n", argv[2], argv[1], (int) input_size, (int) output_size);
   return 0;
 }
 

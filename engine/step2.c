@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 FILE *fi, *fi2;
 unsigned char mem[0x10000], sprites[0x8000], bullets[8], sblocks[0x89], sorder[0x89], subset[0x1200][0x89];
 char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet, bulmax, sprmax;
@@ -166,11 +167,10 @@ int main(int argc, char *argv[]){
       stasp+= blen<<1,
       blocks[nblocks-1].len+= blen;
   }
-  mem[0xffff-stasp]= 0xff;
-  mem[0xfffe-stasp]= 0xff;
-  mem[point]= 0xfffe-stasp&0xff;
-  mem[point+1]= 0xfffe-stasp>>8;
-  fclose(fi);
+  mem[0xffff - stasp]= 0xff;
+  mem[0xfffe - stasp]= 0xff;
+  mem[point]= 0xfffe - stasp&0xff;
+  mem[point+1]= 0xfffe - stasp>>8;
   fi= fopen("map_compressed.bin", "rb");
   fseek(fi, 0, SEEK_END);
   tmp= ftell(fi);
@@ -209,8 +209,8 @@ int main(int argc, char *argv[]){
   fclose(fi2);
   init1= mem[0xfffd] | mem[0xfffe]<<8;
   frame1= mem[0xfffa] | mem[0xfffb]<<8;
-  mem[point]= 0xfffe-stasp&0xff;
-  mem[point+1]= 0xfffe-stasp>>8;
+  mem[point]= 0xfffe - stasp & 0xff;
+  mem[point+1]= 0xfffe - stasp >> 8;
   if( smooth )
     fwrite(mem+0x10002-scode1, 1, scode1-2-0x37f+notabl-tmp, fi);
   else
@@ -224,8 +224,8 @@ int main(int argc, char *argv[]){
   scode2&= 0xfffe;
   fread(mem+0x10002-scode2, 1, 0x2000, fi2);
   fclose(fi2);
-  mem[point]= 0xfffe-stasp&0xff;
-  mem[point+1]= 0xfffe-stasp>>8;
+  mem[point]= 0xfffe - stasp & 0xff;
+  mem[point+1]= 0xfffe - stasp >> 8;
   if( smooth )
     fwrite(mem+0x10002-scode2, 1, scode2-2-0x37f+notabl-tmp, fi),
     scode-= 0x37f-notabl+tmp,
