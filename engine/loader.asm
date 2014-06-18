@@ -18,12 +18,6 @@ ini     ld      de, desc
         ld      hl, $5ccb+descom-ini
         ld      bc, $7f
         ldir
-      IF  border_loading=0
-        xor     a
-      ELSE
-        ld      a, border_loading
-      ENDIF
-        out     ($fe), a
         ld      hl, $5ccb+descom-ini-1
         ld      de, $5aff
         call    desc
@@ -31,6 +25,12 @@ ini     ld      de, desc
         ld      de, engicm
         push    hl
         call    $07f4
+      IF  border_loading=0
+        xor     a
+      ELSE
+        ld      a, border_loading
+      ENDIF
+        out     ($fe), a
         di
         pop     hl
         ld      de, ramt-maplen
