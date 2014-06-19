@@ -15,18 +15,18 @@ struct {
               , {     0,      0}};
 
 int main(int argc, char *argv[]){
-  fi= fopen("sprites.bin", "rb");
+  fi= fopen("build/sprites.bin", "rb");
   ssprites= fread(sprites, 1, 0x8000, fi);
   fclose(fi);
-  fi= fopen("engine1.bin", "rb");
+  fi= fopen("build/engine1.bin", "rb");
   fseek(fi, 0, SEEK_END);
   scode1= ftell(fi);
   fclose(fi);
-  fi= fopen("engine2.bin", "rb");
+  fi= fopen("build/engine2.bin", "rb");
   fseek(fi, 0, SEEK_END);
   scode2= ftell(fi);
   fclose(fi);
-  fi= fopen("engine0.bin", "rb");
+  fi= fopen("build/engine0.bin", "rb");
   fseek(fi, 0, SEEK_END);
   stasp= scode= ftell(fi);
   stasp= stasp<scode1 ? scode1 : stasp;
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
       sprmax= atoi(fou+6);
   }
   fclose(fi);
-  fi= fopen("defmap.asm", "r");
+  fi= fopen("build/defmap.asm", "r");
   while ( !feof(fi) ){
     fgets(tmpstr, 30, fi);
     if( fou= (char *) strstr(tmpstr, "scrw") )
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]){
       tmpbuf= sum;
   }
   tmpbuf= tmpbuf*sprmax+bulmax*4+2;
-  fi= fopen("tiles.bin", "rb");
+  fi= fopen("build/tiles.bin", "rb");
   stiles= fread(mem+0x5c08+bullet*(8<<smooth), 1, 0x23f8-bullet*(8<<smooth), fi);
   fclose(fi);
   nsprites= smooth ? 0x80 : 0x40;
@@ -104,7 +104,7 @@ int main(int argc, char *argv[]){
     blocks[0].len= 243>>1,
     blocks[0].addr= 0xff01;
   if( bullet ){
-    fi= fopen("bullet.bin", "rb");
+    fi= fopen("build/bullet.bin", "rb");
     fread(bullets, 1, smooth ? 8 : 4, fi);
     ssprites+= fread(sprites+(64<<smooth)+ssprites, 1, 0x200, fi);
     fclose(fi);
@@ -171,19 +171,19 @@ int main(int argc, char *argv[]){
   mem[0xfffe - stasp]= 0xff;
   mem[point]= 0xfffe - stasp&0xff;
   mem[point+1]= 0xfffe - stasp>>8;
-  fi= fopen("map_compressed.bin", "rb");
+  fi= fopen("build/map_compressed.bin", "rb");
   fseek(fi, 0, SEEK_END);
   tmp= ftell(fi);
   fclose(fi);
-  fi2= fopen("engine2.bin", "rb");
+  fi2= fopen("build/engine2.bin", "rb");
   fseek(fi2, -10, SEEK_END);
   fread(mem+0xfff6, 1, 9, fi2);
   fclose(fi2);
-  fi2= fopen("engine1.bin", "rb");
+  fi2= fopen("build/engine1.bin", "rb");
   fseek(fi2, -9, SEEK_END);
   fread(mem+0xfff7, 1, 2, fi2);
   fclose(fi2);
-  fi= fopen("block.bin", "wb+");
+  fi= fopen("build/block.bin", "wb+");
   fwrite(mem+0x5c08, 1, 0x23f8, fi);
   if( smooth ){
     fwrite(mem+0xfd00+notabl, 1, 0x300-notabl, fi);
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]){
       fwrite(mem+blocks[2].addr, 1, blocks[2].len<<1, fi);
     fwrite(mem+0x10002-scode, 1, scode-2-0x300+notabl-tmp, fi);
   }
-  fi2= fopen("engine1.bin", "rb");
+  fi2= fopen("build/engine1.bin", "rb");
   fseek(fi2, 0, SEEK_END);
   scode1= ftell(fi2);
   fseek(fi2, 0, SEEK_SET);
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]){
     fwrite(mem+0x10002-scode1, 1, scode1-2-0x37f+notabl-tmp, fi);
   else
     fwrite(mem+0x10002-scode1, 1, scode1-2-0x300+notabl-tmp, fi);
-  fi2= fopen("engine2.bin", "rb");
+  fi2= fopen("build/engine2.bin", "rb");
   fseek(fi2, 0, SEEK_END);
   scode2= ftell(fi2);
   fseek(fi2, 0, SEEK_SET);
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]){
     scode1-= 0x300-notabl+tmp,
     scode2-= 0x300-notabl+tmp;
   fclose(fi);
-  fi= fopen("defload.asm", "wb+");
+  fi= fopen("build/defload.asm", "wb+");
   fprintf(fi, "        DEFINE  smooth  %d\n"
               "        DEFINE  maplen  %d\n"
               "        DEFINE  codel0  %d\n"
@@ -255,7 +255,7 @@ int main(int argc, char *argv[]){
           smooth, tmp, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
           blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet, tmpbuf);
   fclose(fi);
-  fi= fopen("define.h", "wb+");
+  fi= fopen("build/define.h", "wb+");
   fprintf(fi, "#define smooth %d\n"
               "#define stack  %d\n"
               "#define scrw   %d\n"

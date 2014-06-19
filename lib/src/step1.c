@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../ComplementosChurrera/lodepng.c"
+#include "../../ComplementosChurrera/lodepng.c"
 unsigned char *image, *pixel, output[0x10000];
 char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
       notabl, bullet, bulmax, sprmax;
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]){
 
 // tiles
 
-  error= lodepng_decode32_file(&image, &width, &height, "tiles.png");
+  error= lodepng_decode32_file(&image, &width, &height, "gfx/tiles.png");
   if( error )
     printf("Error %u: %s\n", error, lodepng_error_text(error)),
     exit(-1);
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]){
         output[0x5000+apics*4+k]= output[i*36+32+k];
     output[inipos++]= j<i ? output[0x4000|j] : apics++;
   }
-  ft= fopen("define.asm", "wb+");
+  ft= fopen("build/define.asm", "wb+");
   fprintf(ft, "        DEFINE  tmode  %d\n"
               "        DEFINE  tiles  %d\n"
               "        DEFINE  bmaps  %d\n"
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]){
   printf("index bitmap %d bytes\n", pics*5+reppos*32);
   printf("index attr   %d bytes\n", pics*33+apics*4);
   printf("full index   %d bytes\n", pics*2+reppos*32+apics*4);
-  fo= fopen("tiles.bin", "wb+");
+  fo= fopen("build/tiles.bin", "wb+");
   if( !fo )
     printf("\nCannot create tiles.bin\n"),
     exit(-1);
@@ -207,11 +207,11 @@ int main(int argc, char *argv[]){
 
   inipos= 0;
   outpos= 64<<smooth;
-  error= lodepng_decode32_file(&image, &width, &height, "sprites.png");
+  error= lodepng_decode32_file(&image, &width, &height, "gfx/sprites.png");
   if( error )
     printf("\nError %u: %s\n", error, lodepng_error_text(error)),
     exit(-1);
-  fo= fopen("sprites.bin", "wb+");
+  fo= fopen("build/sprites.bin", "wb+");
   if( !fo )
     printf("\nCannot create sprites.bin\n"),
     exit(-1);
@@ -332,11 +332,11 @@ int main(int argc, char *argv[]){
     exit(0);
   inipos= 0;
   outpos= 4<<smooth;
-  error= lodepng_decode32_file(&image, &width, &height, "bullet.png");
+  error= lodepng_decode32_file(&image, &width, &height, "gfx/bullet.png");
   if( error )
     printf("\nError %u: %s\n", error, lodepng_error_text(error)),
     exit(-1);
-  fo= fopen("bullet.bin", "wb+");
+  fo= fopen("build/bullet.bin", "wb+");
   if( !fo )
     printf("\nCannot create bullet.bin\n"),
     exit(-1);
@@ -430,7 +430,7 @@ int main(int argc, char *argv[]){
     else
       output[i>>1-smooth]= outpos-inipos;
   }
-  ft= fopen("define.asm", "a");
+  ft= fopen("build/define.asm", "a");
   fseek(ft, 0, SEEK_END);
   fprintf(ft, "        DEFINE  bulmiy %d\n"
               "        DEFINE  bulmay %d\n",  0x100+offsey*8-output[inipos+1],

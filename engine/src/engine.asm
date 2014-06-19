@@ -1,5 +1,5 @@
-        include define.asm
-        include defmap.asm
+        include build/define.asm
+        include build/defmap.asm
 ; 0 black, 1 blue, 2 red, 3 magenta, 4 green, 5 cyan, 6 yellow, 7 white
 ; 8 none, 9-15 bright versions of 1-7
         DEFINE  scolor  5
@@ -1992,14 +1992,14 @@ ini9    in      a, ($ff)
       ENDIF
 
 ; Map file. Generated externally with TmxCompress.c from map.tmx
-map     incbin  map_compressed.bin
+map     incbin  build/map_compressed.bin
 mapend
 
 ; Look up 256 bytes table and space to decompressor
         block   final-$&$ffff
     IF smooth=0
       IF notabl=0
-lookt   incbin  file1.bin
+lookt   incbin  src/file1.bin
       ENDIF
         block   $fe80-$&$ffff
         block   $7f
@@ -2007,7 +2007,7 @@ lookt   incbin  file1.bin
     ELSE
       IF notabl=0
         block   $7f
-lookt   incbin  file1.bin
+lookt   incbin  src/file1.bin
       ELSE
         block   $7f
       ENDIF

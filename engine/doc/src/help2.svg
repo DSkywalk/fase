@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="765"
+   height="990"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.48.4 r9939"
+   version="1.0"
+   sodipodi:docname="memory_map.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="A:\fase\engine\memory_map.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.3028778"
+     inkscape:cx="464.60615"
+     inkscape:cy="624.40473"
+     inkscape:document-units="in"
+     inkscape:current-layer="layer1"
+     gridanglex="0.33333333in"
+     gridanglez="0.33333333in"
+     grid_units="in"
+     width="8.5in"
+     height="11in"
+     units="in"
+     showgrid="false"
+     inkscape:window-width="1292"
+     inkscape:window-height="741"
+     inkscape:window-x="65"
+     inkscape:window-y="-9"
+     showborder="false"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="false"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <inkscape:grid
+       id="GridFromPre046Settings"
+       type="xygrid"
+       originx="0in"
+       originy="0px"
+       spacingx="0.25in"
+       spacingy="0.25in"
+       color="#3f3fff"
+       empcolor="#3f3fff"
+       opacity="0.15"
+       empopacity="0.38"
+       empspacing="4" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="103.32975"
+       y="835.19495"
+       id="text9265"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         x="103.32975"
+         y="835.19495"
+         id="tspan3020">ROM 3</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="284.43558"
+       y="835.22345"
+       id="text9275"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9277"
+         x="284.43558"
+         y="835.22345">RAM 5</tspan><tspan
+         sodipodi:role="line"
+         x="284.43558"
+         y="860.22345"
+         id="tspan9279" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="461.47064"
+       y="836.1568"
+       id="text9281"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9283"
+         x="461.47064"
+         y="836.1568">RAM 2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="640.09393"
+       y="834.01392"
+       id="text9285"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9287"
+         x="640.09393"
+         y="834.01392">RAM 0/7</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="89.285713"
+       y="45.714287"
+       id="text9413"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9415"
+         x="89.285713"
+         y="45.714287">FASE memory map</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="26.702503"
+       y="806.37512"
+       id="text9451"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9453"
+         x="26.702503"
+         y="806.37512">0x0000</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="24.264999"
+       y="104.3101"
+       id="text9463"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9465"
+         x="24.264999"
+         y="104.3101">0x3FFF</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 0.5,811.5 c 105,0 210,0 315,0 105,0 210,0 315,0 37.5,0 75,0 112.5,0"
+       id="path9515"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M -0.5,90.5 C 104.5,90.5 209.5,90.5 314.5,90.5 C 419.5,90.5 524.5,90.5 629.5,90.5 C 667,90.5 704.5,90.5 742,90.5"
+       id="path9517" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 628.875,811.125 C 628.875,91.125 628.875,91.125 628.875,91.125 L 718.875,91.125 L 718.875,811.125 L 631.125,811.125 z "
+       id="path10500" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 448.875,811.125 C 448.875,91.125 448.875,91.125 448.875,91.125 L 538.875,91.125 L 538.875,811.125 L 448.875,811.125 z "
+       id="path10502" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 268.875,811.125 C 268.875,91.125 268.875,91.125 268.875,91.125 L 358.875,91.125 L 358.875,811.125 L 268.875,811.125 z "
+       id="path10504" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 88.875,811.125 C 88.875,91.125 88.875,91.125 88.875,91.125 L 178.875,91.125 L 178.875,811.125 L 88.875,811.125 z "
+       id="path10508" />
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="91.596451"
+       y="67.250557"
+       id="text10510"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan10512"
+         x="91.596451"
+         y="67.250557">128k mode, smooth=1, notabl=0. In 48k mode is the same but without shadow video</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3233-1"
+       y="104.88598"
+       x="205.05666"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       xml:space="preserve"><tspan
+         y="104.88598"
+         x="205.05666"
+         id="tspan3235-7"
+         sodipodi:role="line">0x7FFF</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3233-4"
+       y="104.08636"
+       x="384.5748"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       xml:space="preserve"><tspan
+         y="104.08636"
+         x="384.5748"
+         id="tspan3235-0"
+         sodipodi:role="line">0xBFFF</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3233-9"
+       y="104.08636"
+       x="566.08649"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       xml:space="preserve"><tspan
+         y="104.08636"
+         x="566.08649"
+         id="tspan3235-4"
+         sodipodi:role="line">0xFFFF</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="207.03197"
+       y="806.6535"
+       id="text9451-1"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9453-7"
+         x="207.03197"
+         y="806.6535">0x4000</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="388.58258"
+       y="806.6535"
+       id="text9451-4"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9453-0"
+         x="388.58258"
+         y="806.6535">0x8000</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="565.47803"
+       y="806.6535"
+       id="text9451-9"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         x="565.47803"
+         y="806.6535"
+         id="tspan3055">0xC000</tspan></text>
+    <rect
+       style="fill:#e6e6e6"
+       id="rect3036"
+       width="86.225441"
+       height="716.41174"
+       x="90.429863"
+       y="92.728455" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3038"
+       style="font-size:32px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;text-anchor:middle;text-align:center;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3040"><rect
+           id="rect3042"
+           width="94.07045"
+           height="79.473289"
+           x="85.960922"
+           y="404.49255"
+           style="font-size:32px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3044">48K</flowPara><flowPara
+         id="flowPara3046">ROM</flowPara></flowRoot>    <rect
+       style="fill:#008000"
+       id="rect3048"
+       width="87.777092"
+       height="313.8895"
+       x="270.03644"
+       y="496.11954" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3070"
+       style="font-size:20px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;text-anchor:middle;text-align:center;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3072"><rect
+           id="rect3074"
+           width="87.237221"
+           height="100.0428"
+           x="269.71509"
+           y="631.44696"
+           style="font-size:20px;text-align:center;text-anchor:middle;font-weight:bold;-inkscape-font-specification:Sans Bold;fill:#ffffff"
+           ry="0" /></flowRegion><flowPara
+         id="flowPara3076">video</flowPara><flowPara
+         id="flowPara3078">memory</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="207.04349"
+       y="500.24097"
+       id="text9451-1-7"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9453-7-4"
+         x="207.04349"
+         y="500.24097">0x5B00</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="563.19543"
+       y="501.04126"
+       id="text9451-1-0"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         x="563.19543"
+         y="501.04126"
+         id="tspan3128">0xDB00</tspan></text>
+    <rect
+       style="fill:#00ffff"
+       id="rect3132"
+       width="87.668213"
+       height="21.886337"
+       x="270.08447"
+       y="474.30292" />
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       x="206.5157"
+       y="481.03271"
+       id="text9451-1-7-4"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan9453-7-4-8"
+         x="206.5157"
+         y="481.03271">0x5C08</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3155"
+       style="font-size:18px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold;text-anchor:middle;text-align:center"><flowRegion
+         id="flowRegion3157"><rect
+           id="rect3159"
+           width="84.836143"
+           height="29.612528"
+           x="272.11612"
+           y="475.38037"
+           style="font-size:18px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3161">interface</flowPara></flowRoot>    <rect
+       style="fill:#ff8080"
+       id="rect3163"
+       width="87.668266"
+       height="291.17047"
+       x="270.08447"
+       y="183.40959" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3167"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;text-anchor:middle;text-align:center"><flowRegion
+         id="flowRegion3169"><rect
+           id="rect3171"
+           width="88.037605"
+           height="61.626328"
+           x="269.71512"
+           y="322.51514"
+           style="text-align:center;text-anchor:middle" /></flowRegion><flowPara
+         id="flowPara3173">tiles</flowPara></flowRoot>    <rect
+       style="fill:#ffff00"
+       id="rect3175"
+       width="87.72998"
+       height="717.81409"
+       x="449.94583"
+       y="91.955162" />
+    <rect
+       style="fill:#ffff00"
+       id="rect3177"
+       width="88.099197"
+       height="464.62906"
+       x="629.86877"
+       y="344.92471" />
+    <rect
+       style="fill:#00ff00"
+       id="rect3048-1"
+       width="45.143539"
+       height="314.10498"
+       x="672.92511"
+       y="495.7421" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3080"
+       style="font-size:12px;font-style:normal;font-weight:bold;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       transform="matrix(0.93002478,0,0,0.96106837,47.17013,24.702101)"><flowRegion
+         id="flowRegion3082"><rect
+           id="rect3084"
+           width="50.421528"
+           height="58.425026"
+           x="671.48657"
+           y="633.04773"
+           style="font-size:12px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3086">shadow</flowPara><flowPara
+         id="flowPara3096">video</flowPara><flowPara
+         id="flowPara3090">memory</flowPara><flowPara
+         id="flowPara3094" /></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3179"
+       style="font-size:36px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;text-anchor:middle;text-align:center;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3181"><rect
+           id="rect3183"
+           width="89.416458"
+           height="112.05354"
+           x="448.21414"
+           y="385.59003"
+           style="text-anchor:middle;text-align:center;font-weight:bold;-inkscape-font-specification:Sans Bold;font-size:36px" /></flowRegion><flowPara
+         id="flowPara3185">user</flowPara><flowPara
+         id="flowPara3187">code</flowPara></flowRoot>    <flowRoot
+       transform="translate(181.59272,-3.6354873)"
+       xml:space="preserve"
+       id="flowRoot3179-8"
+       style="font-size:36px;font-style:normal;font-weight:bold;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3181-2"><rect
+           id="rect3183-4"
+           width="89.416458"
+           height="112.05354"
+           x="448.21414"
+           y="385.59003"
+           style="font-size:36px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3185-5">user</flowPara><flowPara
+         id="flowPara3187-5">code</flowPara></flowRoot>    <rect
+       style="fill:#ff9955"
+       id="rect3219"
+       width="87.471909"
+       height="35.087414"
+       x="630.12341"
+       y="309.7558" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3221"
+       style="font-size:13px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;text-anchor:middle;text-align:center;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3223"><rect
+           id="rect3225"
+           width="99.143646"
+           height="35.983852"
+           x="624.11115"
+           y="314.5188"
+           style="font-size:13px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3227">sprite erasing buffer</flowPara></flowRoot>    <rect
+       style="fill:#afdde9"
+       id="rect3229"
+       width="87.799217"
+       height="52.065277"
+       x="629.79608"
+       y="257.69055" />
+    <rect
+       style="fill:#afdde9"
+       id="rect3231"
+       width="87.61245"
+       height="91.277893"
+       x="270.08209"
+       y="92.224388" />
+    <rect
+       style="fill:#afdde9"
+       id="rect3233"
+       width="87.634155"
+       height="20.373369"
+       x="629.96118"
+       y="94.70359" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3243"
+       style="font-size:16px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;text-anchor:middle;text-align:center;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3245"><rect
+           id="rect3247"
+           width="85.853798"
+           height="43.183914"
+           x="630.79382"
+           y="266.15515"
+           style="font-size:16px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3249">relocatable</flowPara><flowPara
+         id="flowPara3251">sprites</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3257"
+       style="font-size:12px;font-style:normal;font-weight:bold;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;text-anchor:middle;text-align:center;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3259"><rect
+           id="rect3261"
+           width="82.769196"
+           height="16.451023"
+           x="631.82196"
+           y="97.532173"
+           style="font-size:12px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3265">reloc. sprites</flowPara></flowRoot>    <rect
+       style="fill:#8800aa;fill-opacity:1"
+       id="rect3269"
+       width="87.922707"
+       height="2.4128842"
+       x="629.9588"
+       y="92.257652" />
+    <flowRoot
+       transform="translate(-360.76127,-143.24335)"
+       xml:space="preserve"
+       id="flowRoot3243-1"
+       style="font-size:16px;font-style:normal;font-weight:bold;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3245-1"><rect
+           id="rect3247-5"
+           width="85.853798"
+           height="43.183914"
+           x="630.79382"
+           y="266.15515"
+           style="font-size:16px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3249-2">relocatable</flowPara><flowPara
+         id="flowPara3251-7">sprites</flowPara></flowRoot>    <rect
+       style="fill:#8800aa"
+       id="rect3345"
+       width="87.793472"
+       height="66.267845"
+       x="629.99921"
+       y="191.15375" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot3347"
+       style="font-size:24px;font-style:normal;font-weight:bold;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       transform="translate(0,12.708918)"><flowRegion
+         id="flowRegion3349"><rect
+           id="rect3351"
+           width="86.239182"
+           height="68.083481"
+           x="629.09143"
+           y="181.16817"
+           style="font-size:24px;font-weight:bold;text-align:center;text-anchor:middle;fill:#ffffff;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3353">engine</flowPara><flowPara
+         id="flowPara3355">code</flowPara></flowRoot>    <text
+       sodipodi:linespacing="125%"
+       id="text3233-9-6"
+       y="161.0769"
+       x="567.07391"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial"
+       xml:space="preserve"><tspan
+         y="161.0769"
+         x="567.07391"
+         id="tspan3235-4-1"
+         sodipodi:role="line">0xFC81</tspan></text>
+    <rect
+       style="fill:#ac9393"
+       id="rect3378"
+       width="87.623657"
+       height="36.59116"
+       x="629.99921"
+       y="154.77808" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:bold;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       x="674.20129"
+       y="170.48521"
+       id="text3380"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan3382"
+         x="674.20129"
+         y="170.48521">compressed</tspan><tspan
+         sodipodi:role="line"
+         x="674.20129"
+         y="184.48521"
+         id="tspan3384">map</tspan></text>
+    <rect
+       style="fill:#ff0066"
+       id="rect3386"
+       width="87.705193"
+       height="23.2731"
+       x="630.0976"
+       y="114.88837" />
+    <flowRoot
+       transform="translate(-0.10971637,21.862621)"
+       xml:space="preserve"
+       id="flowRoot3257-4"
+       style="font-size:12px;font-style:normal;font-weight:bold;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3259-2"><rect
+           id="rect3261-3"
+           width="82.769196"
+           height="16.451023"
+           x="631.82196"
+           y="97.532173"
+           style="font-size:12px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3265-2">sprites table</flowPara></flowRoot>    <rect
+       style="fill:#aad400"
+       id="rect3415"
+       width="87.705063"
+       height="16.59285"
+       x="630.0976"
+       y="138.16147" />
+    <flowRoot
+       transform="translate(0.75225014,43.411787)"
+       xml:space="preserve"
+       id="flowRoot3257-2"
+       style="font-size:12px;font-style:normal;font-weight:bold;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"><flowRegion
+         id="flowRegion3259-1"><rect
+           id="rect3261-6"
+           width="82.769196"
+           height="16.451023"
+           x="631.82196"
+           y="97.532173"
+           style="font-size:12px;font-weight:bold;text-align:center;text-anchor:middle;-inkscape-font-specification:Sans Bold" /></flowRegion><flowPara
+         id="flowPara3265-8">dZX7+dRCS</flowPara></flowRoot>  </g>
+</svg>

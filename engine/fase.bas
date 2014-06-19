@@ -1,5 +1,5 @@
 #ifndef __LIBRARY_FASE__
-#include "define.h"
+#include "build/define.h"
 #define __LIBRARY_FASE__
 
 #define Init        \
