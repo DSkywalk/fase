@@ -16,12 +16,38 @@ del numbers4map.exe generate_table.exe
 del *.map *.obj
 cd engine
 call fase gfx
-rem %z7z% a ..\FASE.1.01.zip ^
-rem   fase.bat config.def readme.html help1.png help2.png file1.bin ^
-rem   util\GenTape.exe util\GenTmx.exe util\hex2bin.exe util\Png2Rcs.exe ^
-rem   util\SjAsmPlus.exe util\step1.exe util\step2.exe util\TmxCompress.exe util\zx7b.exe ^
-rem   engine0.asm engine1.asm engine2.asm engine.asm loader.asm dzx7b_rcs.asm ^
-rem   loading.png sprites.png tiles.png bullet.png map.tmx ^
-rem   main.c main.bas fase.h fase.bas ending.h ending.rcs.zx7b ^
-rem   zxb
+del /q build\*.*
 cd ..
+%z7z% a FASE.1.03.zip       ^
+  engine\config.def         ^
+  engine\ending.rcs.zx7b    ^
+  engine\fase.h             ^
+  engine\fase.bas           ^
+  engine\fase.bat           ^
+  engine\game.tap           ^
+  engine\main.c             ^
+  engine\main.bas           ^
+  engine\build              ^
+  engine\doc\help1.png      ^
+  engine\doc\help2.png      ^
+  engine\doc\readme.html    ^
+  engine\src\file1.bin      ^
+  engine\src\dzx7b_rcs.asm  ^
+  engine\src\engine.asm     ^
+  engine\src\engine0.asm    ^
+  engine\src\engine1.asm    ^
+  engine\src\engine2.asm    ^
+  engine\src\loader.asm     ^
+  engine\gfx\bullet.png     ^
+  engine\gfx\loading.png    ^
+  engine\gfx\map.tmx        ^
+  engine\gfx\sprites.png    ^
+  engine\gfx\tiles.png      ^
+  lib\bin\GenTape.exe       ^
+  lib\bin\GenTmx.exe        ^
+  lib\bin\Png2Rcs.exe       ^
+  lib\bin\SjAsmPlus.exe     ^
+  lib\bin\step1.exe         ^
+  lib\bin\step2.exe         ^
+  lib\bin\TmxCompress.exe   ^
+  lib\bin\zx7b.exe

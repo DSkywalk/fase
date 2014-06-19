@@ -1,5 +1,10 @@
 @echo off
 SETLOCAL
+if not exist z88dkenv.bat (
+  echo.
+  echo Error: z88dkenv.bat doesn't exist. Please copy it into this folder.
+  exit /b 1
+)
 if "%1"=="gfx" (
   ..\lib\bin\Png2Rcs gfx\loading.png build\loading.rcs
   ..\lib\bin\zx7b build\loading.rcs build\loading.rcs.zx7b
