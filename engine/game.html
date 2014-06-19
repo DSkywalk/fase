@@ -37,11 +37,11 @@ function initgame(){
   ct2= cv2.getContext('2d');
   ct2.fillRect(0, 0, 256, 192);
   itiles= new Image();
-  itiles.src= 'tiles.png';
+  itiles.src= 'gfx/tiles.png';
   isprites= new Image();
-  isprites.src= 'sprites.png';
+  isprites.src= 'gfx/sprites.png';
   ibullet= new Image();
-  ibullet.src= 'bullet.png';
+  ibullet.src= 'gfx/bullet.png';
   onresize();
   document.onresize= document.body.onresize= onresize;
   document.onkeydown= kdown;
@@ -116,6 +116,6 @@ function ajax(f){
   xhr.send(null);
 }
 
-ajax('map.tmx');
+ajax('gfx/map.tmx');
 
 </script></html>

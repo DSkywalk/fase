@@ -57,9 +57,9 @@ function init(){
   0x0b, 0x50, 0x6e, 2];
   dirbul= [];
   digits= new Image();
-  digits.src= 'digits.png';
+  digits.src= 'gfx/digits.png';
   ending= document.createElement('img');
-  ending.src= 'ending.jpg';
+  ending.src= 'gfx/ending.jpg';
   ending.style.position= 'absolute';
   start();
 }
