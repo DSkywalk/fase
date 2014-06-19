@@ -110,4 +110,4 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
         ret
 screen  incbin  build/loading.rcs.zx7b
 descom  org     desc
-        include src/dzx7b_rcs.asm
+        include asm/dzx7b_rcs.asm

@@ -1,8 +1,8 @@
 @echo off
 SETLOCAL
-if not exist z88dkenv.bat (
+if not exist zxb\zxb.exe (
   echo.
-  echo Error: z88dkenv.bat doesn't exist. Please copy it into this folder.
+  echo Error: You need ZX Basic installed into the zxb folder.
   exit /b 1
 )
 if "%1"=="gfx" (
@@ -22,9 +22,8 @@ if "%1"=="config" (
   lib\bin\zx7b build\block.bin build\block.zx7b
 )
 echo.
-call z88dkenv.bat
-zcc +zx -O3 -vn main.c -o build\main.bin -lndos
-echo File main.bin compiled from main.c
+zxb\zxb main.bas -o build\main.bin
+echo File main.bin compiled from main.bas
 lib\bin\zx7b build\main.bin build\main.zx7b
 echo.
 copy /b build\map_compressed.bin+build\main.zx7b+build\block.zx7b build\engine.zx7b > nul

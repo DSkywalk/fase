@@ -1999,7 +1999,7 @@ mapend
         block   final-$&$ffff
     IF smooth=0
       IF notabl=0
-lookt   incbin  src/file1.bin
+lookt   incbin  asm/file1.bin
       ENDIF
         block   $fe80-$&$ffff
         block   $7f
@@ -2007,7 +2007,7 @@ lookt   incbin  src/file1.bin
     ELSE
       IF notabl=0
         block   $7f
-lookt   incbin  src/file1.bin
+lookt   incbin  asm/file1.bin
       ELSE
         block   $7f
       ENDIF

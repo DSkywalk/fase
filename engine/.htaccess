@@ -1,0 +1,2 @@
+AddDefaultCharset utf-8
+AddType text/xml;charset=utf-8 tmx
