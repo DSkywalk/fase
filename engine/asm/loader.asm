@@ -57,6 +57,19 @@ ini     ld      de, desc
         ld      c, screen-prnbuf
         ldir
         ret
+      IF  player
+aqui    out     (c), a
+        exx
+        call    $c000
+        exx
+        ld      a, ($5c01)      ; toggle port value between 00 and 80 every frame
+        xor     $80
+        ld      ($5c01), a
+        ld      a, $18          ; also toggle between bank 5 & 7 for the screen
+        jr      z, aqui         ; and 7 & 0 for the current paging at $c000
+        dec     a               ; so we always show a screen and modify the other
+        jr      aqui
+      ENDIF
 prnbuf  ld      a, $17
         ld      bc, $7ffd
         out     (c), a
@@ -67,6 +80,22 @@ prnbuf  ld      a, $17
         cp      $17
         ld      de, ramt-1-maplen
         jr      z, next
+      IF  player
+        ld      a, $11
+        out     (c), a
+        exx
+        ld      hl, $c000
+        ld      de, player
+        call    $07f4
+        ld      de, $f05b
+        ld      hl, $5ccb+aqui-ini
+        ld      bc, prnbuf-aqui
+        ldir
+        call    $c049
+        ld      a, $10
+        exx
+        out     (c), a
+      ENDIF
         ld      hl, ramt-1-maplen-codel2
         ld      bc, codel1
         lddr

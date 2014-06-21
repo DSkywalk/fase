@@ -11,6 +11,7 @@ if "%1"=="gfx" (
 rem  lib\bin\GenTmx 3 3 10 10 gfx\map.tmx
   lib\bin\TmxCompress gfx\map.tmx build\map_compressed.bin > build\defmap.asm
   lib\bin\step1
+  for /f %%i in ("player.bin") do echo         DEFINE  player 0%%~zi >> build\define.asm
   goto cont
 )
 if "%1"=="config" (
@@ -34,8 +35,17 @@ copy build\defload.asm build\ndefload.asm > nul
 for /f %%i in ("build\engine.zx7b") do echo         DEFINE  engicm  %%~zi >> build\ndefload.asm
 for /f %%i in ("build\main.zx7b")   do echo         DEFINE  maincm  %%~zi >> build\ndefload.asm
 for /f %%i in ("build\main.bin")    do echo         DEFINE  mainrw  %%~zi >> build\ndefload.asm
-lib\bin\sjasmplus asm\loader.asm
-lib\bin\gentape game.tap              ^
-    basic 'game' 0  build\loader.bin  ^
-     data           build\engine.zx7b
+for /f %%i in ("player.bin")        do echo         DEFINE  player 0%%~zi >> build\ndefload.asm
+if exist player.bin (
+  lib\bin\sjasmplus asm\loader.asm
+  lib\bin\gentape game.tap                    ^
+            basic 'game' 0  build\loader.bin  ^
+             data           build\engine.zx7b ^
+             data           player.bin
+) else (
+  lib\bin\sjasmplus asm\loader.asm
+  lib\bin\gentape game.tap                    ^
+            basic 'game' 0  build\loader.bin  ^
+             data           build\engine.zx7b
+)
 ENDLOCAL

@@ -189,6 +189,10 @@ do3     jr      z, do5
         ei
 do1     jp      (hl)
         ld      bc, $7ffd
+      IF player
+        ld      a, $11
+        out     (c), a
+      ELSE
         ld      a, (port&$ffff) ; toggle port value between 00 and 80 every frame
         xor     $80
         ld      (port&$ffff), a
@@ -196,6 +200,7 @@ do1     jp      (hl)
         jr      z, do2          ; and 7 & 0 for the current paging at $c000
         dec     a               ; so we always show a screen and modify the other
 do2     out     (c), a
+      ENDIF
 do3     jr      update_complete
       ENDIF
       IF  machine=2
