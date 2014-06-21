@@ -87,11 +87,14 @@ prnbuf  ld      a, $17
         ld      hl, $c000
         ld      de, player
         call    $07f4
+        di
         ld      de, $f05b
         ld      hl, $5ccb+aqui-ini
         ld      bc, prnbuf-aqui
         ldir
-        call    $c049
+        call    $c018
+        xor     a
+        call    $c087
         ld      a, $10
         exx
         out     (c), a
