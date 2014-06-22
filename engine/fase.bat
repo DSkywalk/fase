@@ -38,9 +38,10 @@ for /f %%i in ("build\main.bin")    do echo         DEFINE  mainrw  %%~zi >> bui
 for /f %%i in ("player.bin")        do echo         DEFINE  player 0%%~zi >> build\ndefload.asm
 if exist player.bin (
   lib\bin\sjasmplus asm\loader.asm
-  lib\bin\gentape game.tap                    ^
+  lib\bin\gentape game.tzx                    ^
             basic 'game' 0  build\loader.bin  ^
              data           build\engine.zx7b ^
+           stop48                             ^
              data           player.bin
 ) else (
   lib\bin\sjasmplus asm\loader.asm
