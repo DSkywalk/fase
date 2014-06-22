@@ -107,7 +107,7 @@ prnbuf  ld      a, $17
         ld      a, $c3
         ld      ($fff6), a
         jr      copied
-next    call    ramt-maplen-12
+next    call    ramt-maplen-11
         jr      z, copied
         ld      hl, ramt-1-maplen-codel2-codel1
         ld      bc, codel0
