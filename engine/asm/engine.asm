@@ -1989,10 +1989,10 @@ gbit3   rl      b               ; get next bit
 ; This code is part of the loader. It tries if floating bus exists.
 ; It's here because loader is located in contened memory
       IF  machine=2
-        defb    $0e
-ini9    ret     nz
-        in      a, ($ff)
+        ld      c, 5
+ini9    in      a, ($ff)
         inc     a
+        ret     nz
         djnz    ini9
         dec     c
         jr      nz, ini9
