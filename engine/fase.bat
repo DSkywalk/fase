@@ -17,7 +17,7 @@ rem  lib\bin\GenTmx 3 3 10 10 gfx\map.tmx
 if "%1"=="config" (
 :cont
   lib\bin\sjasmplus asm\engine0.asm > nul
-  lib\bin\sjasmplus asm\engine1.asm > nul
+  lib\bin\sjasmplus asm\engine1.asm
   lib\bin\sjasmplus asm\engine2.asm > nul
   lib\bin\step2
   lib\bin\zx7b build\block.bin build\block.zx7b
