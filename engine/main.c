@@ -30,6 +30,16 @@ start:
 
   // inicializar engine
   INIT;
+  #asm
+    ld      bc, $7ffd
+    ld      a, $11
+    out     (c), a
+    xor     a
+    call    $c087
+    ld      bc, $7ffd
+    ld      a, $10
+    out     (c), a
+  #endasm
 
   // pasar datos a sprites y balas
   for ( i = 0; i < 5; i++ )
@@ -63,6 +73,15 @@ start:
             tilepaint(tmpx, tmpy, tmpx, tmpy);
             killed++;
             if( killed==10 ){
+              #asm
+                ld      bc, $7ffd
+                ld      a, $11
+                out     (c), a
+                call    $c062
+                ld      bc, $7ffd
+                ld      a, $10
+                out     (c), a
+              #endasm
               EXIT;
               Dzx7b((unsigned int) (&ending-1), 0x5aff);
               Pause(100);

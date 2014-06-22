@@ -93,8 +93,6 @@ prnbuf  ld      a, $17
         ld      bc, prnbuf-aqui
         ldir
         call    $c018
-        xor     a
-        call    $c087
         ld      a, $10
         exx
         out     (c), a
