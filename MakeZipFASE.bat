@@ -17,7 +17,7 @@ del numbers4map.exe generate_table.exe
 del *.map *.obj
 cd engine
 call fase gfx
-rem del /q build\*.*
+del /q build\*.*
 %z7z% a ..\FASE.1.03.zip  ^
   .htaccess               ^
   config.def              ^

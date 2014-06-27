@@ -1,6 +1,9 @@
 
         output  build/player.bin
         org     $c000
+        jp      INICIO
+        jp      CARGA_CANCION
+        jp      PLAYER_OFF
 
 ; SPECTRUM PSG proPLAYER V 0.2 - WYZ 07.09.2011
 ; VER AL FINAL PARA DATOS PROPIOS:
@@ -13,20 +16,7 @@ INICIO:     CALL    ROUT
             LDIR                
             CALL    REPRODUCE_SONIDO
             CALL    REPRODUCE_EFECTO
-            CALL    PLAY
-            RET
-
-; ANTES DE EMPEZAR (CON DI):
-INIT_BUFFERS:
-            LD      BC, $30
-            LD      HL, BUFFERS_CANALES
-            LD      [CANAL_A], HL
-            ADD     HL, BC
-            LD      [CANAL_B], HL
-            ADD     HL, BC
-            LD      [CANAL_C], HL
-            ADD     HL, BC
-            LD      [CANAL_P], HL
+            CALL    PLAY    ; 1 sola vez
             RET
     
 ;VUELCA BUFFER DE SONIDO AL PSG DEL SPECTRUM
@@ -840,9 +830,9 @@ PUNTERO_A:      DW     00               ;DW PUNTERO DEL CANAL A
 PUNTERO_B:      DW     00               ;DW PUNTERO DEL CANAL B
 PUNTERO_C:      DW     00               ;DW PUNTERO DEL CANAL C
 
-CANAL_A:        DW     BUFFER_DEC       ;DW DIRECION DE INICIO DE LA MUSICA A
-CANAL_B:        DW     00               ;DW DIRECION DE INICIO DE LA MUSICA B
-CANAL_C:        DW     00               ;DW DIRECION DE INICIO DE LA MUSICA C
+CANAL_A:        DW     BUFFERS_CANALES      ;DW DIRECION DE INICIO DE LA MUSICA A
+CANAL_B:        DW     BUFFERS_CANALES+$30  ;DW DIRECION DE INICIO DE LA MUSICA B
+CANAL_C:        DW     BUFFERS_CANALES+$60  ;DW DIRECION DE INICIO DE LA MUSICA C
 
 PUNTERO_P_A:    DW     00               ;DW PUNTERO PAUTA CANAL A
 PUNTERO_P_B:    DW     00               ;DW PUNTERO PAUTA CANAL B
@@ -871,7 +861,7 @@ REG_NOTA_C:     DB     00               ;DB REGISTRO DE LA NOTA EN EL CANAL C
 ;CANAL DE EFECTOS - ENMASCARA OTRO CANAL
 
 PUNTERO_P:      DW     00               ;DW PUNTERO DEL CANAL EFECTOS
-CANAL_P:        DW     00               ;DW DIRECION DE INICIO DE LOS EFECTOS
+CANAL_P:        DW     BUFFERS_CANALES+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
 PUNTERO_P_DECP: DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL P
 PUNTERO_DECP:   DW     00               ;DW PUNTERO DECODER CANAL P
 
@@ -900,7 +890,7 @@ ENVOLVENTE:     DB      0               ;DB : FORMA DE LA ENVOLVENTE
                                         ;BIT 1-2  : RATIO 
                                         ;BIT 3-3  : FORMA
 
-BUFFER_DEC:     DB      $00     
+;BUFFER_DEC:     DB      $00     
 
 ;************************* mucha atencion!!!!
 ; aqui se decodifica la cancion hay que dejar suficiente espacio libre.

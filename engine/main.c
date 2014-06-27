@@ -39,7 +39,7 @@ start:
     ld      a, $11
     out     (c), a
     xor     a
-    call    $c087
+    call    $c003
     ld      bc, $7ffd
     ld      a, $10
     out     (c), a
@@ -87,7 +87,7 @@ noplayer:
                 ld      bc, $7ffd
                 ld      a, $11
                 out     (c), a
-                call    $c062
+                call    $c006
                 ld      bc, $7ffd
                 ld      a, $10
                 out     (c), a

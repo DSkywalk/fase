@@ -92,7 +92,6 @@ prnbuf  ld      a, $17
         ld      hl, $5ccb+aqui-ini
         ld      bc, prnbuf-aqui
         ldir
-        call    $c018
         ld      a, $10
         exx
         out     (c), a
