@@ -7,16 +7,17 @@ call setvars.bat
 %dmc% engine\lib\src\zx7b.c            -oengine\lib\bin\zx7b.exe
 %dmc% engine\lib\src\numbers4map.c
 %dmc% engine\lib\src\generate_table.c
+
 numbers4map.exe
 generate_table.exe
 move file1.bin engine\asm
-move numbers4map.h lib\src
-%dmc% lib\src\GenTmx.c          -olib\bin\GenTmx.exe
+move numbers4map.h engine\lib\src
+%dmc% engine\lib\src\GenTmx.c          -oengine\lib\bin\GenTmx.exe
 del numbers4map.exe generate_table.exe
 del *.map *.obj
 cd engine
 call fase gfx
-del /q build\*.*
+rem del /q build\*.*
 %z7z% a ..\FASE.1.03.zip  ^
   .htaccess               ^
   config.def              ^
@@ -27,7 +28,7 @@ del /q build\*.*
   faseb.bat               ^
   game.html               ^
   game.js                 ^
-  game.tap                ^
+  game.tzx                ^
   main.c                  ^
   main.bas                ^
   build                   ^

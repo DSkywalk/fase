@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../ComplementosChurrera/lodepng.c"
+#include "../../../ComplementosChurrera/lodepng.c"
 unsigned char *image, *pixel, output[0x10000];
 char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
       notabl, bullet, bulmax, sprmax;
@@ -169,9 +169,10 @@ int main(int argc, char *argv[]){
               "        DEFINE  notabl %d\n"
               "        DEFINE  bullet %d\n"
               "        DEFINE  bulmax %d\n"
-              "        DEFINE  sprmax %d\n",
-          tmode, pics, reppos, apics, smooth, clipup, clipdn, cliphr,
-          safevr, safehr, offsex, offsey, notabl, bullet, bulmax, sprmax);
+              "        DEFINE  sprmax %d\n"
+              "        DEFINE  player %d\n",
+          tmode, pics, reppos, apics, smooth, clipup, clipdn, cliphr, safevr, safehr,
+          offsex, offsey, notabl, bullet, bulmax, sprmax, fopen("build/player.bin", "rb")?1:0);
   fclose(ft);
   printf("\nno index     %d bytes\n", pics*36);
   printf("index bitmap %d bytes\n", pics*5+reppos*32);

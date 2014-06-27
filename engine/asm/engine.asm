@@ -191,9 +191,6 @@ do1     jp      (hl)
         ld      bc, $7ffd
       IF player
         ld      a, $11
-        display ".............................."
-        display $
-        display ".............................."
         out     (c), a
       ELSE
         ld      a, (port&$ffff) ; toggle port value between 00 and 80 every frame

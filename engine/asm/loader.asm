@@ -88,7 +88,7 @@ prnbuf  ld      a, $17
         ld      de, player
         call    $07f4
         di
-        ld      de, $f05b
+        ld      de, ramt-maplen-codel1+15;$f05b
         ld      hl, $5ccb+aqui-ini
         ld      bc, prnbuf-aqui
         ldir

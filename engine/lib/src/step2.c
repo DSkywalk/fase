@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 FILE *fi, *fi2;
-unsigned char mem[0x10000], sprites[0x8000], bullets[8], sblocks[0x89], sorder[0x89], subset[0x1200][0x89];
+unsigned char mem[0x12000], sprites[0x8000], bullets[8], sblocks[0x89], sorder[0x89], subset[0x1200][0x89];
 char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet, bulmax, sprmax;
 unsigned  saccum[0x89], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites,
           tmpbuf, notabl, nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, blen;
@@ -237,6 +237,12 @@ int main(int argc, char *argv[]){
     scode1-= 0x300-notabl+tmp,
     scode2-= 0x300-notabl+tmp;
   fclose(fi);
+  fi= fopen("build/player.bin", "rb");
+  i= 0;
+  if( fi )
+    fseek(fi, 0, SEEK_END),
+    i= ftell(fi),
+    fclose(fi);
   fi= fopen("build/defload.asm", "wb+");
   fprintf(fi, "        DEFINE  smooth  %d\n"
               "        DEFINE  maplen  %d\n"
@@ -251,9 +257,10 @@ int main(int argc, char *argv[]){
               "        DEFINE  stasp   %d\n"
               "        DEFINE  notabl  %d\n"
               "        DEFINE  bullet  %d\n"
-              "        DEFINE  tmpbuf  %d\n",
+              "        DEFINE  tmpbuf  %d\n"
+              "        DEFINE  player  %d\n",
           smooth, tmp, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
-          blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet, tmpbuf);
+          blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet, tmpbuf, i);
   fclose(fi);
   fi= fopen("build/define.h", "wb+");
   fprintf(fi, "#define smooth %d\n"
@@ -262,8 +269,9 @@ int main(int argc, char *argv[]){
               "#define scrh   %d\n"
               "#define mapw   %d\n"
               "#define maph   %d\n"
-              "#define dzx7a  %d\n",  smooth, 0x10000-tmpbuf-stasp, scrw, scrh,
-                                      mapw, maph, smooth ? 0xfc81+notabl : 0xfe80);
+              "#define dzx7a  %d\n"
+              "#define player %d\n",  smooth, 0x10000-tmpbuf-stasp, scrw, scrh,
+                                      mapw, maph, smooth ? 0xfc81+notabl : 0xfe80, !!i);
   fclose(fi);
   printf("\nFile block.bin generated in STEP 2\n");
 }
