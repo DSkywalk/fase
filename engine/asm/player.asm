@@ -3,15 +3,15 @@
         org     $c000
         jp      INICIO
         jp      CARGA_CANCION
-        jp      PLAYER_OFF
+        jp      poff
 
 ; SPECTRUM PSG proPLAYER V 0.2 - WYZ 07.09.2011
 ; VER AL FINAL PARA DATOS PROPIOS:
 
 ; ISR LLAMA A:
-INICIO:     CALL    ROUT
-            LD      HL,PSG_REG
-            LD      DE,PSG_REG_SEC
+INICIO:     CALL    rout
+            LD      HL,psg_reg
+            LD      DE,psg_reg_sec
             LD      BC,14
             LDIR                
             CALL    REPRODUCE_SONIDO
@@ -19,68 +19,21 @@ INICIO:     CALL    ROUT
             CALL    PLAY    ; 1 sola vez
             RET
     
-;VUELCA BUFFER DE SONIDO AL PSG DEL SPECTRUM
-
-ROUT:       XOR     A
-ROUT_A0:    LD      DE,$FFBF
-            LD      BC,$FFFD
-            LD      HL,PSG_REG_SEC
-LOUT:       OUT     [C],A
-            LD      B,E
-            OUTI 
-            LD      B,D
-            INC     A
-            CP      13
-            JR      NZ,LOUT
-            OUT     [C],A
-            LD      A,[HL]
-            AND     A
-            RET     Z
-            LD      B,E
-            OUTI
-            XOR     A
-            LD      [PSG_REG_SEC+13],A
-            LD      [PSG_REG+13],A
-            RET
-
 ;INICIA EL SONIDO Nº [A]
 
 INICIA_SONIDO:  
             LD      HL,TABLA_SONIDOS
             CALL    EXT_WORD
             LD      [PUNTERO_SONIDO],HL
-            LD      HL,INTERR
+            LD      HL,interr
             SET     2,[HL]
-            RET
-
-;PLAYER OFF
-
-PLAYER_OFF: XOR     A           ;***** IMPORTANTE SI NO HAY MUSICA ****
-            LD      [INTERR],A
-    
-            LD      HL,PSG_REG
-            LD      DE,PSG_REG+1
-            LD      BC,14
-            LD      [HL],A
-            LDIR
-    
-            LD      HL,PSG_REG_SEC
-            LD      DE,PSG_REG_SEC+1
-            LD      BC,14
-            LD      [HL],A
-            LDIR
-    
-        
-            LD      A,10111000B     ; **** POR SI ACASO ****
-            LD      [PSG_REG+7],A
-            CALL    ROUT
             RET
 
 ;CARGA UNA CANCION
 ;IN:[A]=Nº DE CANCION
 
 CARGA_CANCION:  
-            LD      HL,INTERR           ;CARGA CANCION
+            LD      HL,interr           ;CARGA CANCION
             SET     1,[HL]              ;REPRODUCE CANCION
             LD      HL,SONG
             LD      [HL],A              ;Nº [A]
@@ -112,7 +65,7 @@ DECODE_SONG:
             BIT     0,A
             JR      Z,NPTJP0
             PUSH    HL
-            LD      HL,INTERR
+            LD      HL,interr
             SET     4,[HL]
             POP     HL
             
@@ -293,7 +246,7 @@ DCBC0:      RLCA
                 
 ;PLAY __________________________________________________
 
-PLAY:       LD      HL,INTERR               ;PLAY BIT 1 ON?
+PLAY:       LD      HL,interr               ;PLAY BIT 1 ON?
             BIT     1,[HL]
             RET     Z
 ;TEMPO          
@@ -305,33 +258,33 @@ PLAY:       LD      HL,INTERR               ;PLAY BIT 1 ON?
             LD      [HL],0
                 
 ;INTERPRETA      
-            LD      IY,PSG_REG
+            LD      IY,psg_reg
             LD      IX,PUNTERO_A
-            LD      BC,PSG_REG+8
+            LD      BC,psg_reg+8
             CALL    LOCALIZA_NOTA
-            LD      IY,PSG_REG+2
+            LD      IY,psg_reg+2
             LD      IX,PUNTERO_B
-            LD      BC,PSG_REG+9
+            LD      BC,psg_reg+9
             CALL    LOCALIZA_NOTA
-            LD      IY,PSG_REG+4
+            LD      IY,psg_reg+4
             LD      IX,PUNTERO_C
-            LD      BC,PSG_REG+10
+            LD      BC,psg_reg+10
             CALL    LOCALIZA_NOTA
             LD      IX,PUNTERO_P            ;EL CANAL DE EFECTOS ENMASCARA OTRO CANAL
             CALL    LOCALIZA_EFECTO              
 
 ;PAUTAS               
-PAUTAS:     LD      IY,PSG_REG+0
+PAUTAS:     LD      IY,psg_reg+0
             LD      IX,PUNTERO_P_A
-            LD      HL,PSG_REG+8
+            LD      HL,psg_reg+8
             CALL    PAUTA                   ;PAUTA CANAL A
-            LD      IY,PSG_REG+2
+            LD      IY,psg_reg+2
             LD      IX,PUNTERO_P_B
-            LD      HL,PSG_REG+9
+            LD      HL,psg_reg+9
             CALL    PAUTA                   ;PAUTA CANAL B
-            LD      IY,PSG_REG+4
+            LD      IY,psg_reg+4
             LD      IX,PUNTERO_P_C
-            LD      HL,PSG_REG+10
+            LD      HL,psg_reg+10
             CALL    PAUTA                   ;PAUTA CANAL C                
 
             RET
@@ -340,14 +293,14 @@ PAUTAS:     LD      IY,PSG_REG+0
 
 REPRODUCE_SONIDO:
 
-            LD      HL,INTERR   
+            LD      HL,interr   
             BIT     2,[HL]                  ;ESTA ACTIVADO EL EFECTO?
             RET     Z
             LD      HL,[PUNTERO_SONIDO]
             LD      A,[HL]
             CP      $FF
             JR      Z,FIN_SONIDO
-            LD      [PSG_REG_SEC+2],A
+            LD      [psg_reg_sec+2],A
             INC     HL
             LD      A,[HL]
             RRCA
@@ -355,30 +308,30 @@ REPRODUCE_SONIDO:
             RRCA
             RRCA
             AND     00001111B
-            LD      [PSG_REG_SEC+3],A
+            LD      [psg_reg_sec+3],A
             LD      A,[HL]
             AND     00001111B
-            LD      [PSG_REG_SEC+9],A
+            LD      [psg_reg_sec+9],A
             INC     HL
             LD      A,[HL]
             AND     A
             JR      Z,NO_RUIDO
-            LD      [PSG_REG_SEC+6],A
+            LD      [psg_reg_sec+6],A
             LD      A,10101000B
             JR      SI_RUIDO
 NO_RUIDO:   LD      A,10111000B
-SI_RUIDO:   LD      [PSG_REG_SEC+7],A
+SI_RUIDO:   LD      [psg_reg_sec+7],A
        
             INC     HL
             LD      [PUNTERO_SONIDO],HL
             RET
             
-FIN_SONIDO: LD      HL,INTERR
+FIN_SONIDO: LD      HL,interr
             RES     2,[HL]
 
 FIN_NOPLAYER:
             LD      A,10111000B
-            LD      [PSG_REG+7],A
+            LD      [psg_reg+7],A
             RET         
                 
 ;LOCALIZA NOTA CANAL A
@@ -413,8 +366,8 @@ COMANDOS:   LD      A,[HL]
             LD      H,B
             RES     4,[HL]                  ;APAGA EFECTO ENVOLVENTE
             XOR     A
-            LD      [PSG_REG_SEC+13],A
-            LD      [PSG_REG+13],A
+            LD      [psg_reg_sec+13],A
+            LD      [psg_reg+13],A
             JR      LOCALIZA_NOTA
 
 COM_EFECTO: BIT     1,A                     ;EFECTO DE SONIDO
@@ -465,11 +418,40 @@ FIN_NOTA_A: LD      E,[IX+CANAL_A-PUNTERO_A]
             JP      LOCALIZA_NOTA
             
 FIN_CANAL_A:    
-            LD      HL,INTERR           ;LOOP?
+            LD      HL,interr           ;LOOP?
             BIT     4,[HL]              
             JR      NZ,FCA_CONT
-            CALL    PLAYER_OFF
-            RET
+poff    xor     a
+        ld      (interr), a
+        ld      hl, psg_reg
+        ld      de, psg_reg+1
+        ld      bc, 14*2-1
+        ld      (hl), a
+        ldir
+rout    ld      de, $ffc0
+        ld      bc, $fffe
+        ld      hl, psg_reg_sec+13
+        xor     a
+        cpd
+        jr      nz, qout
+sout    ld      a, 12
+lout    out     (c), a
+        ld      b, e
+        outd
+        ld      b, d
+        dec     a
+        jp      p, lout
+        ret
+qout    ld      a, 13
+        out     (c), a
+        inc     l
+        ld      b, e
+        outd
+        xor     a
+        ld      (psg_reg_sec+13), a
+        ld      (psg_reg+13), a
+        jr      sout
+
 
 FCA_CONT:   LD      L,[IX+PUNTERO_P_DECA-PUNTERO_A] ;CARGA PUNTERO INICIAL DECODER
             LD      H,[IX+PUNTERO_P_DECA-PUNTERO_A+1]
@@ -495,10 +477,10 @@ NO_FIN_CANAL_A:
         
 SILENCIO_ENVOLVENTE:
             LD  A,$FF
-            LD  [PSG_REG+11],A
-            LD  [PSG_REG+12],A               
+            LD  [psg_reg+11],A
+            LD  [psg_reg+12],A               
             XOR A
-            LD  [PSG_REG+13],A                               
+            LD  [psg_reg+13],A                               
             LD  [IY+0],A
             LD  [IY+1],A
             RET
@@ -720,16 +702,16 @@ OCTBC01:    ADD     A,12                ;INCREMENTA OCTAVAS
             CALL    EXT_WORD
                 
             LD      A,L
-            LD      [PSG_REG+11],A
+            LD      [psg_reg+11],A
             LD      A,H
             AND     00000011B
-            LD      [PSG_REG+12],A
+            LD      [psg_reg+12],A
             POP     AF                  ;SELECCION FORMA DE ENVOLVENTE
                 
             RRA
             AND     00000110B           ;$08,$0A,$0C,$0E
             ADD     A,8                
-            LD      [PSG_REG+13],A
+            LD      [psg_reg+13],A
        
             RET
 
@@ -756,12 +738,12 @@ INICIA_EFECTO:
             LD      HL,TABLA_EFECTOS
             CALL    EXT_WORD
             LD      [PUNTERO_EFECTO],HL
-            LD      HL,INTERR
+            LD      HL,interr
             SET     3,[HL]
             RET       
 
 REPRODUCE_EFECTO:
-            LD      HL,INTERR   
+            LD      HL,interr   
             BIT     3,[HL]             ;ESTA ACTIVADO EL EFECTO?
             RET     Z
             LD      HL,[PUNTERO_EFECTO]
@@ -784,7 +766,7 @@ REPRODUCE_EFECTO:
             LD   D,A                    ;VOLUMEN
             INC     HL                  ;INCREMENTA Y GUARDA EL PUNTERO
             LD      [PUNTERO_EFECTO],HL     
-            LD      IX,PSG_REG_SEC
+            LD      IX,psg_reg_sec
             LD      A,[CANAL_EFECTOS]   ;SELECCION DE CANAL
             CP      1
             JR      Z,RS_CANALA
@@ -806,14 +788,14 @@ RS_CANALB:  LD      [IX+2],B
             LD      [IX+9],D
             RET
            
-FIN_EFECTO: LD      HL,INTERR
+FIN_EFECTO: LD      HL,interr
             RES     3,[HL]              ;DESACTIVA EFECTO
             RET         
 
 ; VARIABLES__________________________
 
 
-INTERR:         DB     00               ;INTERRUPTORES 1=ON 0=OFF
+interr:         DB     00               ;INTERRUPTORES 1=ON 0=OFF
                                         ;BIT 0=CARGA CANCION ON/OFF
                                         ;BIT 1=PLAYER ON/OFF
                                         ;BIT 2=SONIDOS ON/OFF
@@ -865,8 +847,8 @@ CANAL_P:        DW     BUFFERS_CANALES+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
 PUNTERO_P_DECP: DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL P
 PUNTERO_DECP:   DW     00               ;DW PUNTERO DECODER CANAL P
 
-PSG_REG:        DB     00,00,00,00,00,00,00,10111000B,00,00,00,00,00,00,00    ;DB [11] BUFFER DE REGISTROS DEL PSG
-PSG_REG_SEC:    DB     00,00,00,00,00,00,00,10111000B,00,00,00,00,00,00,00    ;DB [11] BUFFER SECUNDARIO DE REGISTROS DEL PSG
+psg_reg:        defs   14               ;DB [11] BUFFER DE REGISTROS DEL PSG
+psg_reg_sec:    defs   14               ;DB [11] BUFFER SECUNDARIO DE REGISTROS DEL PSG
 
 
 
