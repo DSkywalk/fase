@@ -831,7 +831,7 @@ draw2   ld      sp, ($5c00)
         rlca
         and     $e0
     ELSE
-        ld      (draw3+1), a
+        ld      (draw3+1&$ffff), a
 draw3   ld      a, (lookt&$ffff)
         ld      l, a            ; A=L= rrrRRppp
         and     %00011111
@@ -1087,7 +1087,7 @@ drawg   ld      h, a
         rlca
         and     $e0
     ELSE
-        ld      (drawf+1), a
+        ld      (drawf+1&$ffff), a
       IF offsey=0
         cp      192
 drawf   ld      a, (lookt&$ffff)
@@ -2006,20 +2006,15 @@ mapend
       IF notabl=0
 lookt   incbin  asm/file1.bin
       ENDIF
-        block   $fe80-$&$ffff
-        block   $7f
+        block   $feff-$&$ffff
         defb    $ff
     ELSE
+        block   $7f
       IF notabl=0
-        block   $7f
 lookt   incbin  asm/file1.bin
-      ELSE
-        block   $7f
       ENDIF
-    ENDIF
-
-; Sprite address table and small ISR to sync with the interrupt
         block   $100
+    ENDIF
         defb    $ff
         block   $fff4-$&$ffff
         inc     hl

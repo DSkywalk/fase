@@ -10,7 +10,7 @@ if "%1"=="gfx" (
   lib\bin\zx7b build\loading.rcs build\loading.rcs.zx7b
 rem  lib\bin\GenTmx 3 3 10 10 gfx\map.tmx
   lib\bin\TmxCompress gfx\map.tmx build\map_compressed.bin > build\defmap.asm
-rem   lib\bin\sjasmplus asm\player.asm > nul
+  lib\bin\sjasmplus asm\player.asm > nul
   lib\bin\step1
   goto cont
 )

@@ -11,7 +11,7 @@
         display /A,0x8000-tmpbuf-stasp-mainrw, " bytes free"
         display "____________________________"
         output  build/loader.bin
-        org     $5b06+ini-prnbuf
+        org     $5b0a+ini-prnbuf
 ini     ld      de, desc
         di
         db      $de, $c0, $37, $0e, $8f, $39, $96 ;OVER USR 7 ($5ccb)
@@ -39,7 +39,7 @@ ini     ld      de, desc
         ld      hl, $8000-maplen+engicm-1
         ld      de, ramt-1-maplen
         call    desc
-        ld      sp, $5b06
+        ld      sp, $5b0a
         ld      de, $ffff
         ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len
       IF  smooth=0
@@ -52,7 +52,7 @@ ini     ld      de, desc
       ENDIF
         lddr
         ld      hl, $5ccb+prnbuf-ini
-        ld      de, $5b06
+        ld      de, $5b0a
         push    de
         ld      c, screen-prnbuf
         ldir
