@@ -2,7 +2,7 @@
         output  build/player.bin
         org     $c000
         jp      inicio
-        jp      CARGA_CANCION
+        jp      cancion
         jp      poff
 
 ; SPECTRUM PSG proPLAYER V 0.2 - WYZ 07.09.2011
@@ -148,132 +148,112 @@ pcajp5  pop     hl
         and     %00001111       ;volumen final
         ld      (hl), a
         ret
-    
-;INICIA EL SONIDO Nº (A)
 
-INICIA_SONIDO:  
-            LD      HL,TABLA_SONIDOS
-            CALL    EXT_WORD
-            LD      (PUNTERO_SONIDO),HL
-            LD      HL,interr
-            SET     2,(HL)
-            RET
+;carga una cancion
+;in:(a)=nº de cancion
+cancion ld      hl,interr           ;carga cancion
+        set     1,(hl)              ;reproduce cancion
+        ld      hl,song
+        ld      (hl),a              ;nº (a)
+;decodificar
+;in-> interr 0 on
+;     song
+;carga cancion si/no
+;decode_song:
 
-;CARGA UNA CANCION
-;IN:(A)=Nº DE CANCION
+        ld      a,(song)
 
-CARGA_CANCION:  
-            LD      HL,interr           ;CARGA CANCION
-            SET     1,(HL)              ;REPRODUCE CANCION
-            LD      HL,SONG
-            LD      (HL),A              ;Nº (A)
+;lee cabecera de la cancion
+;byte 0=tempo
 
-;DECODIFICAR
-;IN-> INTERR 0 ON
-;     SONG
-
-;CARGA CANCION SI/NO
-
-DECODE_SONG:
-            LD      A,(SONG)
-
-;LEE CABECERA DE LA CANCION
-;BYTE 0=TEMPO
-
-            LD      HL,TABLA_SONG
-            CALL    EXT_WORD
-            LD      A,(HL)
-            LD      (tempo),A
-            XOR     A
-            LD      (ttempo),A
-                
-;HEADER BYTE 1
-;(-|-|-|-|-|-|-|LOOP)
-
-            INC     HL          ;LOOP 1=ON/0=OFF?
-            LD      A,(HL)
-            BIT     0,A
-            JR      Z,NPTJP0
-            PUSH    HL
-            LD      HL,interr
-            SET     4,(HL)
-            POP     HL
+        ld      hl,tabla_song
+        call    ext_word
+        ld      a,(hl)
+        ld      (tempo),a
+        xor     a
+        ld      (ttempo),a
             
-NPTJP0:     INC     HL              ;2 BYTES RESERVADOS
-            INC     HL
-            INC     HL
+;header byte 1
+;(-|-|-|-|-|-|-|loop)
 
-;BUSCA Y GUARDA INICIO DE LOS CANALES EN EL MODULO MUS
+        inc     hl          ;loop 1=on/0=off?
+        ld      a,(hl)
+        bit     0,a
+        jr      z,nptjp0
+        push    hl
+        ld      hl,interr
+        set     4,(hl)
+        pop     hl
         
-            LD      (PUNTERO_P_DECA),HL
-            LD      E,$3F           ;CODIGO INTRUMENTO 0
-            LD      B,$FF           ;EL MODULO DEBE TENER UNA LONGITUD MENOR DE $FF00 ... o_O!
-            
-BGICMODBC1: XOR     A               ;BUSCA EL BYTE 0
-            CPIR
-            DEC     HL
-            DEC     HL
-            LD      A,E             ;ES EL INSTRUMENTO 0??
-            CP      (HL)
-            INC     HL
-            INC     HL
-            JR      Z,BGICMODBC1
-    
-            LD      (PUNTERO_P_DECB),HL
+nptjp0  inc     hl              ;2 bytes reservados
+        inc     hl
+        inc     hl
 
-BGICMODBC2: XOR     A               ;BUSCA EL BYTE 0
-            CPIR
-            DEC     HL
-            DEC     HL
-            LD      A,E
-            CP      (HL)            ;ES EL INSTRUMENTO 0??
-            INC     HL
-            INC     HL
-            JR      Z,BGICMODBC2
+;busca y guarda inicio de los canales en el modulo mus
     
-            LD      (PUNTERO_P_DECC),HL
+        ld      (puntero_p_deca),hl
+        ld      e,$3f           ;codigo intrumento 0
+        ld      b,$ff           ;el modulo debe tener una longitud menor de $ff00 ... o_o!
         
-BGICMODBC3: XOR     A               ;BUSCA EL BYTE 0
-            CPIR
-            DEC     HL
-            DEC     HL
-            LD      A,E
-            CP      (HL)                ;ES EL INSTRUMENTO 0??
-            INC     HL
-            INC     HL
-            JR      Z,BGICMODBC3
-            LD      (PUNTERO_P_DECP),HL
-        
-                
-;LEE DATOS DE LAS NOTAS
-;(|)(|||||) LONGITUD\NOTA
+bgicmo1 xor     a               ;busca el byte 0
+        cpir
+        dec     hl
+        dec     hl
+        ld      a,e             ;es el instrumento 0??
+        cp      (hl)
+        inc     hl
+        inc     hl
+        jr      z,bgicmo1
 
-INIT_DECODER:   
-            LD      DE,(CANAL_A)
-            LD      (puntero_a),DE
-            LD      HL,(PUNTERO_P_DECA)
-            CALL    DECODE_CANAL    ;CANAL A
-            LD      (PUNTERO_DECA),HL
-            
-            LD      DE,(CANAL_B)
-            LD      (puntero_b),DE
-            LD      HL,(PUNTERO_P_DECB)
-            CALL    DECODE_CANAL    ;CANAL B
-            LD      (PUNTERO_DECB),HL
-            
-            LD      DE,(CANAL_C)
-            LD      (puntero_c),DE
-            LD      HL,(PUNTERO_P_DECC)
-            CALL    DECODE_CANAL    ;CANAL C
-            LD      (PUNTERO_DECC),HL
-            
-            LD      DE,(CANAL_P)
-            LD      (puntero_p),DE
-            LD      HL,(PUNTERO_P_DECP)
-            CALL    DECODE_CANAL    ;CANAL P
-            LD      (PUNTERO_DECP),HL
-           
-            RET
+        ld      (puntero_p_decb),hl
+
+bgicmo2 xor     a               ;busca el byte 0
+        cpir
+        dec     hl
+        dec     hl
+        ld      a,e
+        cp      (hl)            ;es el instrumento 0??
+        inc     hl
+        inc     hl
+        jr      z,bgicmo2
+
+        ld      (puntero_p_decc),hl
+    
+bgicmo3 xor     a               ;busca el byte 0
+        cpir
+        dec     hl
+        dec     hl
+        ld      a,e
+        cp      (hl)                ;es el instrumento 0??
+        inc     hl
+        inc     hl
+        jr      z,bgicmo3
+        ld      (puntero_p_decp),hl
+
+;lee datos de las notas
+;(|)(|||||) longitud\nota
+; init_decoder:
+        ld      de,(canal_a)
+        ld      (puntero_a),de
+        ld      hl,(puntero_p_deca)
+        call    decode_canal    ;canal a
+        ld      (puntero_deca),hl
+        ld      de,(canal_b)
+        ld      (puntero_b),de
+        ld      hl,(puntero_p_decb)
+        call    decode_canal    ;canal b
+        ld      (puntero_decb),hl
+        ld      de,(canal_c)
+        ld      (puntero_c),de
+        ld      hl,(puntero_p_decc)
+        call    decode_canal    ;canal c
+        ld      (puntero_decc),hl
+        ld      de,(canal_p)
+        ld      (puntero_p),de
+        ld      hl,(puntero_p_decp)
+        call    decode_canal    ;canal p
+        ld      (puntero_decp),hl
+        ret
 
 
 ;DECODIFICA NOTAS DE UN CANAL
@@ -283,7 +263,7 @@ INIT_DECODER:
 ;NOTA=2 PUNTILLO
 ;NOTA=3 COMANDO I
 
-DECODE_CANAL:   
+decode_canal:   
             LD      A,(HL)
             AND     A                       ;FIN DEL CANAL?
             JR      Z,FIN_DEC_CANAL
@@ -315,7 +295,7 @@ NO_PUNTILLO:
             LD      (DE),A
             INC     DE
             INC     HL
-            JR      DECODE_CANAL
+            JR      decode_canal
             
 NO_INSTRUMENTO: 
             BIT     2,B
@@ -328,7 +308,7 @@ NO_INSTRUMENTO:
             LD  (DE),A
             INC DE
             INC HL
-            JR      DECODE_CANAL
+            JR      decode_canal
      
 NO_ENVOLVENTE:  
             BIT     1,B
@@ -441,7 +421,7 @@ COMANDOS:   LD      A,(HL)
             LD      (IX),L
             LD      (IX+1),H
             LD      HL,TABLA_PAUTAS
-            CALL    EXT_WORD
+            CALL    ext_word
             LD      (IX+PUNTERO_P_A0-puntero_a),L
             LD      (IX+PUNTERO_P_A0-puntero_a+1),H
             LD      (IX+puntero_p_a-puntero_a),L
@@ -462,7 +442,13 @@ COM_EFECTO: BIT     1,A                     ;EFECTO DE SONIDO
             INC     HL
             LD      (IX),L
             LD      (IX+1),H
-            CALL    INICIA_SONIDO
+;INICIA EL SONIDO Nº (A)
+INICIA_SONIDO:  
+            LD      HL,TABLA_SONIDOS
+            CALL    ext_word
+            LD      (PUNTERO_SONIDO),HL
+            LD      HL,interr
+            SET     2,(HL)
             RET
 
 COM_ENVOLVENTE: 
@@ -488,17 +474,17 @@ LNJP0:      LD      A,(HL)
             BIT     0,A
             JR      Z,FIN_CANAL_A
 
-FIN_NOTA_A: LD      E,(IX+CANAL_A-puntero_a)
-            LD      D,(IX+CANAL_A-puntero_a+1)      ;PUNTERO BUFFER AL INICIO
+FIN_NOTA_A: LD      E,(IX+canal_a-puntero_a)
+            LD      D,(IX+canal_a-puntero_a+1)      ;PUNTERO BUFFER AL INICIO
             LD      (IX),E
             LD      (IX+1),D
-            LD      L,(IX+PUNTERO_DECA-puntero_a)   ;CARGA PUNTERO DECODER
-            LD      H,(IX+PUNTERO_DECA-puntero_a+1)
+            LD      L,(IX+puntero_deca-puntero_a)   ;CARGA PUNTERO DECODER
+            LD      H,(IX+puntero_deca-puntero_a+1)
             PUSH    BC
-            CALL    DECODE_CANAL                    ;DECODIFICA CANAL
+            CALL    decode_canal                    ;DECODIFICA CANAL
             POP     BC
-            LD      (IX+PUNTERO_DECA-puntero_a),L   ;GUARDA PUNTERO DECODER
-            LD      (IX+PUNTERO_DECA-puntero_a+1),H
+            LD      (IX+puntero_deca-puntero_a),L   ;GUARDA PUNTERO DECODER
+            LD      (IX+puntero_deca-puntero_a+1),H
             JP      localiza_nota
             
 FIN_CANAL_A:    
@@ -537,10 +523,10 @@ qout    ld      a, 13
         jr      sout
 
 
-FCA_CONT:   LD      L,(IX+PUNTERO_P_DECA-puntero_a) ;CARGA PUNTERO INICIAL DECODER
-            LD      H,(IX+PUNTERO_P_DECA-puntero_a+1)
-            LD      (IX+PUNTERO_DECA-puntero_a),L
-            LD      (IX+PUNTERO_DECA-puntero_a+1),H
+FCA_CONT:   LD      L,(IX+puntero_p_deca-puntero_a) ;CARGA PUNTERO INICIAL DECODER
+            LD      H,(IX+puntero_p_deca-puntero_a+1)
+            LD      (IX+puntero_deca-puntero_a),L
+            LD      (IX+puntero_deca-puntero_a+1),H
             JR      FIN_NOTA_A
                 
 NO_FIN_CANAL_A: 
@@ -604,19 +590,19 @@ LEJP0:      INC     HL
             JR      Z,FIN_CANAL_P
             
 FIN_NOTA_P: 
-            LD      DE,(CANAL_P)
+            LD      DE,(canal_p)
             LD      (IX+0),E
             LD      (IX+1),D
-            LD      HL,(PUNTERO_DECP)       ;CARGA PUNTERO DECODER
+            LD      HL,(puntero_decp)       ;CARGA PUNTERO DECODER
             PUSH    BC
-            CALL    DECODE_CANAL            ;DECODIFICA CANAL
+            CALL    decode_canal            ;DECODIFICA CANAL
             POP     BC
-            LD      (PUNTERO_DECP),HL       ;GUARDA PUNTERO DECODER
+            LD      (puntero_decp),HL       ;GUARDA PUNTERO DECODER
             JP      localiza_efecto
                 
 FIN_CANAL_P:    
-            LD      HL,(PUNTERO_P_DECP)     ;CARGA PUNTERO INICIAL DECODER
-            LD      (PUNTERO_DECP),HL
+            LD      HL,(puntero_p_decp)     ;CARGA PUNTERO INICIAL DECODER
+            LD      (puntero_decp),HL
             JR      FIN_NOTA_P
                 
 NO_FIN_CANAL_P: 
@@ -636,7 +622,7 @@ NOTA:       LD      L,C
             JR      NZ,ENVOLVENTES
             LD      A,B
 tabla_notas LD      HL,DATOS_NOTAS      ;BUSCA FRECUENCIA
-            CALL    EXT_WORD
+            CALL    ext_word
             LD      (IY+0),L
             LD      (IY+1),H
             RET
@@ -646,7 +632,7 @@ tabla_notas LD      HL,DATOS_NOTAS      ;BUSCA FRECUENCIA
 
 ENVOLVENTES:
             LD      HL,DATOS_NOTAS      ;BUSCA FRECUENCIA
-            CALL    EXT_WORD
+            CALL    ext_word
         
             LD      A,(ENVOLVENTE)      ;FRECUENCIA DEL CANAL ON/OFF
 LOCALIZA_ENV:   
@@ -675,7 +661,7 @@ OCTBC01:    ADD     A,12                ;INCREMENTA OCTAVAS
             ADD     A,B                   ;EN REGISTRO A CODIGO NOTA
             
             LD      HL,DATOS_NOTAS      ;BUSCA FRECUENCIA
-            CALL    EXT_WORD
+            CALL    ext_word
                 
             LD      A,L
             LD      (psg_reg+11),A
@@ -696,8 +682,7 @@ OCTBC01:    ADD     A,12                ;INCREMENTA OCTAVAS
 ;   (A)= POSICION
 ;OUT(HL)=WORD
 
-EXT_WORD:       
-            LD      D,0
+ext_word    LD      D,0
             RLCA
             LD      E,A
             ADD     HL,DE
@@ -712,7 +697,7 @@ EXT_WORD:
 INICIA_EFECTO:  
             LD      A,B
             LD      HL,TABLA_EFECTOS
-            CALL    EXT_WORD
+            CALL    ext_word
             LD      (PUNTERO_EFECTO),HL
             LD      HL,interr
             SET     3,(HL)
@@ -778,14 +763,14 @@ interr          DB     00               ;INTERRUPTORES 1=ON 0=OFF
                                         ;BIT 3=EFECTOS ON/OFF
 ttempo          DB     00               ;DB CONTADOR TEMPO
 tempo           DB     00               ;DB TEMPO
-SONG:           DB     00               ;DBNº DE CANCION
+song            DB     00               ;DBNº DE CANCION
 puntero_a       DW     00               ;DW PUNTERO DEL CANAL A
 puntero_b       DW     00               ;DW PUNTERO DEL CANAL B
 puntero_c       DW     00               ;DW PUNTERO DEL CANAL C
 
-CANAL_A:        DW     BUFFERS_CANALES      ;DW DIRECION DE INICIO DE LA MUSICA A
-CANAL_B:        DW     BUFFERS_CANALES+$30  ;DW DIRECION DE INICIO DE LA MUSICA B
-CANAL_C:        DW     BUFFERS_CANALES+$60  ;DW DIRECION DE INICIO DE LA MUSICA C
+canal_a         DW     BUFFERS_CANALES      ;DW DIRECION DE INICIO DE LA MUSICA A
+canal_b         DW     BUFFERS_CANALES+$30  ;DW DIRECION DE INICIO DE LA MUSICA B
+canal_c         DW     BUFFERS_CANALES+$60  ;DW DIRECION DE INICIO DE LA MUSICA C
 
 puntero_p_a     DW     00               ;DW PUNTERO PAUTA CANAL A
 puntero_p_b     DW     00               ;DW PUNTERO PAUTA CANAL B
@@ -796,13 +781,13 @@ PUNTERO_P_B0:   DW     00               ;DW INI PUNTERO PAUTA CANAL B
 PUNTERO_P_C0:   DW     00               ;DW INI PUNTERO PAUTA CANAL C
 
 
-PUNTERO_P_DECA: DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL A
-PUNTERO_P_DECB: DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL B
-PUNTERO_P_DECC: DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL C
+puntero_p_deca  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL A
+puntero_p_decb  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL B
+puntero_p_decc  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL C
 
-PUNTERO_DECA:   DW     00               ;DW PUNTERO DECODER CANAL A
-PUNTERO_DECB:   DW     00               ;DW PUNTERO DECODER CANAL B
-PUNTERO_DECC:   DW     00               ;DW PUNTERO DECODER CANAL C       
+puntero_deca    DW     00               ;DW PUNTERO DECODER CANAL A
+puntero_decb    DW     00               ;DW PUNTERO DECODER CANAL B
+puntero_decc    DW     00               ;DW PUNTERO DECODER CANAL C       
 
 REG_NOTA_A:     DB     00               ;DB REGISTRO DE LA NOTA EN EL CANAL A
                 DB     00               ;VACIO
@@ -814,9 +799,9 @@ REG_NOTA_C:     DB     00               ;DB REGISTRO DE LA NOTA EN EL CANAL C
 ;CANAL DE EFECTOS - ENMASCARA OTRO CANAL
 
 puntero_p       DW     00               ;DW PUNTERO DEL CANAL EFECTOS
-CANAL_P:        DW     BUFFERS_CANALES+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
-PUNTERO_P_DECP: DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL P
-PUNTERO_DECP:   DW     00               ;DW PUNTERO DECODER CANAL P
+canal_p         DW     BUFFERS_CANALES+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
+puntero_p_decp  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL P
+puntero_decp    DW     00               ;DW PUNTERO DECODER CANAL P
 
 psg_reg:        defs   14               ;DB (11) BUFFER DE REGISTROS DEL PSG
 psg_reg_sec:    defs   14               ;DB (11) BUFFER SECUNDARIO DE REGISTROS DEL PSG
@@ -1016,7 +1001,6 @@ EFECTO5:		DB	$1A,$0E
 				DB	$FF
 				
                                 
-TABLA_SONG:     DW      SONG_0 ;SONG_1
 TABLA_EFECTOS:  DW      EFECTO0, EFECTO1, EFECTO2, EFECTO3, EFECTO4, EFECTO5
 
 ;; NADA A PARTIR DE AQUI!!!
