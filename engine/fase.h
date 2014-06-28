@@ -15,9 +15,9 @@
 #define FRAME asm("call 0xfff9")
 #define EXIT  asm("call 0xfff6")
 
-#define LOAD  0
-#define STOP  3
-#define EFFX  6
+#define LOAD  4
+#define STOP  7
+#define EFFX  10
 
 #if player
   #define Sound(func, param) CallSound(func|param<<8)

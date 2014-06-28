@@ -25,13 +25,13 @@ ini     ld      de, desc
         ld      de, engicm
         push    hl
         call    $07f4
+        di
       IF  border_loading=0
         xor     a
       ELSE
         ld      a, border_loading
       ENDIF
         out     ($fe), a
-        di
         pop     hl
         ld      de, ramt-maplen
         ld      bc, maplen
@@ -40,7 +40,9 @@ ini     ld      de, desc
         ld      de, ramt-1-maplen
         call    desc
         ld      sp, $5b0a
-        ld      de, $ffff
+        ld      e, b
+        dec     de
+;        ld      de, $ffff
         ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len
       IF  smooth=0
         ld      bc, $101
@@ -60,7 +62,7 @@ ini     ld      de, desc
       IF  player
 aqui    out     (c), a
         exx
-        call    $c009
+        call    $c00d
         exx
         ld      a, ($5c01)      ; toggle port value between 00 and 80 every frame
         xor     $80
@@ -84,13 +86,20 @@ prnbuf  ld      a, $17
         ld      a, $11
         out     (c), a
         exx
+        ld      de, desc
+        ld      hl, $5ccb+descom-ini
+        ld      bc, $7f
+        ldir
         ld      hl, $c000
         ld      de, player
         call    $07f4
         di
+        ld      hl, $c000+player-1
+        ld      de, $c000+playrw+3
+        call    desc
         ld      de, ramt-maplen-codel1+15;$f05b
         ld      hl, $5ccb+aqui-ini
-        ld      bc, prnbuf-aqui
+        ld      c, prnbuf-aqui
         ldir
         ld      a, $10
         exx
@@ -125,8 +134,10 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
         ld      bc, bl2len
         lddr
       ENDIF
-        ld      hl, $ffff
-        ld      ($fffe-stasp), hl
+        dec     bc
+        ld      ($fffe-stasp), bc
+;        ld      hl, $ffff
+;        ld      ($fffe-stasp), hl
         ld      hl, $8000+maincm-1
         ld      de, $8200+mainrw-1
         call    desc

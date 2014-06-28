@@ -1,6 +1,6 @@
 
         output  build/player.bin
-        org     $c000
+        org     $c004
         jp      cancion
         jp      poff
         jp      inicia_efecto

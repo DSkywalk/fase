@@ -172,7 +172,7 @@ int main(int argc, char *argv[]){
               "        DEFINE  sprmax %d\n"
               "        DEFINE  player %d\n",
           tmode, pics, reppos, apics, smooth, clipup, clipdn, cliphr, safevr, safehr,
-          offsex, offsey, notabl, bullet, bulmax, sprmax, fopen("build/player.bin", "rb")?1:0);
+          offsex, offsey, notabl, bullet, bulmax, sprmax, fopen("build/player.bin.zx7b", "rb")?1:0);
   fclose(ft);
   printf("\nno index     %d bytes\n", pics*36);
   printf("index bitmap %d bytes\n", pics*5+reppos*32);

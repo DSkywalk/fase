@@ -237,11 +237,15 @@ int main(int argc, char *argv[]){
     scode1-= 0x300-notabl+tmp,
     scode2-= 0x300-notabl+tmp;
   fclose(fi);
-  fi= fopen("build/player.bin", "rb");
+  fi= fopen("build/player.bin.zx7b", "rb");
   i= 0;
   if( fi )
     fseek(fi, 0, SEEK_END),
     i= ftell(fi),
+    fclose(fi),
+    fi= fopen("build/player.bin", "rb"),
+    fseek(fi, 0, SEEK_END),
+    j= ftell(fi),
     fclose(fi);
   fi= fopen("build/defload.asm", "wb+");
   fprintf(fi, "        DEFINE  smooth  %d\n"
@@ -258,9 +262,10 @@ int main(int argc, char *argv[]){
               "        DEFINE  notabl  %d\n"
               "        DEFINE  bullet  %d\n"
               "        DEFINE  tmpbuf  %d\n"
-              "        DEFINE  player  %d\n",
+              "        DEFINE  player  %d\n"
+              "        DEFINE  playrw  %d\n",
           smooth, tmp, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
-          blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet, tmpbuf, i);
+          blocks[2].len>0?blocks[2].len<<1:0, stasp, notabl, bullet, tmpbuf, i, j);
   fclose(fi);
   fi= fopen("build/define.h", "wb+");
   fprintf(fi, "#define smooth %d\n"
