@@ -60,7 +60,7 @@ ini     ld      de, desc
       IF  player
 aqui    out     (c), a
         exx
-        call    $c000
+        call    $c009
         exx
         ld      a, ($5c01)      ; toggle port value between 00 and 80 every frame
         xor     $80

@@ -1,9 +1,9 @@
 
         output  build/player.bin
         org     $c000
-        jp      inicio
         jp      cancion
         jp      poff
+        jp      inicia_efecto
 
 ; SPECTRUM PSG proPLAYER V 0.2 - WYZ 07.09.2011
 ; VER AL FINAL PARA DATOS PROPIOS:
@@ -688,9 +688,8 @@ ext_word    LD      D,0
 
 ;;;;;;;; EFECTOS DE SONIDO ;;;;;;;;;;;
             
-INICIA_EFECTO:  
-            LD      A,B
-            LD      HL,TABLA_EFECTOS
+inicia_efecto:  
+            LD      HL,tabla_efectos
             CALL    ext_word
             LD      (PUNTERO_EFECTO),HL
             LD      HL,interr
@@ -762,9 +761,9 @@ puntero_a       DW     00               ;DW PUNTERO DEL CANAL A
 puntero_b       DW     00               ;DW PUNTERO DEL CANAL B
 puntero_c       DW     00               ;DW PUNTERO DEL CANAL C
 
-canal_a         DW     BUFFERS_CANALES      ;DW DIRECION DE INICIO DE LA MUSICA A
-canal_b         DW     BUFFERS_CANALES+$30  ;DW DIRECION DE INICIO DE LA MUSICA B
-canal_c         DW     BUFFERS_CANALES+$60  ;DW DIRECION DE INICIO DE LA MUSICA C
+canal_a         DW     buffers_canales      ;DW DIRECION DE INICIO DE LA MUSICA A
+canal_b         DW     buffers_canales+$30  ;DW DIRECION DE INICIO DE LA MUSICA B
+canal_c         DW     buffers_canales+$60  ;DW DIRECION DE INICIO DE LA MUSICA C
 
 puntero_p_a     DW     00               ;DW PUNTERO PAUTA CANAL A
 puntero_p_b     DW     00               ;DW PUNTERO PAUTA CANAL B
@@ -793,7 +792,7 @@ REG_NOTA_C:     DB     00               ;DB REGISTRO DE LA NOTA EN EL CANAL C
 ;CANAL DE EFECTOS - ENMASCARA OTRO CANAL
 
 puntero_p       DW     00               ;DW PUNTERO DEL CANAL EFECTOS
-canal_p         DW     BUFFERS_CANALES+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
+canal_p         DW     buffers_canales+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
 puntero_p_decp  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL P
 puntero_decp    DW     00               ;DW PUNTERO DECODER CANAL P
 
@@ -832,171 +831,5 @@ ENVOLVENTE:     DB      0               ;DB : FORMA DE LA ENVOLVENTE
 
                 INCLUDE "mus/list.asm"
 
-;; INCLUIR LOS EFECTOS DE SONIDO:
-
-;                INCLUDE "efectos.asm"
-
-; (0) Select
-EFECTO0:		DB 	$51,$1A
-				DB	$5A,$0F
-				DB	$3C,$0F
-				DB	$1E,$0E
-				DB	$2D,$0E
-				DB	$5A,$0B
-				DB	$3C,$0B
-				DB	$1E,$0A
-				DB	$2D,$0A
-				DB	$B4,$01
-				DB	$FF
-				
-; (1) Start
-EFECTO1:		DB 	$25,$1C
-				DB 	$3A,$0F
-				DB	$2D,$0F
-				DB	$E2,$0F
-				DB	$BC,$0F
-				DB	$96,$0D
-				DB	$4B,$0D
-				DB	$32,$0D
-				DB 	$3A,$0D
-				DB	$2D,$0D
-				DB	$E2,$0D
-				DB	$BC,$0D
-				DB	$96,$0D
-				DB	$4B,$0D
-				DB	$32,$0D
-				DB 	$3A,$0D
-				DB	$2D,$0C
-				DB	$E2,$0C
-				DB	$BC,$0C
-				DB	$96,$0B
-				DB	$4B,$0B
-				DB	$32,$0B
-				DB 	$3A,$0B
-				DB	$2D,$0B
-				DB	$E2,$0B
-				DB	$BC,$0B
-				DB	$96,$0B
-				DB	$4B,$0A
-				DB	$32,$0A
-				DB 	$3A,$0A
-				DB	$2D,$09
-				DB	$E2,$09
-				DB	$BC,$08
-				DB	$96,$08
-				DB	$4B,$08
-				DB	$32,$07
-				DB 	$3A,$07
-				DB	$2D,$06
-				DB	$E2,$06
-				DB	$BC,$06
-				DB	$96,$05
-				DB	$4B,$05
-				DB	$32,$05
-				DB 	$3A,$04
-				DB	$2D,$04
-				DB	$E2,$03
-				DB	$BC,$03
-				DB	$96,$03
-				DB	$4B,$03
-				DB	$32,$02
-				DB 	$3A,$01
-				DB	$2D,$01
-				DB	$E2,$01
-				DB	$BC,$01
-				DB	$FF
-				
-; (2) Sartar
-EFECTO2:		DB	$E8,$1B
-				DB	$B4,$0F
-				DB	$A0,$0E
-				DB	$90,$0D
-				DB	$87,$0D
-				DB	$78,$0C	
-				DB	$6C,$0B	
-				DB	$60,$0A	
-				DB	$5A,$09
-				DB	$FF	
-				
-; (3) Disparo 1
-EFECTO3:		DB	$1F,$0B
-				DB	$5A,$0F
-				DB	$3C,$0F
-				DB	$1E,$0A
-				DB	$2D,$0A
-				DB	$5A,$05
-				DB	$3C,$05
-				DB	$1E,$04
-				DB	$2D,$02
-				DB	$B4,$01
-				DB	$FF
-	
-; (4) Disparo 2
-EFECTO4:		DB	$1F,$0B
-				DB	$AF,$0F
-				DB	$8A,$0F
-				DB	$71,$0F
-				DB	$64,$0F
-				DB	$3E,$0C
-				DB	$25,$0C
-				DB	$25,$0C
-				DB	$25,$0C
-				DB	$25,$0A
-				DB	$4B,$0A
-				DB	$4B,$0A
-				DB	$4B,$0A
-				DB	$3E,$08
-				DB	$3E,$08
-				DB	$3E,$08
-				DB	$71,$08
-				DB	$3E,$07
-				DB	$25,$05
-				DB	$25,$02
-				DB	$FF
-				
-; (5) Vida
-EFECTO5:		DB	$1A,$0E
-				DB	$B4,$0E
-				DB	$B4,$0E
-				DB	$B4,$0E
-				DB	$B4,$0E
-				DB	$B4,$0E
-				DB	$B4,$0E
-				DB	$B4,$0E
-				DB	$B4,$0E	
-				DB	$A0,$0E
-				DB	$A0,$0E
-				DB	$A0,$0E
-				DB	$A0,$0E
-				DB	$A0,$0E
-				DB	$A0,$0E
-				DB	$A0,$0E
-				DB	$87,$0E
-				DB	$87,$0E
-				DB	$87,$0E
-				DB	$87,$0E
-				DB	$87,$0E
-				DB	$87,$0E
-				DB	$87,$0E
-				DB	$87,$0E
-				DB	$87,$0E		
-				DB	$78,$0E
-				DB	$78,$0E
-				DB	$78,$0D
-				DB	$78,$0D
-				DB	$78,$0D
-				DB	$78,$0D
-				DB	$78,$0D
-				DB	$78,$0D
-				DB	$78,$0C
-				DB	$78,$09
-				DB	$78,$06
-				DB	$78,$05	
-				DB	$FF
-				
-                                
-TABLA_EFECTOS:  DW      EFECTO0, EFECTO1, EFECTO2, EFECTO3, EFECTO4, EFECTO5
-
 ;; NADA A PARTIR DE AQUI!!!
-BUFFERS_CANALES:
-                DB              0
+buffers_canales

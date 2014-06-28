@@ -30,7 +30,7 @@ start:
 
   // inicializar engine
   INIT;
-  Sound(0, 3);
+  Sound(LOAD, 0);
 
   // pasar datos a sprites y balas
   for ( i = 0; i < 5; i++ )
@@ -62,9 +62,9 @@ start:
             tmpy= sprites[i].y>>4;
             tiles[tmpy*scrw+tmpx]= 68;
             tilepaint(tmpx, tmpy, tmpx, tmpy);
-            killed++;
+            Sound(EFFX, 1+killed++%5);
             if( killed==10 ){
-              Sound(0, 6);
+              Sound(STOP, 0);
               EXIT;
               Dzx7b((unsigned int) (&ending-1), 0x5aff);
               Pause(100);
@@ -126,8 +126,6 @@ start:
       }
     }
 
-
-
     vx+= ax;
     x+= vx;
     if( vx+8>>3 )
@@ -162,25 +160,17 @@ start:
       y= 15<<11;
     sprites[0].y= y>>8;
 
-
     // movimiento del protagonista
     if( inKey(KeybYUIOP) & 0x01 ) // P
       ax= vx<maxvx ? 40 : 0;
     else if( inKey(KeybYUIOP) & 0x02 ) // O
       ax= vx>-maxvx ? -40 : 0;
-    if( inKey(KeybGFDSA) & 0x01 ){ // A
-/*    if( sprites[0].y<scrh*16 )
-        sprites[0].y++;
-      else if( mapy < maph-1 )
-        sprites[0].y= 0,
-        mapy++,
-        update_screen();*/
-    }
-    else if( inKey(KeybTREWQ) & 0x01 ){ // Q
+    if( inKey(KeybTREWQ) & 0x01 ){ // Q
       if( (unsigned int)y == 15<<11 )
         vy= -800;
     }
     if( inKey(KeybBNMs_) & 0x01 && !spacepressed && num_bullets<4 ){ // Space
+      Sound(EFFX, 0);
       bullets[num_bullets].x= sprites[0].x;
       bullets[num_bullets].y= sprites[0].y;
       i= inKey(KeybTREWQ)<<3&8 | inKey(KeybGFDSA)<<2&4 | inKey(KeybYUIOP)&3;
@@ -223,4 +213,3 @@ void update_scoreboard(){
         BINARY  "ending.rcs.zx7b"
 ._ending
     #endasm
-
