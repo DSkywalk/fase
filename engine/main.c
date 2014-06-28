@@ -30,22 +30,7 @@ start:
 
   // inicializar engine
   INIT;
-  #if player
-  #asm
-    ld      a, ($fff6)
-    cp      $c3
-    jr      nz, noplayer
-    ld      bc, $7ffd
-    ld      a, $11
-    out     (c), a
-    xor     a
-    call    $c003
-    ld      bc, $7ffd
-    ld      a, $10
-    out     (c), a
-noplayer:
-  #endasm
-  #endif
+  Sound(0, 3);
 
   // pasar datos a sprites y balas
   for ( i = 0; i < 5; i++ )
@@ -79,21 +64,7 @@ noplayer:
             tilepaint(tmpx, tmpy, tmpx, tmpy);
             killed++;
             if( killed==10 ){
-              #if player
-              #asm
-                ld      a, ($fff6)
-                cp      $c3
-                jr      nz, noplayer2
-                ld      bc, $7ffd
-                ld      a, $11
-                out     (c), a
-                call    $c006
-                ld      bc, $7ffd
-                ld      a, $10
-                out     (c), a
-noplayer2:
-              #endasm
-              #endif
+              Sound(0, 6);
               EXIT;
               Dzx7b((unsigned int) (&ending-1), 0x5aff);
               Pause(100);

@@ -151,108 +151,102 @@ pcajp5  pop     hl
 
 ;carga una cancion
 ;in:(a)=nº de cancion
-cancion ld      hl,interr           ;carga cancion
-        set     1,(hl)              ;reproduce cancion
-        ld      hl,song
-        ld      (hl),a              ;nº (a)
+cancion ld      hl, interr      ;carga cancion
+        set     1, (hl)         ;reproduce cancion
+        ld      hl, song
+        ld      (hl), a         ;nº (a)
 ;decodificar
 ;in-> interr 0 on
 ;     song
 ;carga cancion si/no
 ;decode_song:
 
-        ld      a,(song)
+        ld      a, (song)
 
 ;lee cabecera de la cancion
 ;byte 0=tempo
 
-        ld      hl,tabla_song
+        ld      hl, tabla_song
         call    ext_word
-        ld      a,(hl)
-        ld      (tempo),a
+        ld      a, (hl)
+        ld      (tempo), a
         xor     a
-        ld      (ttempo),a
+        ld      (ttempo), a
             
 ;header byte 1
 ;(-|-|-|-|-|-|-|loop)
 
-        inc     hl          ;loop 1=on/0=off?
-        ld      a,(hl)
-        bit     0,a
-        jr      z,nptjp0
+        inc     hl              ;loop 1=on/0=off?
+        ld      a, (hl)
+        bit     0, a
+        jr      z, nptjp0
         push    hl
-        ld      hl,interr
-        set     4,(hl)
+        ld      hl, interr
+        set     4, (hl)
         pop     hl
-        
 nptjp0  inc     hl              ;2 bytes reservados
         inc     hl
         inc     hl
 
 ;busca y guarda inicio de los canales en el modulo mus
     
-        ld      (puntero_p_deca),hl
-        ld      e,$3f           ;codigo intrumento 0
-        ld      b,$ff           ;el modulo debe tener una longitud menor de $ff00 ... o_o!
-        
+        ld      (puntero_p_deca), hl
+        ld      e, $3f          ;codigo intrumento 0
+        ld      b, $ff          ;el modulo debe tener una longitud menor de $ff00 ... o_o!
 bgicmo1 xor     a               ;busca el byte 0
         cpir
         dec     hl
         dec     hl
-        ld      a,e             ;es el instrumento 0??
+        ld      a, e            ;es el instrumento 0??
         cp      (hl)
         inc     hl
         inc     hl
-        jr      z,bgicmo1
-
-        ld      (puntero_p_decb),hl
-
+        jr      z, bgicmo1
+        ld      (puntero_p_decb), hl
 bgicmo2 xor     a               ;busca el byte 0
         cpir
         dec     hl
         dec     hl
-        ld      a,e
+        ld      a, e
         cp      (hl)            ;es el instrumento 0??
         inc     hl
         inc     hl
-        jr      z,bgicmo2
-
-        ld      (puntero_p_decc),hl
-    
+        jr      z, bgicmo2
+        ld      (puntero_p_decc), hl
 bgicmo3 xor     a               ;busca el byte 0
         cpir
         dec     hl
         dec     hl
-        ld      a,e
-        cp      (hl)                ;es el instrumento 0??
+        ld      a, e
+        cp      (hl)            ;es el instrumento 0??
         inc     hl
         inc     hl
-        jr      z,bgicmo3
-        ld      (puntero_p_decp),hl
+        jr      z, bgicmo3
+        ld      (puntero_p_decp), hl
 
 ;lee datos de las notas
 ;(|)(|||||) longitud\nota
 ; init_decoder:
-        ld      de,(canal_a)
-        ld      (puntero_a),de
-        ld      hl,(puntero_p_deca)
+        ld      de, (canal_a)
+        ld      (puntero_a), de
+        ld      hl, (puntero_p_deca)
         call    decode_canal    ;canal a
-        ld      (puntero_deca),hl
-        ld      de,(canal_b)
-        ld      (puntero_b),de
-        ld      hl,(puntero_p_decb)
+        ld      (puntero_deca), hl
+        ld      de, (canal_b)
+        ld      (puntero_b), de
+        ld      hl, (puntero_p_decb)
         call    decode_canal    ;canal b
-        ld      (puntero_decb),hl
-        ld      de,(canal_c)
-        ld      (puntero_c),de
-        ld      hl,(puntero_p_decc)
+        ld      (puntero_decb), hl
+        ld      de, (canal_c)
+        ld      (puntero_c), de
+        ld      hl, (puntero_p_decc)
         call    decode_canal    ;canal c
-        ld      (puntero_decc),hl
-        ld      de,(canal_p)
-        ld      (puntero_p),de
-        ld      hl,(puntero_p_decp)
+        ld      (puntero_decc), hl
+        ld      de, (canal_p)
+        ld      (puntero_p), de
+        ld      hl, (puntero_p_decp)
         call    decode_canal    ;canal p
-        ld      (puntero_decp),hl
+        ld      (puntero_decp), hl
         ret
 
 

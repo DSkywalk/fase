@@ -10,6 +10,11 @@
 #define KeybBNMs_ 0x7f
 
 #define tilepaint(from_x, from_y, to_x, to_y) *repaint= from_x|from_y<<4|to_x<<8|to_y<<12
+#if player
+  #define Sound(param, func) CallSound(func|param<<8)
+#else
+  #define Sound(param, func)
+#endif
 
 #define INIT  asm("call 0xfffc")
 #define FRAME asm("call 0xfff9")
@@ -68,3 +73,23 @@ void __CALLEE__ Dzx7b ( unsigned int source, unsigned int addr ){
         jp      dzx7a
     #endasm
 }
+
+#if player
+void __FASTCALL__ CallSound ( unsigned int source ){
+    #asm
+        ld      a, ($fff6)
+        cp      $c3
+        ret     nz
+        ld      bc, $7ffd
+        ld      a, $11
+        out     (c), a
+        ld      a, h
+        ld      h, $c0
+        call    $162c
+        ld      bc, $7ffd
+        ld      a, $10
+        out     (c), a
+        ret
+    #endasm
+}
+#endif
