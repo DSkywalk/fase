@@ -1,3 +1,7 @@
+        DEFINE  machine 1
+        output  build/nulo.bin
+        include asm/engine.asm
+
         include build/ndefload.asm
         DEFINE  border_loading 0
       IF  smooth=0
@@ -56,7 +60,7 @@ ini     ld      de, desc
         ld      hl, $5ccb+prnbuf-ini
         ld      de, $5b0a
         push    de
-        ld      c, screen-prnbuf
+        ld      c, ldscrn-prnbuf
         ldir
         ret
       IF  player
@@ -97,7 +101,7 @@ prnbuf  ld      a, $17
         ld      hl, $c000+player-1
         ld      de, $c000+playrw+3
         call    desc
-        ld      de, ramt-maplen-codel1+15;$f05b
+        ld      de, do1+6;ramt-maplen-codel1+21;$f05b
         ld      hl, $5ccb+aqui-ini
         ld      c, prnbuf-aqui
         ldir
@@ -148,6 +152,6 @@ copied  ld      hl, ramt-1-maplen-codel2-codel1-codel0-bl2len-$281-$7f*smooth+no
         ld      bc, mainrw
         ldir
         ret
-screen  incbin  build/loading.rcs.zx7b
+ldscrn  incbin  build/loading.rcs.zx7b
 descom  org     desc
         include asm/dzx7b_rcs.asm

@@ -21,9 +21,9 @@
         DEFINE  tiladdr $5c08+bullet*(8<<smooth)
         DEFINE  sprites $fe00
       IF  smooth=0
-        DEFINE  final   $fd00+(notabl<<8)
+        DEFINE  final   $fd00+notabl
       ELSE
-        DEFINE  final   $fc81+(notabl<<8)
+        DEFINE  final   $fc81+notabl
       ENDIF
 
   MACRO multsub first, second
@@ -172,8 +172,26 @@
         org     staspr+final-mapend-$
 staspr  defw    draw_sprites+1&$ffff
         nop
+        include mus/effx.asm
 do_sprites
+      IF  machine=1
         ld      (drawz+1&$ffff), sp
+      ELSE
+dom     ld      hl, effx1-1
+        ld      (drawz+1&$ffff), sp
+        ld      b, (hl)
+        ld      a, $10
+        cp      b
+        jr      z, dom2
+        out     ($fe), a
+        ld      hl, (dom+1)
+        inc     hl
+        ld      (dom+1), hl
+dom1    djnz    dom1
+        xor     a
+        out     ($fe), a
+dom2
+      ENDIF
       IF  machine=0             ; if 48k doing sync with the sync bar (8 lines)
 do0     ld      bc, syhi | sylo<<8
 do1     in      a, ($ff)        ; first detect the syhi byte in the floating bus
@@ -779,9 +797,9 @@ draw1   ld      (draw8+1&$ffff), a
         ld      l, a            ; in the bullets we only store 2 bytes, one of each
         ld      h, enems >> 8   ; coordinate (X and Y)
         ld      a, (hl)         ; read y
-        cp      bulmiy          ; basically if the bullet is out of the screen
+        cp      bulmiy&$ff      ; basically if the bullet is out of the screen
         jp      c, draw8&$ffff  ; area we don't paint it
-        cp      11+scrh*16-2*bulmay
+        cp      11+scrh*16-2*bulmay&$ff
         jp      nc, draw8&$ffff ; calculate the screen address
         dec     l               ; and the source of the sprite (bullet) in SP
         ld      a, (hl)         ; read x
@@ -817,7 +835,7 @@ draw2   ld      sp, ($5c00)
         and     $fe
       ENDIF
         add     a, d
-    IF notabl=1
+    IF notabl
         ld      l, a            ; A=L= RRrrrppp
         rrca
         rrca
@@ -1058,7 +1076,7 @@ drawe
         cp      1+((offsey+scrh*2-2)<<3)
         jp      nc, craw1&$ffff
       ENDIF
-    IF notabl=1
+    IF notabl
         ld      l, a            ; A=L= RRrrrppp
       IF offsey=0
         cp      192
@@ -1442,7 +1460,7 @@ braw1   ld      (braw9+1&$ffff), bc
         inc     a
       ENDIF
         ld      ixh, a
-    IF notabl=1
+    IF notabl
 braw2   ld      a, 0
         ld      l, a
         rrca
@@ -1568,7 +1586,7 @@ craw1   ld      (craw2+1&$ffff), a
         sub     $ff-(offsey+scrh*2<<3)
         rra
         ld      ixh, a
-      IF notabl=1
+      IF notabl
 craw2   ld      a, 0
         ld      l, a
         rrca

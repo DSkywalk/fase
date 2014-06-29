@@ -153,6 +153,12 @@ int main(int argc, char *argv[]){
         output[0x5000+apics*4+k]= output[i*36+32+k];
     output[inipos++]= j<i ? output[0x4000|j] : apics++;
   }
+  ft= fopen("build/player.bin.zx7b", "rb");
+  i= 0;
+  if( ft )
+    fseek(ft, 0, SEEK_END),
+    i= ftell(ft),
+    fclose(ft);
   ft= fopen("build/define.asm", "wb+");
   fprintf(ft, "        DEFINE  tmode  %d\n"
               "        DEFINE  tiles  %d\n"
@@ -171,8 +177,8 @@ int main(int argc, char *argv[]){
               "        DEFINE  bulmax %d\n"
               "        DEFINE  sprmax %d\n"
               "        DEFINE  player %d\n",
-          tmode, pics, reppos, apics, smooth, clipup, clipdn, cliphr, safevr, safehr,
-          offsex, offsey, notabl, bullet, bulmax, sprmax, fopen("build/player.bin.zx7b", "rb")?1:0);
+          tmode, pics, reppos, apics, smooth, clipup, clipdn, cliphr,
+          safevr, safehr, offsex, offsey, notabl<<8, bullet, bulmax, sprmax, i);
   fclose(ft);
   printf("\nno index     %d bytes\n", pics*36);
   printf("index bitmap %d bytes\n", pics*5+reppos*32);

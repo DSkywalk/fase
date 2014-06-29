@@ -15,9 +15,9 @@
 #define FRAME asm("call 0xfff9")
 #define EXIT  asm("call 0xfff6")
 
-#define LOAD  4
+#define EFFX  4
 #define STOP  7
-#define EFFX  10
+#define LOAD  10
 
 #if player
   #define Sound(func, param) CallSound(func|param<<8)
@@ -84,7 +84,7 @@ void __FASTCALL__ CallSound ( unsigned int source ){
     #asm
         ld      a, ($fff6)
         cp      $c3
-        ret     nz
+        jr      nz, beep
         ld      bc, $7ffd
         ld      a, $11
         out     (c), a
@@ -94,6 +94,21 @@ void __FASTCALL__ CallSound ( unsigned int source ){
         ld      bc, $7ffd
         ld      a, $10
         out     (c), a
+        ret
+beep:   ld      a, l
+        sub     EFFX+1
+        ret     nc
+        ld      d, a
+        sub     h
+        add     a, a
+        ld      e, a
+        ld      hl, ($fffa)
+        ex      de, hl
+        add     hl, de
+        inc     de
+        ldi
+        ld      a, (hl)
+        ld      (de), a
         ret
     #endasm
 }

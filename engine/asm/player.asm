@@ -1,9 +1,9 @@
 
         output  build/player.bin
         org     $c004
-        jp      cancion
-        jp      poff
         jp      inicia_efecto
+        jp      poff
+        jp      cancion
 
 ; SPECTRUM PSG proPLAYER V 0.2 - WYZ 07.09.2011
 ; VER AL FINAL PARA DATOS PROPIOS:
