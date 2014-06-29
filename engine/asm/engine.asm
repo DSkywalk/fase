@@ -154,10 +154,12 @@
 
     MACRO tileprint
       IF offsey&1
+        ld      (.save+1), a
         cellprint $f901
         cellprin1
         cellprint $f901
         cellprin2
+.save   ld      a, 0
       ELSE
         cellprint $f901
         cellprint $f91f

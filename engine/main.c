@@ -203,7 +203,7 @@ void update_scoreboard(){
   unsigned int scr, dst;
   char count;
   scr= 0x3d80+killed*8;
-  dst= 0x50de|*shadow<<8;
+  dst= 0x403e|*shadow<<8;
   for ( count= 0; count<8; count++ )
     zxmem[dst]= zxmem[scr++]^0xff,
     dst+= 0x100;
