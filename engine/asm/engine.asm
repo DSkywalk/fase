@@ -179,18 +179,23 @@ do_sprites
       ELSE
 dom     ld      hl, effx1-1
         ld      (drawz+1&$ffff), sp
-        ld      b, (hl)
         ld      a, $10
+dom1    ld      b, (hl)
         cp      b
-        jr      z, dom2
+        jr      z, dom4
         out     ($fe), a
-        ld      hl, (dom+1)
+dom2    djnz    dom2
+        add     a, a
+        ld      a, b
+        out     ($fe), a
+        jr      c, dom3
+        ld      a, $90
+        bit     7, (hl)
+        jr      z, dom1
+dom3    ld      hl, (dom+1)
         inc     hl
         ld      (dom+1), hl
-dom1    djnz    dom1
-        xor     a
-        out     ($fe), a
-dom2
+dom4
       ENDIF
       IF  machine=0             ; if 48k doing sync with the sync bar (8 lines)
 do0     ld      bc, syhi | sylo<<8

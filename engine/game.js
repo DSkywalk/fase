@@ -133,13 +133,13 @@ function frame(){
       if( dirbul[i]&3 ){
         if( dirbul[i]&1 ){
           if( bullets[i].x<scrw*16 )
-            bullets[i].x+= 2;
+            bullets[i].x+= 4;
           else
             remove_bullet( i );
         }
         else{
-          if( bullets[i].x>2 )
-            bullets[i].x-= 2;
+          if( bullets[i].x>4 )
+            bullets[i].x-= 4;
           else
             remove_bullet( i );
         }
@@ -147,13 +147,13 @@ function frame(){
       if( dirbul[i]&12 ){
         if( dirbul[i]&4 ){
           if( bullets[i].y<scrh*16 )
-            bullets[i].y+= 2;
+            bullets[i].y+= 4;
           else
             remove_bullet( i );
         }
         else{
-          if( bullets[i].y>2 )
-            bullets[i].y-= 2;
+          if( bullets[i].y>4 )
+            bullets[i].y-= 4;
           else
             remove_bullet( i );
         }
