@@ -185,10 +185,10 @@ dom1    ld      b, (hl)
         jr      z, dom4
         out     ($fe), a
 dom2    djnz    dom2
-        add     a, a
+        and     a
         ld      a, b
         out     ($fe), a
-        jr      c, dom3
+        jp      m, dom3
         ld      a, $90
         bit     7, (hl)
         jr      z, dom1
@@ -555,7 +555,7 @@ del2    pop     bc
         ld      a, c
       IF smooth=1
         bit     0, h            ; this conditional assembly is when smooth=1
-        jp      z, wel2         ; we can save some cycles width different
+        jp      z, wel2&$ffff   ; we can save some cycles width different
         and     %00001100       ; routines for even and odd lines
         jr      z, wel4
         jp      po, wel5

@@ -7,23 +7,9 @@ dim datos(19) as ubyte = { _
     $08, $60, $60, 2, _
     $09, $a8, $48, 3, _
     $0a, $22, $02, 1, _
-    $0b, $d0, $6e, 2}
+    $0c, $d0, $6e, 2}
 dim i, j, x, y, spacepressed, killed, numbullets as byte
 dim tmpx, tmpy as ubyte
-
-sub FASTCALL pausa( time as uinteger )
-  asm
-loop1:  ld      bc, 21
-loop2:  djnz    loop2
-        dec     c
-        jr      nz, loop2
-        dec     hl
-        ld      a, l
-        or      h
-        jr      nz, loop1
-        ret
-  end asm
-end sub
 
 function abso( a as ubyte, b as ubyte ) as uinteger
   if b<a then
@@ -46,7 +32,7 @@ sub updatescoreboard()
   dim scr, dst as uinteger
   dim count as ubyte
   scr= $3d80+CAST(uinteger, killed)*8
-  dst= $50de|CAST(uinteger, shadow)<<8
+  dst= $403e|CAST(uinteger, shadow)<<8
   for count = 0 to 7
     poke dst, (peek scr ~ $ff)
     scr= scr+1
@@ -80,6 +66,7 @@ start:
   updatescoreboard()
 
   Init
+  Sound(LOAD, 0)
 
   for i = 0 to 4
     SetSpriteV(i, datos(i*4))
@@ -107,8 +94,10 @@ start:
             tmpy= GetSpriteY(i)>>4
             SetTile(tmpy*scrw+tmpx, 68)
             TilePaint(tmpx, tmpy, tmpx, tmpy)
+            Sound(EFFX, 1+(killed Mod 5))
             killed= killed+1
             if killed=10 then
+              Sound(STOP, 0)
               Exit
               dzx7b(@image-1, $5aff)
               pausa(100)
@@ -150,13 +139,13 @@ start:
       if dirbul(i) & 3 then
         if dirbul(i) & 1 then
           if GetBulletX(i) < scrw*16 then
-            SetBulletX(i, GetBulletX(i)+2)
+            SetBulletX(i, GetBulletX(i)+4)
           else
             removebullet(i)
           end if
         else
-          if GetBulletX(i) > 2 then
-            SetBulletX(i, GetBulletX(i)-2)
+          if GetBulletX(i) > 4 then
+            SetBulletX(i, GetBulletX(i)-4)
           else
             removebullet(i)
           end if
@@ -165,13 +154,13 @@ start:
       if dirbul(i) & 12 then
         if dirbul(i) & 4 then
           if GetBulletY(i) < scrh*16 then
-            SetBulletY(i, GetBulletY(i)+2)
+            SetBulletY(i, GetBulletY(i)+4)
           else
             removebullet(i)
           end if
         else
-          if GetBulletY(i) > 2 then
-            SetBulletY(i, GetBulletY(i)-2)
+          if GetBulletY(i) > 4 then
+            SetBulletY(i, GetBulletY(i)-4)
           else
             removebullet(i)
           end if
@@ -216,6 +205,7 @@ start:
       end if
     end if
     if multikeys(KEYSPACE) and (not spacepressed) and numbullets<4 then
+      Sound(EFFX, 0)
       SetBulletX(numbullets, GetSpriteX(0))
       SetBulletY(numbullets, GetSpriteY(0))
       i= (multikeys(KEYQ)<<3&8 | multikeys(KEYA)<<2&4 | multikeys(KEYO|KEYP)&3) & 15

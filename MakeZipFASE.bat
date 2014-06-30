@@ -41,6 +41,7 @@ del /q build\*.*
   asm\engine0.asm         ^
   asm\engine1.asm         ^
   asm\engine2.asm         ^
+  asm\player.asm          ^
   asm\loader.asm          ^
   gfx\bullet.png          ^
   gfx\digits.png          ^
@@ -56,5 +57,9 @@ del /q build\*.*
   lib\bin\step1.exe       ^
   lib\bin\step2.exe       ^
   lib\bin\TmxCompress.exe ^
-  lib\bin\zx7b.exe
+  lib\bin\zx7b.exe        ^
+  mus\effx.asm            ^
+  mus\list.asm            ^
+  mus\song.mus.asm        ^
+  mus\song0.mus
 cd ..

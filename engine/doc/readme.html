@@ -59,35 +59,37 @@ sprites, tiles, bullet an map. Also code elements as your convenience, we put
 a simple demo in main.c (and main.bas) but you must need more files when your
 game grows in complexity. And finally configuration elements. The configuration
 elements are part of the engine itself, but we facilitate the task by grouping
-the most part on config.def file (the rest are in engine.asm and loader.asm).
+the most part on config.def file (the rest are in asm/engine.asm and asm/loader.asm).
 <br/>
 <br/>
 When all elements are ready you must compile the project, generating a file
-called game.tap. There are 3 ways of generate game.tap. Just execute
-fase.bat with zero or one of these parameters:
+called game.tzx. There are 3 ways of generate game.tzx. Just execute
+fase.bat (or faseb.bat if you want to compile ZX BASIC) with zero or one
+of these parameters:
 <ol>
 <li>fase gfx</li>
-Will compile all files. Type this if you modify map.tmx or any png file or
+Will compile all files. Type this if you modify gfx/map.tmx or any gfx/*.png file or
 tmode constant in config.def. You can modify the png files with any image
-editor (I use GIMP) and map.tmx with Tiled (www.mapeditor.org/). To ensure
+editor (I use <a href="http://www.gimp.org/downloads">GIMP</a>) and gfx/map.tmx with <a href="http://www.mapeditor.org">Tiled</a>. To ensure
 legal ZX Spectrum colors filter it with <a href="http://retrolandia.net/foro/showthread.php?tid=78&pid=452#pid452">PosterizeZX</a>
 <li>fase config</li>
 If you change one of the options into config.def (except tmode)
 <li>fase</li>
-Without parameters just compile main.c (or main.bas) and generate game.tap
+Without parameters just compile main.c (or main.bas) and generate game.tzx
 </ol>
 <h1>Modifing graphics</h1>
 Just modify png files as in the example with your favorite image editor, I
-use GIMP. They are sprites.png, tiles.png, bullet.png and loading.png. We
-use the same format that <a href="http://www.mojontwins.com/juegos_mojonos/la-churrera-english/">Churrera</a>.
-That is 256x32 sprites image in black/with with separate mask in black/red,
-and 256x[multiple of 16] tiles image, with a limit of 256 tiles. Remember
+use GIMP. They are gfx/sprites.png, gfx/tiles.png, gfx/bullet.png and gfx/loading.png. We
+use for sprites our own format (256x16 png with transparency) included in the package,
+but also you can use the same than <a href="http://www.mojontwins.com/juegos_mojonos/la-churrera-english/">The Churrera</a>
+use, that is 256x32 sprites image in black/with with separate mask in black/red. 
+For the tiles you must use a 256x[multiple of 16] image, with a limit of 256 tiles. Remember
 that your pallette is limited to the 15 ZX Spectrum colors, if you are not
-sure pass your file by PosterizeZX (in util folder).
+sure pass your file by PosterizeZX (in lib/bin folder).
 <br/><br/>
-The map file is stored in map.tmx, to open and change the file
+The map file is stored in gfx/map.tmx, to open and change the file
 use <a href="http://www.mapeditor.org/">Tiled</a>. To create an empty map type
-employ GenTmx (also in util folder). If you want to create an empty screen (not accessible
+employ GenTmx (also in lib/bin folder). If you want to create an empty screen (not accessible
 in the game) put the left upper tile with a tile different than zero, and the rest with
 tile zero. This won't encode this screen and it will cost only a byte.
 <br/><br/>
@@ -115,15 +117,14 @@ before write because in 128K mode there is another screen between 0xc000 and 0xd
 <br/><br/>
 In the BASIC demo the interace definition is into fase.bas, has some mapped variables but
 the interace mainly is done by macros to peek and poke commands. Both BASIC and C demos have
-identical behaviour, you only must specify the language to use in line 3 of fase.bat. Default
-compiler is ZXBasic because it's included in the package. In case of SDCC you must download
-and install it, with the compiler executable in the path.
+identical behaviour, use faseb.bat or fase.bat respectively to compile.
 <br/><br/>
 Take care about heavy task if you want mantain the 50fps. Sprite painting is about 3500 cycles
 per sprite, so if for example you have four sprites that's 14000 cycles of almost 70000
 (20% of the frame). So in this example you have up to 56000 cycles to do non graphic stuff like
 collision management, inertia and gravity calculation and game logic. If you surpases this
-number you'll miss a frame.
+number you'll miss a frame. Note: Now there is some inertia and gravity in the main.c code, not
+in the main.bas.
 <h1>Modifing configuration</h1>
 The main part of the useful constants are grouped in config.def file:
 <ul>
@@ -171,11 +172,25 @@ The main part of the useful constants are grouped in config.def file:
   Between 1 and 12. Same as above but with sprites. Take account that about 8 sprites
   in the 48K mode you'll start to have flickering
 </ul>
-Another useful constants outside the config.def are scolor and ccolor in engine.asm to
+Another useful constants outside the config.def are scolor and ccolor in asm/engine.asm to
 configure the color of sync and clipping bars, and border_loading in loader.asm to put
 the color in the border after the tape loading.
 <br/><br/>
 <img src="help1.png" style="margin-left:80px"/>
+<h1>Adding sound</h1>
+You can create AY effects and music for 128K machines, and 48K effects with the beeper.
+To create music download and install <a href="https://sites.google.com/site/augustoruiz/home">WYZ tracker</a>.
+When you finished your music export and rename files to song.mus.asm, song0.mus, song1.mus... and
+edit mus/list.asm to update the table and create AY effects (I don't know how).
+To create 48K effects just modify mus/effx.asm, lower values produces sharper sounds, $10 is the
+end marker.
+<br/><br/>
+To disable sound delete build\player.bin.zx7b and comment these two lines in fase.bat/faseb.bat:
+<pre>
+rem lib\bin\sjasmplus asm\player.asm > nul
+rem lib\bin\zx7b build\player.bin build\player.bin.zx7b
+</pre>
+
 <h1>Advanced stuff</h1>
 As said before the interface between game and engine is by memory, exactly the area
 area located between 0x5b00 and 0x5c07. In this section I'll explain the structure
@@ -232,21 +247,26 @@ To manage the bullets, up to 8 of them. In this case there are only 2 values:
 </ul>
 <br/>
 If you want to know the internals of the engine, this memory map will be useful for you
-before reading the assembly code in engine.asm.
+before reading the assembly code in asm/engine.asm.
 <br/><br/><br/>
 <img src="help2.png" style="margin-left:20px"/>
 <h1>Credits</h1>
 <ul>
   <li>Antonio Villena</li>
   All the code, and most of the utilities like TmxCompress, GenTape, GenTmx, ZX7B
+  <li>Augusto Ruiz</li>
+  WYZ player code
   <li>Einar Saukas</li>
   For the compression code in TmxCompress and in ZX7B
+  <li>David Colmenero</li>
+  Beta testing, and creator of the first game with this engine, Maxim The Cat
   <li>na_th_an</li>
-  For doing "La Churrera" engine that inspired this project
+  For doing "La Churrera" engine that inspired this project, also the music is
+  extracted from Ninjajar
   <li>radastan</li>
   He borrows the graphics on the demo, are the same that "Nightmare in Hallowen"
 </ul>
 <br/>
-FASE 1.01 / 2014-02-04
+FASE 1.03 / 2014-06-30
 </div>
 <br/></body></html>

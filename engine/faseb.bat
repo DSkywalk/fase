@@ -34,7 +34,15 @@ for /f %%i in ("build\engine.zx7b") do echo         DEFINE  engicm  %%~zi >> bui
 for /f %%i in ("build\main.zx7b")   do echo         DEFINE  maincm  %%~zi >> build\ndefload.asm
 for /f %%i in ("build\main.bin")    do echo         DEFINE  mainrw  %%~zi >> build\ndefload.asm
 lib\bin\sjasmplus asm\loader.asm
-lib\bin\gentape game.tap              ^
-    basic 'game' 0  build\loader.bin  ^
-     data           build\engine.zx7b
+if exist build\player.bin.zx7b (
+  lib\bin\gentape game.tzx                    ^
+            basic 'game' 0  build\loader.bin  ^
+             data           build\engine.zx7b ^
+           stop48                             ^
+             data           build\player.bin.zx7b
+) else (
+  lib\bin\gentape game.tzx                    ^
+            basic 'game' 0  build\loader.bin  ^
+             data           build\engine.zx7b
+)
 ENDLOCAL

@@ -109,7 +109,6 @@ beep:   ld      a, l
         ldi
         ld      a, (hl)
         ld      (de), a
-        ret
     #endasm
 }
 #endif
