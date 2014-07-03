@@ -39,13 +39,14 @@ offend  rr      e
         ex      de, hl
         adc     hl, de
         lddr
-exitdz  pop     hl
-        jr      nc, mainlo
-        ld      a, $41
-        sub     h
-        ret     c
-        ld      b, a
-drcsne  ld      de, $4001
+        pop     hl
+        jr      mainlo
+exitdz  pop     de
+        ret
+drcs    inc     de
+        inc     e
+        ld      b, 2
+drcsne  push    de
 drcslo  ld      h, d
         ld      a, e
         djnz    drcsco
@@ -86,6 +87,7 @@ drcssk  inc     b
         ld      a, d
         cp      $58
         jr      nz, drcslo
+        pop     de
         djnz    drcsne
 getbit  ld      a, (hl)
         dec     hl

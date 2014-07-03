@@ -6,8 +6,9 @@ if not exist z88dkenv.bat (
   exit /b 1
 )
 if "%1"=="gfx" (
-  lib\bin\Png2Rcs gfx\loading.png build\loading.rcs
+  lib\bin\Png2Rcs gfx\loading.png build\loading.rcs build\loading.atr
   lib\bin\zx7b build\loading.rcs build\loading.rcs.zx7b
+  lib\bin\zx7b build\loading.atr build\loading.atr.zx7b
 rem  lib\bin\GenTmx 3 3 10 10 gfx\map.tmx
   lib\bin\TmxCompress gfx\map.tmx build\map_compressed.bin > build\defmap.asm
   lib\bin\sjasmplus asm\player.asm > nul
@@ -29,7 +30,8 @@ zcc +zx -O3 -vn main.c -o build\main.bin -lndos
 echo File main.bin compiled from main.c
 lib\bin\zx7b build\main.bin build\main.zx7b
 echo.
-copy /b build\map_compressed.bin+build\main.zx7b+build\block.zx7b build\engine.zx7b > nul
+rem copy /b build\map_compressed.bin+build\screen.bin+build\main.zx7b+build\block.zx7b build\engine.zx7b > nul
+copy /b build\block.zx7b+build\main.zx7b+build\map_compressed.bin build\engine.zx7b > nul
 echo File engine.zx7b joined from map_compressed.bin, main.zx7b and block.zx7b
 echo.
 copy build\defload.asm build\ndefload.asm > nul

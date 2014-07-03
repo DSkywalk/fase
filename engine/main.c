@@ -5,8 +5,7 @@
 #define maxvx   600
 #define maxvy   600
 
-extern unsigned char *ending;
-/* const */ unsigned char data[20]= {
+unsigned char data[20]= {
   0x00, 0x42, 0x11, 0,
   0x08, 0x60, 0x60, 2,
   0x09, 0x58, 0x48, 3,
@@ -66,7 +65,7 @@ start:
             if( killed==10 ){
               Sound(STOP, 0);
               EXIT;
-              Dzx7b((unsigned int) (&ending-1), 0x5aff);
+              //Dzx7b((unsigned int) (&ending-1), 0x5aff);
               Pause(100);
               goto start;
             }
@@ -208,8 +207,3 @@ void update_scoreboard(){
     zxmem[dst]= zxmem[scr++]^0xff,
     dst+= 0x100;
 }
-
-    #asm
-        BINARY  "ending.rcs.zx7b"
-._ending
-    #endasm

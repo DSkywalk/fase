@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include "../../../ComplementosChurrera/lodepng.c"
 unsigned char *image, *pixel, output[0x10000];
-char  tmpstr[20], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr, offsex, offsey,
-      notabl, bullet, bulmax, sprmax;
+char  tmpstr[50], command[50], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr,
+      offsex, offsey, notabl, bullet, bulmax, sprmax;
 unsigned error, width, height, i, j, l, min, max, nmin, nmax, amin, amax,
           pics, apics, inipos, iniposback, reppos, smooth, outpos, fondo, tinta;
 int k, mask, amask;
 long long atr, celdas[4];
-FILE *fo, *ft;
+FILE *fi, *fo, *ft;
 
 int check(int value){
   return value==0 || value==192 || value==255;
@@ -53,6 +53,45 @@ void atrgen(void){
 }
 
 int main(int argc, char *argv[]){
+
+// screens
+
+  ft= fopen("gfx/screen.def", "r");
+  fo= fopen("build/screen.bin", "wb+");
+  k= j= 0;
+  while ( fgets(tmpstr, 50, ft) ){
+    if( tmpstr[8]=='"' )
+      strchr(tmpstr+9, '"')[1]= 0,
+      sprintf(command, "lib\\bin\\Png2Rcs \"gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+9);
+    else
+      strchr(tmpstr+8, '\n')[0]= 0,
+      sprintf(command, "lib\\bin\\Png2Rcs gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+8);
+    if( system(command) )
+      printf("\nError: plug error with command: %s\n", command),
+      exit(-1);
+    system("lib\\bin\\zx7b build\\tmp.rcs build\\tmp.rcs.zx7b");
+    system("lib\\bin\\zx7b build\\tmp.atr build\\tmp.atr.zx7b");
+    fi= fopen("build/tmp.atr.zx7b", "rb");
+    j+= i= fread(output, 1, 0x300, fi);
+    fwrite(output, 1, i, fo);
+    fclose(fi);
+    fi= fopen("build/tmp.rcs.zx7b", "rb");
+    j+= i= fread(output, 1, 0x1800, fi);
+    fwrite(output, 1, i, fo);
+    fclose(fi);
+    output[0]= atoi(tmpstr+4)&7 | atoi(tmpstr+4)<<3;
+    fwrite(output, 1, 1, fo);
+    j++;
+    k+= 2;
+    *(short*)(output-k+0x1900)= j;
+  }
+  printf("%d\n", k);
+  fclose(ft);
+  fwrite(output-k+0x1900, 1, k, fo);
+  fclose(fo);
+
+// config
+
   ft= fopen("config.def", "r");
   while ( !feof(ft) ){
     fgets(tmpstr, 20, ft);

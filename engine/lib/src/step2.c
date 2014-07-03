@@ -175,6 +175,10 @@ int main(int argc, char *argv[]){
   fseek(fi, 0, SEEK_END);
   tmp= ftell(fi);
   fclose(fi);
+  fi= fopen("build/screen.bin", "rb");
+  fseek(fi, 0, SEEK_END);
+  j= ftell(fi);
+  fclose(fi);
   fi2= fopen("build/engine2.bin", "rb");
   fseek(fi2, -10, SEEK_END);
   fread(mem+0xfff6, 1, 9, fi2);
@@ -244,6 +248,7 @@ int main(int argc, char *argv[]){
     fclose(fi);
   fi= fopen("build/defload.asm", "wb+");
   fprintf(fi, "        DEFINE  maplen  %d\n"
+              "        DEFINE  scrlen  %d\n"
               "        DEFINE  codel0  %d\n"
               "        DEFINE  codel1  %d\n"
               "        DEFINE  codel2  %d\n"
@@ -255,7 +260,7 @@ int main(int argc, char *argv[]){
               "        DEFINE  stasp   %d\n"
               "        DEFINE  tmpbuf  %d\n"
               "        DEFINE  playrw  %d\n",
-          tmp, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
+          tmp, j, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
           blocks[2].len>0?blocks[2].len<<1:0, stasp, tmpbuf, i);
   fclose(fi);
   fi= fopen("build/define.h", "wb+");
