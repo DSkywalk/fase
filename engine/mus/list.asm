@@ -1,8 +1,9 @@
-tabla_song  dw  song_0
+tabla_song  dw  song_0, song_1
 
         include mus/song.mus.asm
 
 song_0  incbin  mus/song0.mus
+song_1  incbin  mus/song1.mus
 
 ;; INCLUIR LOS EFECTOS DE SONIDO:
 

@@ -44,7 +44,19 @@ ini     ld      de, desc        ; apunto al descompresor
       ELSE
         ld      a, border_loading
       ENDIF
-        out     ($fe), a        ; pongo borde
+        out     ($fe), a        ; pongo borde (creo que es mejor más abajo, después de cargar wyzplayer)
+        ld      hl, $ffff
+        ld      ($feff), hl
+        ld      a, $fe
+        ld      i, a
+        im      2
+      IF  music
+        ld      hl, ramt-engicm+blo1cm+music-1
+        ld      de, $8000+musirw-1
+        call    desc
+        ld      hl, ramt-engicm+blo1cm+music+maincm+scrlen-2
+        call    $8000
+      ENDIF
         ld      hl, $5ccb+prnbuf-ini
         ld      de, $5b0a
         ld      bc, ldscrn-prnbuf
@@ -67,11 +79,11 @@ aqui    out     (c), a
         jr      aqui
       ENDIF
 salto   call    desc
-        ld      hl, ramt-engicm+blo1cm
+        ld      hl, ramt-engicm+blo1cm+music
         ld      de, $8000
         ld      bc, maincm+scrlen
         ldir
-        ld      hl, ramt-engicm+blo1cm+maincm+scrlen+blo2cm-1
+        ld      hl, ramt-engicm+blo1cm+music+maincm+scrlen+blo2cm-1
         ld      de, $8000+maincm+scrlen+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl-1
         call    desc
         ld      sp, $5b0a
@@ -132,8 +144,8 @@ salto   call    desc
         ld      ($fffd), hl
         ld      hl, frame1
         ld      ($fffa), hl
-        ld      a, $c3
-        ld      ($fff6), a      ; apunto vectores para máquina 1
+        ld      hl, $c3|parche<<8
+        ld      ($fff6), hl     ; apunto vectores para máquina 1
         ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0+codel1-1
         ld      bc, codel1
         jr      copied

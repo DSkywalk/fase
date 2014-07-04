@@ -45,6 +45,7 @@ unsigned char *screen= 0x5c00;
 unsigned char *shadow= 0x5c01;
 unsigned int *repaint= 0x5c02;
 unsigned int *drwout= 0x5c06;
+unsigned int *isradr= 0xfff5;
 unsigned char *zxmem= 0;
 
 char __FASTCALL__ inKey ( unsigned char row ){
@@ -53,6 +54,7 @@ char __FASTCALL__ inKey ( unsigned char row ){
         ld      c, $fe
         in      a, (c)
         cpl
+        and     $1f
         ld      l, a
     #endasm
 }
@@ -124,9 +126,9 @@ void __FASTCALL__ CallBitmap ( unsigned int source ){
 #if player
 void __FASTCALL__ CallSound ( unsigned int source ){
     #asm
-        ld      a, ($fff6)
-        cp      $c3
-        jr      nz, beep
+        ld      a, ($fff7)
+        or      a
+        jr      z, beep
         ld      bc, $7ffd
         ld      a, $11
         out     (c), a
@@ -153,4 +155,21 @@ beep:   ld      a, l
         ld      (de), a
     #endasm
 }
+void __FASTCALL__ IsrSound ( void ){
+    #asm
+        ex      af, af
+        ld      bc, $7ffd
+        ld      a, $11
+        out     (c), a
+        exx
+        call    $c00d
+        exx
+        ld      a, $10
+        out     (c), a
+        ex      af, af
+        ei
+    #endasm
+}
+#else
+void __FASTCALL__ IsrSound ( void );
 #endif

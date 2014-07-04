@@ -558,7 +558,7 @@ del2    pop     bc
         jp      z, wel2&$ffff   ; we can save some cycles width different
         and     %00001100       ; routines for even and odd lines
         jr      z, wel4
-        jp      po, wel5
+        jp      po, wel5&$ffff
 wel3    pop     de
         dec     h
         ld      (hl), e
@@ -1929,9 +1929,20 @@ ini8    ld      sp, 0
         ret
     ENDIF
     IF  machine=1
-        ld      sp, $5c06
         ld      (do3+1), a
         ld      (port), a
+
+        ld      sp, $fff4
+        ld      l, $23
+        ex      (sp), hl
+        ld      (exit+1&$ffff), hl
+        inc     sp
+        ld      hl, $c3c9
+        ex      (sp), hl
+        ld      a, h
+        ld      (exit1+1&$ffff), a
+
+        ld      sp, $5c06
         ld      hl, ini2&$ffff
         ld      de, $5b00
       IF atrbar=0
@@ -1946,9 +1957,9 @@ ini8    ld      sp, 0
         ld      (screen), a
         ld      (selbeg), a
         ld      (drwout+1), a
-        dec     a
-        ld      i, a
-        im      2
+;        dec     a
+;        ld      i, a
+;        im      2
 ini8    ld      sp, 0
         ret
 ini2    ld      c, $ff+ini2-ini5&$ff
@@ -1980,7 +1991,12 @@ ini4    push    bc
         pop     bc
         ret
 ini5
-exit    ld      a, $10
+exit    ld      hl, 0
+        ld      ($fff4), hl
+exit1   ld      a, 0
+        ld      ($fff6), a
+
+        ld      a, $10
         jr      ini4
     ENDIF
       IF  machine=2
@@ -2042,8 +2058,9 @@ lookt   incbin  asm/file1.bin
     ENDIF
         defb    $ff
         block   $fff4-$&$ffff
-        inc     hl
-        ret
+        defw    $c3c3
+;        inc     hl
+;        ret
         defb    $c9
       IF machine=1
         defw    exit

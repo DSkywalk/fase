@@ -21,7 +21,21 @@ void update_scoreboard();
 
 main(){
 
+  *isradr= (unsigned int) IsrSound;
+
 start:
+  Sound(LOAD, 0);
+  #asm
+        ld      a, ($fff7)
+        or      a
+        jr      z, waitk
+        ei
+waitk:  in      a, ($fe)
+        or      $e0
+        inc     a
+        jr      z, waitk
+        di
+  #endasm
   killed= mapx= mapy= spacepressed= num_bullets= *shadow= 0;
   x= 0x3000;
   y= 0x1000;
@@ -29,7 +43,7 @@ start:
 
   // inicializar engine
   INIT;
-  Sound(LOAD, 0);
+  Sound(LOAD, 1);
 
   // pasar datos a sprites y balas
   for ( i = 0; i < 5; i++ )

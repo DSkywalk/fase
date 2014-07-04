@@ -3,7 +3,7 @@
 #include <string.h>
 FILE *fi, *fi2;
 unsigned char mem[0x12000], sprites[0x8000], bullets[8], sblocks[0x89], sorder[0x89], subset[0x1200][0x89];
-char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet, bulmax, sprmax;
+char tmpstr[30], *fou, scrw, scrh, mapw, maph, bullet, bulmax, sprmax, parche;
 unsigned  saccum[0x89], stiles, ssprites, scode, scode1, scode2, smooth, nblocks, nsprites,
           tmpbuf, notabl, nnsprites, sum, tmp, init0, init1, frame0, frame1, point, stasp, blen;
 int i, j, k, l, bulimit;
@@ -186,6 +186,8 @@ int main(int argc, char *argv[]){
   fi2= fopen("build/engine1.bin", "rb");
   fseek(fi2, -9, SEEK_END);
   fread(mem+0xfff7, 1, 2, fi2);
+  parche= mem[0xfff7];
+  mem[0xfff7]= 0;
   fclose(fi2);
   fi= fopen("build/block1.bin", "wb+");
   fwrite(mem+0x5c08, 1, 0x23f8, fi);
@@ -248,6 +250,16 @@ int main(int argc, char *argv[]){
     fseek(fi, 0, SEEK_END),
     i= ftell(fi),
     fclose(fi);
+  k= 0;
+  fi= fopen("build/music.zx7b", "rb");
+  if( fi )
+    fseek(fi, 0, SEEK_END),
+    k= ftell(fi),
+    fclose(fi),
+    fi= fopen("build/music.bin", "rb"),
+    fseek(fi, 0, SEEK_END),
+    l= ftell(fi),
+    fclose(fi);
   fi= fopen("build/defload.asm", "wb+");
   fprintf(fi, "        DEFINE  maplen  %d\n"
               "        DEFINE  scrlen  %d\n"
@@ -261,9 +273,12 @@ int main(int argc, char *argv[]){
               "        DEFINE  bl2len  %d\n"
               "        DEFINE  stasp   %d\n"
               "        DEFINE  tmpbuf  %d\n"
-              "        DEFINE  playrw  %d\n",
+              "        DEFINE  playrw  %d\n"
+              "        DEFINE  music   %d\n"
+              "        DEFINE  musirw  %d\n"
+              "        DEFINE  parche  %d\n",
           tmp, j, scode-2, scode1-2, scode2-2, init0, init1, frame0, frame1,
-          blocks[2].len>0?blocks[2].len<<1:0, stasp, tmpbuf, i);
+          blocks[2].len>0?blocks[2].len<<1:0, stasp, tmpbuf, i, k, l, parche);
   fclose(fi);
   fi= fopen("build/define.h", "wb+");
   fprintf(fi, "#define smooth %d\n"

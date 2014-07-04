@@ -197,7 +197,7 @@ int main(int argc, char *argv[]){
         output[0x5000+apics*4+k]= output[i*36+32+k];
     output[inipos++]= j<i ? output[0x4000|j] : apics++;
   }
-  ft= fopen("build/player.bin.zx7b", "rb");
+  ft= fopen("build/player.zx7b", "rb");
   i= 0;
   if( ft )
     fseek(ft, 0, SEEK_END),

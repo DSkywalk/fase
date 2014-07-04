@@ -3,17 +3,42 @@
 ;One channel of interrupting drums
 ;Feel free to do whatever you want with the code, it is PD
 
+        include build/define.asm
+      IF  smooth=0
+        DEFINE  desc  $fe80
+      ELSE
+        DEFINE  desc  $fc81+notabl
+      ENDIF
+
         output  build/music.bin
+        org     $8000
 
 OP_NOP  equ     $00
 OP_SCF  equ     $37
-OP_ORC  equ     $b1
 
         ;define NO_VOLUME       ;define this if you want to have the same volume for all the channels
-
-play    di
-        ld      (nextps+1),hl
-        ld      c, 16
+        ld      e, (hl)
+        inc     hl
+        ld      d, (hl)
+        add     hl, de
+        ld      a, (hl)
+        rrca
+        rra
+        dec     hl
+        push    hl
+        ld      hl, $5aff
+        ld      de, $5afe
+        ld      bc, $02ff
+        ld      (hl), a
+        lddr                    ; pongo pantalla en blanco
+        pop     hl
+        call    desc
+        push    hl
+        call    desc+65
+        pop     hl
+        ld      de, $5aff
+        call    desc
+play    ld      c, 16
         push    iy
         exx
         push    hl
@@ -28,12 +53,12 @@ play    di
         ld      (solodu1+1),a
         ld      (solodu2+1),a
         ld      (nextb),a
-        in      a, ($1f)
-        and     $1f
-        ld      a, OP_NOP
-        jr      nz, play1
-        ld      a, OP_ORC
-play1   ld      (chkemp),a
+;        in      a, ($1f)
+;        and     $1f
+;        ld      a, OP_NOP
+;        jr      nz, play1
+;        ld      a, OP_ORC
+;play1   ld      (chkemp),a
         jp      nextps
 
 nextrow ld      hl, 0
@@ -166,7 +191,7 @@ drumn1  ld      a, (hl)
 drumn2  djnz    drumn1
         jp      nextrow
 
-nextps  ld      hl, 0
+nextps  ld      hl, musicd
 nextrd  ld      e, (hl)
         inc     hl
         ld      d, (hl)
@@ -254,19 +279,21 @@ solodu2 cp      128             ;7
         xor     a
         out     ($fe), a
         ld      (plrwphl+1), hl
-        in      a, ($1f)
-        and     $1f
-        ld      c, a
+;        in      a, ($1f)
+;        and     $1f
+;        ld      c, a
         in      a, ($fe)
-        cpl
-chkemp  or      c
-        and     $1f
+;        cpl
+;chkemp  or      c
+;        and     $1f
+        or      $e0
+        inc     a
         jp      z, nextrow
 stoppl  ld      sp, 0
         pop     hl
         exx
         pop     iy
-        ei
+;        ei
         ret
 
 drumse  defb    $01, $01        ;tone, highest
