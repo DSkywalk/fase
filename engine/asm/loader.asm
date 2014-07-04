@@ -49,6 +49,8 @@ ini     ld      de, desc        ; apunto al descompresor
         ld      de, $5b0a
         ld      bc, ldscrn-prnbuf
         ldir                    ; copio resto del cargador encima de memoria video
+        ld      hl, ramt-engicm+blo1cm-1
+        ld      de, $7fff
         jp      salto
 prnbuf
       IF  player
@@ -64,12 +66,17 @@ aqui    out     (c), a
         dec     a               ; so we always show a screen and modify the other
         jr      aqui
       ENDIF
-salto   ld      hl, ramt-1-maplen-maincm
-        ld      de, $8000+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl-1
+salto   call    desc
+        ld      hl, ramt-engicm+blo1cm
+        ld      de, $8000
+        ld      bc, maincm+scrlen
+        ldir
+        ld      hl, ramt-engicm+blo1cm+maincm+scrlen+blo2cm-1
+        ld      de, $8000+maincm+scrlen+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl-1
         call    desc
         ld      sp, $5b0a
         ld      de, $ffff
-        ld      hl, $8000+$281+$7f*smooth-notabl-1
+        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl-1
     IF  smooth=0
         inc     b
         inc     c
@@ -84,10 +91,6 @@ salto   ld      hl, ramt-1-maplen-maincm
         ld      b, 3-(notabl>>8)
     ENDIF
         lddr                    ; alto arriba
-        ld      hl, ramt-1-maplen
-        ld      de, $8000+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl+maincm-1
-        ld      bc, maincm
-        lddr                    ; justo encima de engine2 en bloque
         ld      a, $17          ; compruebo si 128k
         ld      bc, $7ffd
         out     (c), a
@@ -99,7 +102,7 @@ salto   ld      hl, ramt-1-maplen-maincm
         ld      de, ramt-1-maplen
         jr      z, next         ; si no, salto a next
       IF  player
-        ld      de, $8000+$281+$7f*smooth-notabl+bl2len+codel0-1
+        ld      de, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0-1
         ld      hl, desc+$7e
         ld      bc, $7f
         lddr
@@ -131,34 +134,33 @@ salto   ld      hl, ramt-1-maplen-maincm
         ld      ($fffa), hl
         ld      a, $c3
         ld      ($fff6), a      ; apunto vectores para máquina 1
-        ld      hl, $8000+$281+$7f*smooth-notabl+bl2len+codel0+codel1-1
+        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0+codel1-1
         ld      bc, codel1
         jr      copied
-next    call    $8000+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-12  ; llamo rutina comprobación bus flotante
-        ld      hl, $8000+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-1
+next    call    $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-12  ; llamo rutina comprobación bus flotante
+        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-1
         ld      bc, codel2
         jr      z, copied       ; si hay bus flotante me quedo con máquina 2
         ld      hl, init0
         ld      ($fffd), hl
         ld      hl, frame0
         ld      ($fffa), hl     ; con sus vectores
-        ld      hl, $8000+$281+$7f*smooth-notabl+bl2len+codel0-1
+        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0-1
         ld      bc, codel0      ; aquí me puedo ahorrar 1 byte
 copied  lddr                    ; copio máquina 0 ó 2
       IF  bl2len>0
-        ld      hl, $8000+$281+$7f*smooth-notabl+bl2len-1
+        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len-1
         ld      de, $10000-stasp+bl2len-1
         ld      bc, bl2len
         lddr                    ; sprites_reloc2 si existe
       ENDIF
+        ld      hl, $8000+maincm+scrlen-1
+        ld      de, 0xffad-tmpbuf-stasp ; 10 calls anidados
+        ld      bc, scrlen
+        lddr
         dec     bc
         ld      ($fffe-stasp), bc
-        ld      hl, $8000+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl
-        ld      de, $8000
-        ld      bc, maincm
-        ldir                    ; muevo main.zx7 a $8000
-        ex      de, hl
-        dec     l
+        ld      hl, $8000+maincm-1
         ld      de, $8004+mainrw-1
         call    desc            ; descomprimo main.bin
         ex      de, hl

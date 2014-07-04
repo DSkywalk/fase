@@ -65,8 +65,13 @@ start:
             if( killed==10 ){
               Sound(STOP, 0);
               EXIT;
-              //Dzx7b((unsigned int) (&ending-1), 0x5aff);
-              Pause(100);
+              Bitmap(1, 0);
+              Pause(50);
+              Bitmap(3, 1);
+              Pause(50);
+              Bitmap(2, 1);
+              Pause(50);
+              Bitmap(0, 0);
               goto start;
             }
             *drwout= (unsigned int)update_scoreboard;

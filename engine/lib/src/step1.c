@@ -79,13 +79,18 @@ int main(int argc, char *argv[]){
     j+= i= fread(output, 1, 0x1800, fi);
     fwrite(output, 1, i, fo);
     fclose(fi);
-    output[0]= atoi(tmpstr+4)&7 | atoi(tmpstr+4)<<3;
+    fi= fopen("build/tmp.atr", "rb");
+    fseek(fi, 0, SEEK_END);
+    i= ftell(fi),
+    fclose(fi);
+    output[0]= atoi(tmpstr+4)<<2&28 | atoi(tmpstr+4)<<5&224 | i-1>>8;
     fwrite(output, 1, 1, fo);
     j++;
     k+= 2;
     *(short*)(output-k+0x1900)= j;
   }
-  printf("%d\n", k);
+  for ( i= k; i; i-= 2 )
+    *(short*)(output-i+0x1900)-= j+(k-i)+2;
   fclose(ft);
   fwrite(output-k+0x1900, 1, k, fo);
   fclose(fo);

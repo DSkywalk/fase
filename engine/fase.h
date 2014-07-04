@@ -10,6 +10,7 @@
 #define KeybBNMs_ 0x7f
 
 #define tilepaint(from_x, from_y, to_x, to_y) *repaint= from_x|from_y<<4|to_x<<8|to_y<<12
+#define Bitmap(func, param) CallBitmap(func|param<<8)
 
 #define INIT  asm("call 0xfffc")
 #define FRAME asm("call 0xfff9")
@@ -69,12 +70,53 @@ loop2:  djnz    loop2
     #endasm
 }
 
-void __CALLEE__ Dzx7b ( unsigned int source, unsigned int addr ){
+void __FASTCALL__ CallBitmap ( unsigned int source ){
     #asm
-        pop     af
-        pop     de
+        ld      c, h
+        ld      a, $ff
+        ld      d, a
+        sub     l
+        add     a, a
+        ld      e, a
+        ld      hl, bitmap+1
+        add     hl, de
+        ld      e, (hl)
+        inc     hl
+        ld      d, (hl)
+        add     hl, de
+        ld      a, (hl)
+        and     3
+        ld      b, a
+        add     a, $58
+        add     a, c
+        ld      d, a
+        ld      a, (hl)
+        rra
+        rra
+        dec     hl
+        ld      e, $ff
+        push    de
+        push    hl
+        ld      h, d
+        ld      l, e
+        dec     e
+        ld      (hl), a
+        ld      a, d
+        rlca
+        rlca
+        rlca
+        xor     $85
+        ld      c, l
+        lddr
         pop     hl
-        push    af
+        ld      d, a
+        inc     a
+        ld      (dzx7a+117), a
+        call    dzx7a
+        push    hl
+        call    dzx7a+65
+        pop     hl
+        pop     de
         jp      dzx7a
     #endasm
 }

@@ -22,7 +22,8 @@ if "%1"=="config" (
   lib\bin\sjasmplus asm\engine1.asm > nul
   lib\bin\sjasmplus asm\engine2.asm > nul
   lib\bin\step2
-  lib\bin\zx7b build\block.bin build\block.zx7b
+  lib\bin\zx7b build\block1.bin build\block1.zx7b
+  lib\bin\zx7b build\block2.bin build\block2.zx7b
 )
 echo.
 call z88dkenv.bat
@@ -30,14 +31,16 @@ zcc +zx -O3 -vn main.c -o build\main.bin -lndos
 echo File main.bin compiled from main.c
 lib\bin\zx7b build\main.bin build\main.zx7b
 echo.
-rem copy /b build\map_compressed.bin+build\screen.bin+build\main.zx7b+build\block.zx7b build\engine.zx7b > nul
-copy /b build\block.zx7b+build\main.zx7b+build\map_compressed.bin build\engine.zx7b > nul
+rem copy /b build\block.zx7b+build\main.zx7b+build\map_compressed.bin build\engine.zx7b > nul
+copy /b build\block1.zx7b+build\main.zx7b+build\screen.bin+build\block2.zx7b+build\map_compressed.bin build\engine.zx7b > nul
 echo File engine.zx7b joined from map_compressed.bin, main.zx7b and block.zx7b
 echo.
 copy build\defload.asm build\ndefload.asm > nul
 for /f %%i in ("build\engine.zx7b") do echo         DEFINE  engicm  %%~zi >> build\ndefload.asm
 for /f %%i in ("build\main.zx7b")   do echo         DEFINE  maincm  %%~zi >> build\ndefload.asm
 for /f %%i in ("build\main.bin")    do echo         DEFINE  mainrw  %%~zi >> build\ndefload.asm
+for /f %%i in ("build\block1.zx7b") do echo         DEFINE  blo1cm  %%~zi >> build\ndefload.asm
+for /f %%i in ("build\block2.zx7b") do echo         DEFINE  blo2cm  %%~zi >> build\ndefload.asm
 lib\bin\sjasmplus asm\loader.asm
 if exist build\player.bin.zx7b (
   lib\bin\gentape game.tzx                    ^

@@ -187,8 +187,10 @@ int main(int argc, char *argv[]){
   fseek(fi2, -9, SEEK_END);
   fread(mem+0xfff7, 1, 2, fi2);
   fclose(fi2);
-  fi= fopen("build/block.bin", "wb+");
+  fi= fopen("build/block1.bin", "wb+");
   fwrite(mem+0x5c08, 1, 0x23f8, fi);
+  fclose(fi);
+  fi= fopen("build/block2.bin", "wb+");
   if( smooth ){
     fwrite(mem+0xfd00+notabl, 1, 0x300-notabl, fi);
     if( blocks[2].len>0 )
@@ -265,13 +267,13 @@ int main(int argc, char *argv[]){
   fclose(fi);
   fi= fopen("build/define.h", "wb+");
   fprintf(fi, "#define smooth %d\n"
-              "#define stack  %d\n"
+              "#define bitmap %d\n"
               "#define scrw   %d\n"
               "#define scrh   %d\n"
               "#define mapw   %d\n"
               "#define maph   %d\n"
               "#define dzx7a  %d\n"
-              "#define player %d\n",  smooth, 0x10000-tmpbuf-stasp, scrw, scrh,
+              "#define player %d\n",  smooth, 0xffad-tmpbuf-stasp, scrw, scrh,
                                       mapw, maph, smooth ? 0xfc81+notabl : 0xfe80, !!i);
   fclose(fi);
   printf("\nFile block.bin generated in STEP 2\n");
