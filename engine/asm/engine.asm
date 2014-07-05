@@ -2058,9 +2058,8 @@ lookt   incbin  asm/file1.bin
     ENDIF
         defb    $ff
         block   $fff4-$&$ffff
-        defw    $c3c3
-;        inc     hl
-;        ret
+        inc     hl
+        ret
         defb    $c9
       IF machine=1
         defw    exit

@@ -45,7 +45,6 @@ unsigned char *screen= 0x5c00;
 unsigned char *shadow= 0x5c01;
 unsigned int *repaint= 0x5c02;
 unsigned int *drwout= 0x5c06;
-unsigned int *isradr= 0xfff5;
 unsigned char *zxmem= 0;
 
 char __FASTCALL__ inKey ( unsigned char row ){
@@ -157,7 +156,7 @@ beep:   ld      a, l
 }
 void __FASTCALL__ IsrSound ( void ){
     #asm
-        ex      af, af
+labsou: ex      af, af
         ld      bc, $7ffd
         ld      a, $11
         out     (c), a

@@ -21,14 +21,14 @@ void update_scoreboard();
 
 main(){
 
-  *isradr= (unsigned int) IsrSound;
-
 start:
   Sound(LOAD, 0);
   #asm
         ld      a, ($fff7)
         or      a
         jr      z, waitk
+        ld      hl, labsou
+        ld      ($fff5), hl
         ei
 waitk:  in      a, ($fe)
         or      $e0

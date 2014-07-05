@@ -12,7 +12,7 @@
         DEFINE  ramt  desc
       ENDIF
         display "----------------------------"
-        display /A,0x8000-tmpbuf-stasp-mainrw, " bytes free"
+        display /A,0x7fad-tmpbuf-stasp-mainrw-scrlen, " bytes free"
         display "____________________________"
         output  build/loader.bin
         org     $5b0a+ini-prnbuf
@@ -50,20 +50,19 @@ ini     ld      de, desc        ; apunto al descompresor
         ld      a, $fe
         ld      i, a
         im      2
-      IF  music
-        ld      hl, ramt-engicm+blo1cm+music-1
-        ld      de, $8000+musirw-1
-        call    desc
-        ld      hl, ramt-engicm+blo1cm+music+maincm+scrlen-2
-        call    $8000
-      ENDIF
         ld      hl, $5ccb+prnbuf-ini
         ld      de, $5b0a
         ld      bc, ldscrn-prnbuf
         ldir                    ; copio resto del cargador encima de memoria video
+        ld      hl, ramt-engicm+blo1cm
+        ld      de, $8000
+        ld      bc, music+scrlen+maincm
+        ldir                    ; bajo music+scrlen+maincm
+        ld      hl, salto
+        push    hl
         ld      hl, ramt-engicm+blo1cm-1
         ld      de, $7fff
-        jp      salto
+        jp      desc            ; descomprimo block1
 prnbuf
       IF  player
 aqui    out     (c), a
@@ -78,17 +77,12 @@ aqui    out     (c), a
         dec     a               ; so we always show a screen and modify the other
         jr      aqui
       ENDIF
-salto   call    desc
-        ld      hl, ramt-engicm+blo1cm+music
-        ld      de, $8000
-        ld      bc, maincm+scrlen
-        ldir
-        ld      hl, ramt-engicm+blo1cm+music+maincm+scrlen+blo2cm-1
-        ld      de, $8000+maincm+scrlen+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl-1
-        call    desc
+salto   ld      hl, ramt-engicm+blo1cm+music+scrlen+maincm+blo2cm-1
+        ld      de, $8000+music+scrlen+maincm+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl-1
+        call    desc            ; descomprimo block2
         ld      sp, $5b0a
         ld      de, $ffff
-        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl-1
+        ld      hl, $8000+music+scrlen+maincm+$281+$7f*smooth-notabl-1
     IF  smooth=0
         inc     b
         inc     c
@@ -114,7 +108,7 @@ salto   call    desc
         ld      de, ramt-1-maplen
         jr      z, next         ; si no, salto a next
       IF  player
-        ld      de, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0-1
+        ld      de, $8000+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len+codel0-1
         ld      hl, desc+$7e
         ld      bc, $7f
         lddr
@@ -144,45 +138,52 @@ salto   call    desc
         ld      ($fffd), hl
         ld      hl, frame1
         ld      ($fffa), hl
-        ld      hl, $c3|parche<<8
-        ld      ($fff6), hl     ; apunto vectores para máquina 1
-        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0+codel1-1
+        ld      a, parche
+        ld      ($fff7), a      ; apunto vectores para máquina 1
+        ld      a, $c3
+        ld      ($fff4), a      ; apunto vectores para máquina 1
+
+        ld      hl, $8000+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len+codel0+codel1-1
         ld      bc, codel1
         jr      copied
-next    call    $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-12  ; llamo rutina comprobación bus flotante
-        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-1
+next    call    $8000+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-12  ; llamo rutina comprobación bus flotante
+        ld      hl, $8000+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len+codel0+codel1+codel2-1
         ld      bc, codel2
         jr      z, copied       ; si hay bus flotante me quedo con máquina 2
         ld      hl, init0
         ld      ($fffd), hl
         ld      hl, frame0
         ld      ($fffa), hl     ; con sus vectores
-        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len+codel0-1
+        ld      hl, $8000+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len+codel0-1
         ld      bc, codel0      ; aquí me puedo ahorrar 1 byte
 copied  lddr                    ; copio máquina 0 ó 2
       IF  bl2len>0
-        ld      hl, $8000+maincm+scrlen+$281+$7f*smooth-notabl+bl2len-1
+        ld      hl, $8000+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len-1
         ld      de, $10000-stasp+bl2len-1
         ld      bc, bl2len
         lddr                    ; sprites_reloc2 si existe
       ENDIF
-        ld      hl, $8000+maincm+scrlen-1
+        ld      hl, $8000+music+scrlen-1
         ld      de, 0xffad-tmpbuf-stasp ; 10 calls anidados
         ld      bc, scrlen
         lddr
         dec     bc
         ld      ($fffe-stasp), bc
-        ld      hl, $8000+maincm-1
-        ld      de, $8004+mainrw-1
-        call    desc            ; descomprimo main.bin
-        ex      de, hl
-        inc     l
-        inc     de
+        ld      hl, $8000+music-1
+        ld      de, $8004+musirw-1
+        call    desc
+        inc     e
         ld      sp, 0x10000-tmpbuf-stasp
         push    de
-        ld      bc, mainrw
-        ldir                    
-        ret
+        call    $8004
+        ld      hl, $8000+music+scrlen
+        ld      d, $80
+        ld      bc, maincm
+        ldir
+        ex      de, hl
+        dec     hl
+        ld      de, $8004+mainrw-1
+        jp      desc            ; descomprimo main.bin
 ldscrn  incbin  build/loading.atr.zx7b
         incbin  build/loading.rcs.zx7b
 descom  org     desc

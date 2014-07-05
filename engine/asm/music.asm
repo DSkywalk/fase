@@ -4,6 +4,7 @@
 ;Feel free to do whatever you want with the code, it is PD
 
         include build/define.asm
+        include build/ndefload.asm
       IF  smooth=0
         DEFINE  desc  $fe80
       ELSE
@@ -11,12 +12,16 @@
       ENDIF
 
         output  build/music.bin
-        org     $8000
+        org     $8004
 
 OP_NOP  equ     $00
 OP_SCF  equ     $37
 
         ;define NO_VOLUME       ;define this if you want to have the same volume for all the channels
+
+        
+
+        ld      hl, 0xffad-tmpbuf-stasp-1
         ld      e, (hl)
         inc     hl
         ld      d, (hl)
