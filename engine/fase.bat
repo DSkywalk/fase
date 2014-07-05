@@ -14,6 +14,8 @@ rem  lib\bin\GenTmx 3 3 10 10 gfx\map.tmx
   lib\bin\sjasmplus asm\player.asm > nul
   lib\bin\zx7b build\player.bin build\player.zx7b
   lib\bin\xm2tritone mus\music.xm build\music.asm
+  lib\bin\sjasmplus asm\music.asm > nul
+  lib\bin\zx7b build\music.bin build\music.zx7b
   lib\bin\step1
   goto cont
 )
@@ -23,8 +25,6 @@ if "%1"=="config" (
   lib\bin\sjasmplus asm\engine1.asm > nul
   lib\bin\sjasmplus asm\engine2.asm > nul
   lib\bin\step2
-  lib\bin\sjasmplus asm\music.asm > nul
-  lib\bin\zx7b build\music.bin build\music.zx7b
   lib\bin\zx7b build\block1.bin build\block1.zx7b
   lib\bin\zx7b build\block2.bin build\block2.zx7b
 )
