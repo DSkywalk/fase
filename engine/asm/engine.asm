@@ -2,8 +2,8 @@
         include build/defmap.asm
 ; 0 black, 1 blue, 2 red, 3 magenta, 4 green, 5 cyan, 6 yellow, 7 white
 ; 8 none, 9-15 bright versions of 1-7
-        DEFINE  scolor  5
-        DEFINE  ccolor  9
+        DEFINE  scolor  0
+        DEFINE  ccolor  0
         DEFINE  sylo    $66
       IF scolor=0
         DEFINE  syhi    $c0

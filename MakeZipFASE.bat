@@ -44,6 +44,7 @@ del /q build\*.*
   asm\engine2.asm         ^
   asm\player.asm          ^
   asm\loader.asm          ^
+  asm\music.asm           ^
   gfx\bullet.png          ^
   gfx\digits.png          ^
   "gfx\dos ter.png"       ^

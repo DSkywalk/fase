@@ -23,7 +23,7 @@ main(){
 
 start:
   Sound(LOAD, 0);
-  if( is128 ){
+  if( *is128 ){
     EI;
     *intadr= IsrSound;
   }
@@ -70,9 +70,9 @@ start:
   while(1){
 
     // esto hace que el engine procese un frame generando el escenario
-    M_OUTP(0xfe, 0);
+//    M_OUTP(0xfe, 0);
     FRAME;
-    M_OUTP(0xfe, 2);
+//    M_OUTP(0xfe, 2);
 
     // movimiento de los enemigos
     for ( i = 1; i < 5; i++ )

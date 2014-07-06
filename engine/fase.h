@@ -45,7 +45,7 @@ unsigned char *screen= 0x5c00;
 unsigned char *shadow= 0x5c01;
 unsigned int *repaint= 0x5c02;
 unsigned int  *drwout= 0x5c06;
-unsigned int   *is128= 0xfff7;
+unsigned char  *is128= 0xfff7;
 unsigned int  *intadr= 0xfff5;
 unsigned char  *zxmem= 0;
 
