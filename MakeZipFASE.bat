@@ -4,6 +4,7 @@ call setvars.bat
 %dmc% ComplementosChurrera\FiltroRCS\Png2Rcs.c          -oengine\lib\bin\Png2Rcs.exe
 %dmc% engine\lib\src\step1.c           -oengine\lib\bin\step1.exe
 %dmc% engine\lib\src\step2.c           -oengine\lib\bin\step2.exe
+%dmc% engine\lib\src\step3.c           -oengine\lib\bin\step3.exe
 %dmc% engine\lib\src\zx7b.c            -oengine\lib\bin\zx7b.exe
 %dmc% engine\lib\src\xm2tritone.c      -oengine\lib\bin\xm2tritone.exe
 %dmc% engine\lib\src\numbers4map.c
@@ -61,6 +62,7 @@ del /q build\*.*
   lib\bin\SjAsmPlus.exe   ^
   lib\bin\step1.exe       ^
   lib\bin\step2.exe       ^
+  lib\bin\step3.exe       ^
   lib\bin\TmxCompress.exe ^
   lib\bin\xm2tritone.exe  ^
   lib\bin\zx7b.exe        ^
@@ -68,5 +70,6 @@ del /q build\*.*
   mus\list.asm            ^
   mus\music.xm            ^
   mus\song.mus.asm        ^
-  mus\song0.mus
+  mus\song0.mus           ^
+  mus\song1.mus
 cd ..
