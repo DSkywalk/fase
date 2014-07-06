@@ -11,7 +11,7 @@
       ENDIF
 
         output  build/music.bin
-        org     $8050
+        org     $8060
 
 OP_NOP  equ     $00
 OP_SCF  equ     $37

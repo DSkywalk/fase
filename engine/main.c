@@ -23,19 +23,29 @@ main(){
 
 start:
   Sound(LOAD, 0);
-  #asm
-        ld      a, ($fff7)
-        or      a
-        jr      z, waitk
-        ld      hl, labsou
-        ld      ($fff5), hl
-        ei
-waitk:  in      a, ($fe)
-        or      $e0
-        inc     a
-        jr      z, waitk
-        di
-  #endasm
+  if( is128 ){
+    EI;
+    *intadr= IsrSound;
+  }
+  while ( 1 ){
+    i= inp(0xf7fe) & 0x1f;
+    if( i==0x1e ){
+      Input= Joystick;
+      break;
+    }
+    else if( i==0x1d ){
+      Input= Cursors;
+      break;
+    }
+    else if( i==0x1b ){
+      Input= Keyboard;
+      break;
+    }
+    else if( i==0x17 ){
+      Redefine();
+    }
+  }
+  DI;
   killed= mapx= mapy= spacepressed= num_bullets= *shadow= 0;
   x= 0x3000;
   y= 0x1000;
@@ -179,23 +189,23 @@ waitk:  in      a, ($fe)
     sprites[0].y= y>>8;
 
     // movimiento del protagonista
-    if( inKey(KeybYUIOP) & 0x01 ) // P
+    if( Input() & 0x01 ) // P
       ax= vx<maxvx ? 40 : 0;
-    else if( inKey(KeybYUIOP) & 0x02 ) // O
+    else if( Input() & 0x02 ) // O
       ax= vx>-maxvx ? -40 : 0;
-    if( inKey(KeybTREWQ) & 0x01 ){ // Q
+    if( Input() & 0x08 ){ // Q
       if( (unsigned int)y == 15<<11 )
         vy= -800;
     }
-    if( inKey(KeybBNMs_) & 0x01 && !spacepressed && num_bullets<4 ){ // Space
+    if( Input() & 0x10 && !spacepressed && num_bullets<4 ){ // Space
       Sound(EFFX, 0);
       bullets[num_bullets].x= sprites[0].x;
       bullets[num_bullets].y= sprites[0].y;
-      i= inKey(KeybTREWQ)<<3&8 | inKey(KeybGFDSA)<<2&4 | inKey(KeybYUIOP)&3;
+      i= Input() & 0x0f;
       dirbul[num_bullets]= i ? i : 1;
       num_bullets++;
     }
-    spacepressed= inKey(KeybBNMs_) & 0x01;
+    spacepressed= Input() & 0x10;
   }
 }
 

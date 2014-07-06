@@ -58,10 +58,6 @@ ini     ld      de, desc        ; apunto al descompresor
         ld      de, $5b0a
         ld      c, ldscrn-mitad
         ldir                    ; copio resto del cargador encima de memoria video
-        ld      hl, ramt-engicm+blo1cm
-        ld      de, $8000+mitad-prnbuf
-        ld      bc, music+scrlen+maincm
-        ldir                    ; bajo music+scrlen+maincm
         ld      hl, ramt-engicm+blo1cm-1
         ld      de, $7fff
         jp      $8000+salto-prnbuf
@@ -78,6 +74,10 @@ prnbuf  out     (c), a
         dec     a               ; so we always show a screen and modify the other
         jr      prnbuf
 salto   call    desc
+        ld      hl, ramt-engicm+blo1cm
+        ld      de, $8000+mitad-prnbuf
+        ld      bc, music+scrlen+maincm
+        ldir                    ; bajo music+scrlen+maincm
         ld      hl, ramt-engicm+blo1cm+music+scrlen+maincm+blo2cm-1
         ld      de, $8000+mitad-prnbuf+music+scrlen+maincm+codel2+codel1+codel0+bl2len+$281+$7f*smooth-notabl-1
         call    desc            ; descomprimo block2
@@ -172,11 +172,11 @@ copied  lddr                    ; copio máquina 0 ó 2
         dec     bc
         ld      ($fffe-stasp), bc
         ld      hl, $8000+mitad-prnbuf+music-1
-        ld      de, $8050+musirw-1
+        ld      de, $8060+musirw-1
         call    desc
         ld      sp, 0x10000-tmpbuf-stasp
         ld      hl, 0xffad-tmpbuf-stasp-1
-        call    $8050
+        call    $8060
         ld      hl, $8000+mitad-prnbuf+music+scrlen
         ld      d, $80
         ld      bc, maincm
