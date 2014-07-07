@@ -9,6 +9,12 @@
 #define OKEY  $4adf
 #define PKEY  $42df
 
+#define RIGHT 1
+#define LEFT  2
+#define DOWN  4
+#define UP    8
+#define FIRE  16
+
 #define INIT  asm("call 0xfffc")
 #define FRAME asm("call 0xfff9")
 #define EXIT  asm("call 0xfff6")

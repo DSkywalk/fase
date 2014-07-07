@@ -3,7 +3,6 @@
         include asm/engine.asm
 
         include build/ndefload.asm
-        DEFINE  border_loading 0
       IF  smooth=0
         DEFINE  desc  $fe80
         DEFINE  ramt  $fd00+notabl
@@ -39,12 +38,6 @@ ini     ld      de, desc        ; apunto al descompresor
         ld      de, engicm
         call    $07f4           ; cargo bloque cinta principal
         di
-      IF  border_loading=0
-        xor     a
-      ELSE
-        ld      a, border_loading
-      ENDIF
-        out     ($fe), a        ; pongo borde (creo que es mejor más abajo, después de cargar wyzplayer)
         ld      hl, $ffff
         ld      ($feff), hl
         ld      a, $fe
@@ -109,7 +102,6 @@ salto   call    desc
         ld      de, ramt-1-maplen
         jp      $5b0a
 
-
 mitad   jr      z, next         ; si no, salto a next
         ld      de, $8000+mitad-prnbuf+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len+codel0-1
         ld      hl, desc+$7e
@@ -129,7 +121,7 @@ mitad   jr      z, next         ; si no, salto a next
         ld      de, $c000+playrw+3
         call    desc            ; descomprimo
         ld      de, do1+6
-        ld      hl, $8000 ;prnbuf
+        ld      hl, $8000
         ld      c, salto-prnbuf
         ldir                    ; copio pequeño fragmento/parche
         ld      a, $10
@@ -144,7 +136,6 @@ mitad   jr      z, next         ; si no, salto a next
         ld      ($fff7), a      ; apunto vectores para máquina 1
         ld      a, $c3
         ld      ($fff4), a      ; apunto vectores para máquina 1
-
         ld      hl, $8000+mitad-prnbuf+music+scrlen+maincm+$281+$7f*smooth-notabl+bl2len+codel0+codel1-1
         ld      bc, codel1
         jr      copied

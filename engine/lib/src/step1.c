@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include "../../../ComplementosChurrera/lodepng.c"
+
 unsigned char *image, *pixel, output[0x10000];
 char  tmpstr[50], command[50], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr,
       offsex, offsey, notabl, bullet, bulmax, sprmax;
@@ -52,6 +54,11 @@ void atrgen(void){
     atr|= tinta<<3 | fondo&7 | fondo<<3&64;
 }
 
+int exist(char *name){
+  struct stat   buffer;
+  return (stat (name, &buffer) == 0);
+}
+
 int main(int argc, char *argv[]){
 
 // screens
@@ -60,12 +67,25 @@ int main(int argc, char *argv[]){
   fo= fopen("build/screen.bin", "wb+");
   k= j= 0;
   while ( fgets(tmpstr, 50, ft) ){
-    if( tmpstr[8]=='"' )
-      strchr(tmpstr+9, '"')[1]= 0,
+    if( tmpstr[8]=='"' ){
+      strchr(tmpstr+9, '"')[1]= 0;
       sprintf(command, "lib\\bin\\Png2Rcs \"gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+9);
-    else
+      fou= (char *) strchr(tmpstr+9, '.');
+      fou[1]= 'a', fou[2]= 't', fou[3]= 'r', fou[4]= 0;
+      sprintf(tmpstr, " -a \"gfx\\%s", tmpstr+9);
+      if( exist(tmpstr+5) )
+        strcat(command, tmpstr),
+        strcat(command, "\"");
+    }
+    else{
       strchr(tmpstr+8, '\n')[0]= 0,
       sprintf(command, "lib\\bin\\Png2Rcs gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+8);
+      fou= (char *) strchr(tmpstr+8, '.');
+      fou[1]= 'a', fou[2]= 't', fou[3]= 'r';
+      if( exist(tmpstr+8) )
+        strcat(command, " -a gfx\\"),
+        strcat(command, tmpstr+8);
+    }
     if( system(command) )
       printf("\nError: plug error with command: %s\n", command),
       exit(-1);

@@ -13,6 +13,7 @@ unsigned char data[20]= {
   0x0c, 0x50, 0x6e, 2};
 
 char i, j, killed, mapx, mapy, spacepressed, dirbul[4], num_bullets;
+char *points= "0";
 unsigned char tmpx, tmpy;
 short x, vx, ax, y, vy, ay;
 void remove_bullet( char k );
@@ -189,23 +190,23 @@ start:
     sprites[0].y= y>>8;
 
     // movimiento del protagonista
-    if( Input() & 0x01 ) // P
+    if( Input() & RIGHT ) // P
       ax= vx<maxvx ? 40 : 0;
-    else if( Input() & 0x02 ) // O
+    else if( Input() & LEFT ) // O
       ax= vx>-maxvx ? -40 : 0;
-    if( Input() & 0x08 ){ // Q
+    if( Input() & UP ){ // Q
       if( (unsigned int)y == 15<<11 )
         vy= -800;
     }
-    if( Input() & 0x10 && !spacepressed && num_bullets<4 ){ // Space
+    if( Input() & FIRE && !spacepressed && num_bullets<4 ){ // Space
       Sound(EFFX, 0);
       bullets[num_bullets].x= sprites[0].x;
       bullets[num_bullets].y= sprites[0].y;
-      i= Input() & 0x0f;
+      i= Input() & (RIGHT | LEFT | UP | DOWN);
       dirbul[num_bullets]= i ? i : 1;
       num_bullets++;
     }
-    spacepressed= Input() & 0x10;
+    spacepressed= Input() & FIRE;
   }
 }
 
@@ -228,11 +229,6 @@ void update_screen(){
 }
 
 void update_scoreboard(){
-  unsigned int scr, dst;
-  char count;
-  scr= 0x3d80+killed*8;
-  dst= 0x403e|*shadow<<8;
-  for ( count= 0; count<8; count++ )
-    zxmem[dst]= zxmem[scr++]^0xff,
-    dst+= 0x100;
+  points[0]= '0'+killed;
+  PrintStr(points, 0x1e01);
 }
