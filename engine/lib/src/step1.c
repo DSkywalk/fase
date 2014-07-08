@@ -3,9 +3,9 @@
 #include <sys/stat.h>
 #include "../../../ComplementosChurrera/lodepng.c"
 
-unsigned char *image, *pixel, output[0x10000];
+unsigned char *image, *pixel, output[0x10000], input[0x400];
 char  tmpstr[50], command[50], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr,
-      offsex, offsey, notabl, bullet, bulmax, sprmax;
+      offsex, offsey, notabl, bullet, bulmax, sprmax, forceatr= 0;
 unsigned error, width, height, i, j, l, min, max, nmin, nmax, amin, amax,
           pics, apics, inipos, iniposback, reppos, smooth, outpos, fondo, tinta;
 int k, mask, amask;
@@ -24,22 +24,34 @@ void celdagen(void){
   pixel= &image[(((j|i<<8)<<4) | k<<8 | l)<<2];
   if( !(check(pixel[0]) && check(pixel[1]) && check(pixel[2]))
     || ((char)pixel[0]*-1 | (char)pixel[1]*-1 | (char)pixel[2]*-1)==65 )
-    printf("El pixel (%d, %d) tiene un color incorrecto\n" , j*16+l, i*16+k),
+    printf("\nThe pixel (%d, %d) has an incorrect color\n" , j*16+l, i*16+k),
     exit(-1);
-  if( tinta != tospec(pixel[0], pixel[1], pixel[2]) )
-    if( fondo != tospec(pixel[0], pixel[1], pixel[2]) ){
-      if( tinta != fondo )
-        printf("El pixel (%d, %d) tiene un tercer color de celda\n", j*16+l, i*16+k),
-        exit(-1);
-      tinta= tospec(pixel[0], pixel[1], pixel[2]);
-    }
-  celdas[k>>3<<1 | l>>3]<<= 1;
-  celdas[k>>3<<1 | l>>3]|= fondo != tospec(pixel[0], pixel[1], pixel[2]);
+  if( forceatr ){
+    if( (tinta|8) != (tospec(pixel[0], pixel[1], pixel[2])|8)
+     && (fondo|8) != (tospec(pixel[0], pixel[1], pixel[2])|8) )
+      printf("\nThe pixel (%d, %d) has a third color in the cell\n", j*16+l, i*16+k),
+      exit(-1);
+    celdas[k>>3<<1 | l>>3]<<= 1;
+    celdas[k>>3<<1 | l>>3]|= (fondo|8) != (tospec(pixel[0], pixel[1], pixel[2])|8);
+  }
+  else{
+    if( tinta != tospec(pixel[0], pixel[1], pixel[2]) )
+      if( fondo != tospec(pixel[0], pixel[1], pixel[2]) ){
+        if( tinta != fondo )
+          printf("\nThe pixel (%d, %d) has a third color in the cell\n", j*16+l, i*16+k),
+          exit(-1);
+        tinta= tospec(pixel[0], pixel[1], pixel[2]);
+      }
+    celdas[k>>3<<1 | l>>3]<<= 1;
+    celdas[k>>3<<1 | l>>3]|= fondo != tospec(pixel[0], pixel[1], pixel[2]);
+  }
 }
 
 void atrgen(void){
   atr<<= 8;
-  if( fondo==tinta ){
+  if( forceatr )
+    atr|= fondo<<3&120 | tinta&7 | tinta<<3&64;
+  else if( fondo==tinta ){
     if( tinta )
       celdas[k>>4<<1 | l>>4]= 0xffffffffffffffff,
       atr|= tinta&7 | tinta<<3&64;
@@ -157,29 +169,50 @@ int main(int argc, char *argv[]){
     exit(-1);
   if( width!= 256 )
     printf("Error. The width of tiles.png must be 256");
+  if( exist("gfx/tiles.atr") )
+    fi= fopen("gfx/tiles.atr", "rb"),
+    fread(input, 1, 0x400, fi),
+    fclose(fi),
+    forceatr= 1;
   for ( i= 0; i < height>>4; i++ )
     for ( j= 0; j < 16; j++ ){
       celdas[0]= celdas[1]= celdas[2]= celdas[3]= atr= 0;
       pixel= &image[((j|i<<8)<<4)<<2];
-      fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
+      if( forceatr )
+        tinta= input[i<<6 | j<<1]&7 | input[i<<6 | j<<1]>>3&8,
+        fondo= input[i<<6 | j<<1]>>3&15;
+      else
+        fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
       for ( k= 0; k < 8; k++ )
         for ( l= 0; l < 8; l++ )
           celdagen();
       atrgen();
       pixel= &image[(((j|i<<8)<<4)|8)<<2];
-      fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
+      if( forceatr )
+        tinta= input[i<<6 | j<<1 | 1]&7 | input[i<<6 | j<<1 | 1]>>3&8,
+        fondo= input[i<<6 | j<<1 | 1]>>3&15;
+      else
+        fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
       for ( k= 0; k < 8; k++ )
         for ( l= 8; l < 16; l++ )
           celdagen();
       atrgen();
       pixel= &image[(((j|i<<8)<<4)|2048)<<2];
-      fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
+      if( forceatr )
+        tinta= input[i<<6 | j<<1 | 32]&7 | input[i<<6 | j<<1 | 32]>>3&8,
+        fondo= input[i<<6 | j<<1 | 32]>>3&15;
+      else
+        fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
       for ( k= 8; k < 16; k++ )
         for ( l= 0; l < 8; l++ )
           celdagen();
       atrgen();
       pixel= &image[(((j|i<<8)<<4)|2056)<<2];
-      fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
+      if( forceatr )
+        tinta= input[i<<6 | j<<1 | 33]&7 | input[i<<6 | j<<1 | 33]>>3&8,
+        fondo= input[i<<6 | j<<1 | 33]>>3&15;
+      else
+        fondo= tinta= tospec(pixel[0], pixel[1], pixel[2]);
       for ( k= 8; k < 16; k++ )
         for ( l= 8; l < 16; l++ )
           celdagen();

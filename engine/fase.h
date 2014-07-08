@@ -132,31 +132,31 @@ tabla:  defw    sKEY, QKEY, AKEY, OKEY, PKEY
     #endasm
 }
 
-char Redefine ( void ){
+void Redefine ( void ){
     #asm
-redem:  xor     a
+redef:  xor     a
         in      a, ($fe)
         or      $e0
         inc     a
-        jr      nz, redem
+        jr      nz, redef
         ld      hl, tabla
-        ld      ix, texts
-pipi:   ld      de, $0e12
+        ld      ix, rede8
+rede1:  ld      de, $0e12
         push    hl
         ld      h, 0
         call    print
         pop     hl
-rede0:  ld      bc, $fefe
-rede:   ld      a, $42
+rede2:  ld      bc, $fefe
+rede3:  ld      a, $42
         in      d, (c)
-rede1:  rr      d
-        jr      nc, rede2
+rede4:  rr      d
+        jr      nc, rede5
         add     a, 8
         cp      $6a
-        jr      nz, rede1
+        jr      nz, rede4
         rlc     b
-        jr      rede
-rede2:  ld      (hl), b
+        jr      rede3
+rede5:  ld      (hl), b
         inc     hl
         ld      (hl), a
         dec     hl
@@ -164,23 +164,23 @@ rede2:  ld      (hl), b
         ld      c, (hl)
         dec     hl
         cp      c
-        jr      nz, rede3
+        jr      nz, rede6
         ld      a, (hl)
         cp      b
-        jr      z, rede4
-rede3:  ld      de, 4
+        jr      z, rede7
+rede6:  ld      de, 4
         add     hl, de
         ld      de, tabla+10
         sbc     hl, de
         add     hl, de
-        jr      nz, pipi
+        jr      nz, rede1
         ld      de, $0e12
         ld      h, 0
         jp      print
-rede4:  inc     hl
+rede7:  inc     hl
         inc     hl
-        jr      rede0
-texts:  defm    "Fire", 0
+        jr      rede2
+rede8:  defm    "Fire", 0
         defm    " Up ", 0
         defm    "Down", 0
         defm    "Left", 0
@@ -287,7 +287,7 @@ beep:   ld      a, l
 }
 void __FASTCALL__ IsrSound ( void ){
     #asm
-labsou: ex      af, af
+        ex      af, af
         push    ix
         push    bc
         ld      bc, $7ffd

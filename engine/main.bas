@@ -56,6 +56,27 @@ end sub
   DisableInt
 
 start:
+  Sound(LOAD, 1)
+  if is128 then
+    EnableInt
+    intadr= @IsrSound
+  end if
+  while 1
+    i= in($f7fe) & $1f
+    if i=$1e then
+'      Input= @Joystick
+      exit while
+    elseif i=$1d then
+'      Input= @Cursors
+      exit while
+    elseif i=$1b then
+'      Input= @Keyboard
+      exit while
+    elseif i=$17 then
+      Redefine()
+    end if
+  end while
+  DisableInt
   killed= 0
   x= 0
   y= 0
@@ -66,7 +87,7 @@ start:
   updatescoreboard()
 
   Init
-  Sound(LOAD, 0)
+  Sound(LOAD, 1)
 
   for i = 0 to 4
     SetSpriteV(i, datos(i*4))
@@ -99,8 +120,13 @@ start:
             if killed=10 then
               Sound(STOP, 0)
               Exit
-              dzx7b(@image-1, $5aff)
-              pausa(100)
+              Bitmap(1, 0)
+              pausa(50)
+              Bitmap(3, 1)
+              pausa(50)
+              Bitmap(2, 1)
+              pausa(50)
+              Bitmap(0, 0)
               goto start
             end if
             drwout= @updatescoreboard
@@ -168,7 +194,7 @@ start:
       end if
     next i
 
-    if multikeys(KEYP) then
+    if Keyboard() & RIGHT then
       if GetSpriteX(0) < scrw*16 then
         SetSpriteX(0, GetSpriteX(0)+1)
       elseif x < mapw-1 then
@@ -177,7 +203,7 @@ start:
         updatescreen()
       end if
     end if
-    if multikeys(KEYO) then
+    if Keyboard() & LEFT then
       if GetSpriteX(0) > 0 then
         SetSpriteX(0, GetSpriteX(0)-1)
       elseif x then
@@ -186,7 +212,7 @@ start:
         updatescreen()
       end if
     end if
-    if multikeys(KEYA) then
+    if Keyboard() & DOWN then
       if GetSpriteY(0) < scrh*16 then
         SetSpriteY(0, GetSpriteY(0)+1)
       elseif y < maph-1 then
@@ -195,7 +221,7 @@ start:
         updatescreen()
       end if
     end if
-    if multikeys(KEYQ) then
+    if Keyboard() & UP then
       if GetSpriteY(0) > 0 then
         SetSpriteY(0, GetSpriteY(0)-1)
       elseif y then
@@ -204,11 +230,11 @@ start:
         updatescreen()
       end if
     end if
-    if multikeys(KEYSPACE) and (not spacepressed) and numbullets<4 then
+    if Keyboard() & FIRE and (not spacepressed) and numbullets<4 then
       Sound(EFFX, 0)
       SetBulletX(numbullets, GetSpriteX(0))
       SetBulletY(numbullets, GetSpriteY(0))
-      i= (multikeys(KEYQ)<<3&8 | multikeys(KEYA)<<2&4 | multikeys(KEYO|KEYP)&3) & 15
+      i= Keyboard() & (RIGHT | LEFT | UP | DOWN)
       if i then
         dirbul(numbullets)= i
       else
@@ -216,10 +242,5 @@ start:
       end if
       numbullets= numbullets+1
     end if
-    spacepressed= multikeys(KEYSPACE)
+    spacepressed= Keyboard() & FIRE
   end while
-
-  asm
-        incbin  "ending.rcs.zx7b"
-  end asm
-image:

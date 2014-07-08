@@ -31,4 +31,4 @@ PosterizeZX.c PosterizeZX.exe ^
 rcs.c rcs.exe ^
 TmxCnv.c TmxCnv.exe ^
 TmxCompress.c TmxCompress.exe
-del *.map *.obj *.exe *.c makefile
+del *.map *.obj *.exe *.c
