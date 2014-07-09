@@ -10,6 +10,7 @@ dim datos(19) as ubyte = { _
     $0c, $d0, $6e, 2}
 dim i, j, x, y, spacepressed, killed, numbullets as byte
 dim tmpx, tmpy as ubyte
+dim points as uinteger
 
 function abso( a as ubyte, b as ubyte ) as uinteger
   if b<a then
@@ -19,7 +20,7 @@ function abso( a as ubyte, b as ubyte ) as uinteger
   end if
 end function
 
-sub updatescreen()
+sub FASTCALL updatescreen()
   scr= y*mapw + x
   for j = 1 to 4
     if GetSpriteV(j) > $7f then
@@ -28,16 +29,9 @@ sub updatescreen()
   next j
 end sub
 
-sub updatescoreboard()
-  dim scr, dst as uinteger
-  dim count as ubyte
-  scr= $3d80+CAST(uinteger, killed)*8
-  dst= $403e|CAST(uinteger, shadow)<<8
-  for count = 0 to 7
-    poke dst, (peek scr ~ $ff)
-    scr= scr+1
-    dst= dst+$100
-  next count
+sub FASTCALL updatescoreboard()
+  points= $30 | killed
+  PrintStr(@points, $1e01)
 end sub
 
 sub removebullet( k as ubyte )
@@ -56,7 +50,7 @@ end sub
   DisableInt
 
 start:
-  Sound(LOAD, 1)
+  Sound(LOAD, 0)
   if is128 then
     EnableInt
     intadr= @IsrSound
@@ -64,13 +58,13 @@ start:
   while 1
     i= in($f7fe) & $1f
     if i=$1e then
-'      Input= @Joystick
+      poke uinteger @Inputs+1, @Joystick
       exit while
     elseif i=$1d then
-'      Input= @Cursors
+      poke uinteger @Inputs+1, @Cursors
       exit while
     elseif i=$1b then
-'      Input= @Keyboard
+      poke uinteger @Inputs+1, @Keyboard
       exit while
     elseif i=$17 then
       Redefine()
@@ -102,8 +96,9 @@ start:
   scr= 0
 
   while 1
-
+'    border 0
     Frame
+'    border 2
 
     for i = 1 to 4
       if GetSpriteV(i) < $80 then
@@ -194,7 +189,7 @@ start:
       end if
     next i
 
-    if Keyboard() & RIGHT then
+    if Inputs() & RIGHT then
       if GetSpriteX(0) < scrw*16 then
         SetSpriteX(0, GetSpriteX(0)+1)
       elseif x < mapw-1 then
@@ -203,7 +198,7 @@ start:
         updatescreen()
       end if
     end if
-    if Keyboard() & LEFT then
+    if Inputs() & LEFT then
       if GetSpriteX(0) > 0 then
         SetSpriteX(0, GetSpriteX(0)-1)
       elseif x then
@@ -212,7 +207,7 @@ start:
         updatescreen()
       end if
     end if
-    if Keyboard() & DOWN then
+    if Inputs() & DOWN then
       if GetSpriteY(0) < scrh*16 then
         SetSpriteY(0, GetSpriteY(0)+1)
       elseif y < maph-1 then
@@ -221,7 +216,7 @@ start:
         updatescreen()
       end if
     end if
-    if Keyboard() & UP then
+    if Inputs() & UP then
       if GetSpriteY(0) > 0 then
         SetSpriteY(0, GetSpriteY(0)-1)
       elseif y then
@@ -230,11 +225,11 @@ start:
         updatescreen()
       end if
     end if
-    if Keyboard() & FIRE and (not spacepressed) and numbullets<4 then
+    if Inputs() & FIRE and (not spacepressed) and numbullets<4 then
       Sound(EFFX, 0)
       SetBulletX(numbullets, GetSpriteX(0))
       SetBulletY(numbullets, GetSpriteY(0))
-      i= Keyboard() & (RIGHT | LEFT | UP | DOWN)
+      i= Inputs() & (RIGHT | LEFT | UP | DOWN)
       if i then
         dirbul(numbullets)= i
       else
@@ -242,5 +237,5 @@ start:
       end if
       numbullets= numbullets+1
     end if
-    spacepressed= Keyboard() & FIRE
+    spacepressed= Inputs() & FIRE
   end while

@@ -72,7 +72,7 @@ dim drwout  as uinteger at $5c06
 dim intadr  as uinteger at $fff5
 dim is128   as ubyte    at $fff7
 
-function Joystick () as ubyte
+function FASTCALL Joystick () as ubyte
   asm
         ld      bc, $effe
         in      b, (c)
@@ -97,7 +97,7 @@ function Joystick () as ubyte
   end asm
 end function
 
-function Cursors () as ubyte
+function FASTCALL Cursors () as ubyte
   asm
         ld      a, $ef
         in      a, ($fe)
@@ -144,6 +144,12 @@ keyb2:  ld      b, (hl)
         ret
 tabla:  defw    sKEY, QKEY, AKEY, OKEY, PKEY
         defb    1
+  end asm
+end function
+
+function FASTCALL Inputs () as ubyte
+  asm
+        defb    $c3, 0
   end asm
 end function
 
@@ -327,7 +333,7 @@ sub FASTCALL IsrSound ()
 end sub
 #endif
 
-sub FASTCALL PrintStr( source as string, xy as uinteger )
+sub FASTCALL PrintStr( source as uinteger, xy as uinteger )
   asm
         pop     af
         pop     de
