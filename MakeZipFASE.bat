@@ -20,7 +20,7 @@ del *.map *.obj
 cd engine
 call fase gfx
 del /q build\*.*
-%z7z% a ..\FASE.1.03.zip  ^
+%z7z% a ..\FASE.1.04.zip  ^
   .htaccess               ^
   config.def              ^
   fase.h                  ^

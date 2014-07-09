@@ -1,6 +1,6 @@
 CC = gcc
 TARGETS = lib/bin/numbers4map lib/bin/generate_table
-TARGETS_INSTALL = lib/bin/tmxcompress lib/bin/png2rcs lib/bin/step1 lib/bin/step2 lib/bin/zx7b lib/bin/gentmx
+TARGETS_INSTALL = lib/bin/tmxcompress lib/bin/png2rcs lib/bin/step1 lib/bin/step2 lib/bin/step3 lib/bin/zx7b lib/bin/gentmx
 CFLAGS = -std=c99 -static
 
 all: prepare $(TARGETS) $(TARGETS_INSTALL)
@@ -17,6 +17,9 @@ lib/bin/step1: lib/src/step1.c
 lib/bin/step2: lib/src/step2.c
 	@ echo "compile: step2"
 	@ $(CC) -o lib/bin/step2 lib/src/step2.c $(CFLAGS)
+lib/bin/step3: lib/src/step3.c
+	@ echo "compile: step3"
+	@ $(CC) -o lib/bin/step3 lib/src/step3.c $(CFLAGS)
 lib/bin/zx7b: lib/src/zx7b.c
 	@ echo "compile: zx7b"
 	@ $(CC) -o lib/bin/zx7b lib/src/zx7b.c $(CFLAGS)
