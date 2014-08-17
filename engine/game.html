@@ -85,6 +85,8 @@ function FRAME(){
 
 function kdown(ev) {
   kb[ev.keyCode>>3]|= 0x80 >> (ev.keyCode & 7);
+  if( ev.keyCode==9 )
+    return false;
 }
 
 function kup(ev) {

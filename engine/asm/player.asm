@@ -29,7 +29,7 @@ inicio  call    rout
         sub     (hl)
         jr      nz, pautas
         ld      (hl), a
-            
+
 ;INTERPRETA      
         ld      iy, psg_reg
         ld      ix, puntero_a
@@ -351,8 +351,8 @@ DCBC0:      RLCA
 ;REPRODUCE EFECTOS DE SONIDO 
 
 reproduce_sonido:
-            LD      HL,interr   
-            BIT     2,(HL)                  ;ESTA ACTIVADO EL EFECTO?
+            LD      HL, interr
+            BIT     2, (HL)     ;ESTA ACTIVADO EL EFECTO?
             RET     Z
             LD      HL,(PUNTERO_SONIDO)
             LD      A,(HL)

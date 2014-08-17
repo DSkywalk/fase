@@ -1,7 +1,9 @@
 /*
- * (c) Copyright 2013 by Antonio Villena. All rights reserved.
- * The compressor is based on ZX7 from Einar Saukas
- *   http://www.worldofspectrum.org/infoseekid.cgi?id=0027996
+ * TmxCompress (c) Copyright 2013 by Antonio Villena. All rights reserved.
+ *
+ * Based on ZX7 <http://www.worldofspectrum.org/infoseekid.cgi?id=0027996>
+ * (c) Copyright 2012 by Einar Saukas. All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright

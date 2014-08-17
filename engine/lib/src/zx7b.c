@@ -1,7 +1,8 @@
 /*
- * (c) Copyright 2012 by Einar Saukas. All rights reserved.
+ * ZX7b (c) Copyright 2013 by Antonio Villena. All rights reserved.
  *
- * Modified in 2013 by Antonio Villena
+ * Based on ZX7 <http://www.worldofspectrum.org/infoseekid.cgi?id=0027996>
+ * (c) Copyright 2012 by Einar Saukas. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

@@ -66,7 +66,7 @@ function init(){
 
 function start(){
 
-  vx= ax= vy= ay= killed= mapx= mapy= spacepressed= num_bullets= 0;
+  salto= vx= ax= vy= ay= killed= mapx= mapy= spacepressed= num_bullets= 0;
   x= 0x3000;
   y= 0x1000;
 
@@ -196,23 +196,27 @@ function frame(){
 
 
   // movimiento del protagonista
-  if( kb[10] & 0x80 ) // P
+  if( kb[4] & 0x01 ) // P
     ax= vx<maxvx ? 40 : 0;
-  else if( kb[9] & 0x01 ) // O
+  else if( kb[4] & 0x04 ) // O
     ax= vx>-maxvx ? -40 : 0;
-  if( kb[8] & 0x40 ){ // A
-  }
-  else if( kb[10] & 0x40 ){ // Q
+//  if( kb[5] & 0x80 ){ // A
+//  }
+  if( kb[4] & 0x02 ){ // Q
+    salto++;
     if( y == 15<<11 )
       vy= -800;
   }
-  if( kb[4] & 0x80 && !spacepressed && num_bullets<4 ){ // Space
+  else{
+    salto= 0;
+  }
+  if( kb[1] & 0x40 && !spacepressed && num_bullets<4 ){ // Space
     bullets[num_bullets].x= sprites[0].x;
     bullets[num_bullets].y= sprites[0].y;
-    i= kb[10]>>3&8 | kb[8]>>4&4 | kb[9]<<1&2 | kb[10]>>7&1;
+    i= kb[4]<<2&8 | kb[5]>>5&4 | kb[4]>>1&2 | kb[4]&1;
     dirbul[num_bullets]= i ? i : 1;
     num_bullets++;
   }
-  spacepressed= kb[4] & 0x80;
+  spacepressed= kb[1] & 0x40;
 
 }
