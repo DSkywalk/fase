@@ -282,7 +282,7 @@ Optimal* optimize(unsigned char *input_data, size_t input_size) {
           break;
         }
         for ( len= 2; len <= MAX_LEN; len++ ){
-          if( len > best_len && len&0xff ){
+          if( len > best_len && len+1&0xff ){
             best_len= len;
             bits= optimal[i-len].bits + count_bits(offset, len);
             if( optimal[i].bits > bits )
