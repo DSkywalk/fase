@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
   int i, j;
 
   if( argc==1 )
-    printf("\nZX7 Backwards compressor v1.0 by Einar Saukas/AntonioVillena, 28 Dec 2013\n\n"
+    printf("\nZX7 Backwards compressor v1.01 by Einar Saukas/AntonioVillena, 28 Dec 2013\n\n"
            "  zx7b <input_file> <output_file>\n\n"
            "  <input_file>    Raw input file\n"
            "  <output_file>   Compressed output file\n\n"
