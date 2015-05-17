@@ -35,13 +35,13 @@ lib\bin\zx7b build\main.bin build\main.zx7b
 lib\bin\step3
 lib\bin\sjasmplus asm\loader.asm
 if exist build\player.zx7b (
-  lib\bin\gentape game.tzx                    ^
-            basic 'game' 0  build\loader.bin  ^
-             data           build\engine.zx7b ^
-           stop48                             ^
-             data           build\player.zx7b
+  lib\bin\gentape game.tzx                  ^
+            basic game 0  build\loader.bin  ^
+             data         build\engine.zx7b ^
+           stop48                           ^
+             data         build\player.zx7b
 ) else (
-  lib\bin\gentape game.tzx                    ^
-            basic 'game' 0  build\loader.bin  ^
-             data           build\engine.zx7b
+  lib\bin\gentape game.tzx                  ^
+            basic game 0  build\loader.bin  ^
+             data         build\engine.zx7b
 )
