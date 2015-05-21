@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include "../../../ComplementosChurrera/lodepng.c"
+#include "../../ComplementosChurrera/lodepng.c"
 
 unsigned char *image, *pixel, output[0x10000], input[0x400];
 char  tmpstr[50], command[50], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr,

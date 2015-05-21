@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../../ComplementosChurrera/lodepng.c"
+#include "../../ComplementosChurrera/lodepng.c"
 unsigned char *image;
 unsigned error, width, height, i, j, k, l, m;
 FILE *fo;
 
 int main(int argc, char *argv[]){
-  error= lodepng_decode32_file(&image, &width, &height, "numbers4map.png");
+  error= lodepng_decode32_file(&image, &width, &height, "../gfx/numbers4map.png");
   if( error )
     printf("Error %u: %s\n", error, lodepng_error_text(error)),
     exit(-1);

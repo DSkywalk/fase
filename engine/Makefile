@@ -1,16 +1,16 @@
 # zxb-> Boriel ZX Basic Compiler. zcc-> z88dk C compiler
 COMPILER = zcc
-
-export Z80_OZFILES=/c/z88dk/lib/
-export ZCCCFG=/c/z88dk/lib/config/
-export PATH=$PATH:/c/z88dk/bin
-export TEMP=build
+ZCCPATH = /c/z88dk
 
 ifneq ("$(wildcard asm/player.asm)","")
 	PLAYER_EXISTS = 1
 else
 	PLAYER_EXISTS = 0
 endif
+export Z80_OZFILES=${ZCCPATH}/lib/
+export ZCCCFG     =${ZCCPATH}/lib/config/
+export PATH=$PATH:${ZCCPATH}
+export TEMP=build
 
 all: game.tzx
 

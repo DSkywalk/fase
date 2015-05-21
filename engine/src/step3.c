@@ -3,7 +3,7 @@
 FILE *fi, *fo;
 unsigned char mem[0x10000];
 int i, blo1cm, blo2cm, maincm, engicm, mainrw;
-void main(void){
+int main(void){
   fo= fopen("build/engine.zx7b", "wb");
   blo1cm= fread(mem, 1, 0x10000, fi= fopen("build/block1.zx7b", "rb"));   fclose(fi);
   fwrite(mem, 1, blo1cm, fo);
