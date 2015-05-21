@@ -81,7 +81,7 @@ int main(int argc, char *argv[]){
   while ( fgets(tmpstr, 50, ft) ){
     if( tmpstr[8]=='"' ){
       strchr(tmpstr+9, '"')[1]= 0;
-      sprintf(command, "lib\\bin\\Png2Rcs \"gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+9);
+      sprintf(command, "bin\\Png2Rcs \"gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+9);
       fou= (char *) strchr(tmpstr+9, '.');
       fou[1]= 'a', fou[2]= 't', fou[3]= 'r', fou[4]= 0;
       sprintf(tmpstr, " -a \"gfx\\%s", tmpstr+9);
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]){
     }
     else{
       strchr(tmpstr+8, '\n')[0]= 0,
-      sprintf(command, "lib\\bin\\Png2Rcs gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+8);
+      sprintf(command, "bin\\Png2Rcs gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+8);
       fou= (char *) strchr(tmpstr+8, '.');
       fou[1]= 'a', fou[2]= 't', fou[3]= 'r';
       if( exist(tmpstr+8) )
@@ -101,8 +101,8 @@ int main(int argc, char *argv[]){
     if( system(command) )
       printf("\nError: plug error with command: %s\n", command),
       exit(-1);
-    system("lib\\bin\\zx7b build\\tmp.rcs build\\tmp.rcs.zx7b");
-    system("lib\\bin\\zx7b build\\tmp.atr build\\tmp.atr.zx7b");
+    system("bin\\zx7b build\\tmp.rcs build\\tmp.rcs.zx7b");
+    system("bin\\zx7b build\\tmp.atr build\\tmp.atr.zx7b");
     fi= fopen("build/tmp.atr.zx7b", "rb");
     j+= i= fread(output, 1, 0x300, fi);
     fwrite(output, 1, i, fo);
