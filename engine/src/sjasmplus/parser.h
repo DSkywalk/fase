@@ -37,8 +37,5 @@ char* ReplaceDefineNext(char* lp); /* added */
 void ParseLine(bool = true);
 void ParseLineSafe(bool = true);
 void ParseStructLine(CStructure* st);
-unsigned long LuaCalculate(char *str);
-void LuaParseLine(char *str);
-void LuaParseCode(char *str);
 //eof parser.h
 

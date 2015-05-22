@@ -62,7 +62,7 @@ extern char* DeviceID;
 extern char filename[LINEMAX], * lp, line[LINEMAX], temp[LINEMAX], * tp, pline[LINEMAX2], ErrorLine[LINEMAX2], * bp;
 extern char mline[LINEMAX2], sline[LINEMAX2], sline2[LINEMAX2];
 
-extern char SourceFNames[128][MAX_PATH];
+extern char SourceFNames[128][260];
 extern int CurrentSourceFName;
 
 extern bool displayinprocces, displayerror; /* added */

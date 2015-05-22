@@ -323,8 +323,5 @@ private:
 	CDevicePage* Pages[256];
 };
 
-
-int LuaGetLabel(char *name);
-
 //eof tables.h
 
