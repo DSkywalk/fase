@@ -29,7 +29,7 @@
 // sjasm.cpp
 
 #include "sjdefs.h"
-#include "lua_sjasm.h"
+//#include "lua_sjasm.h"
 
 namespace Options {
 	char SymbolListFName[LINEMAX];
@@ -327,7 +327,7 @@ int main(int argc, char **argv) {
 	luaL_openlibs(LUA);
 	luaopen_pack(LUA);
 
-	tolua_sjasm_open(LUA);
+	//tolua_sjasm_open(LUA);
 
 	// init vars
 	Options::DestionationFName[0] = 0;
