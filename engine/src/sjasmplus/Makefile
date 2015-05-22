@@ -14,7 +14,7 @@ CXXFLAGS=$(CFLAGS)
 LDFLAGS=-static-libgcc -static-libstdc++
 
 #sjasmplus object files
-OBJS=sjasm/devices.o sjasm/directives.o sjasm/io_snapshots.o sjasm/io_trd.o sjasm/lua_lpack.o sjasm/lua_sjasm.o \
+OBJS=sjasm/devices.o sjasm/directives.o sjasm/io_snapshots.o sjasm/io_trd.o \
 sjasm/parser.o sjasm/reader.o sjasm/sjasm.o sjasm/sjio.o sjasm/support.o sjasm/tables.o sjasm/z80.o
 
 #liblua objects

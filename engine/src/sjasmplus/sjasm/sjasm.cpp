@@ -29,7 +29,6 @@
 // sjasm.cpp
 
 #include "sjdefs.h"
-//#include "lua_sjasm.h"
 
 namespace Options {
 	char SymbolListFName[LINEMAX];
@@ -267,11 +266,6 @@ namespace Options {
 	}
 }
 
-void LuaFatalError(lua_State *L) {
-	Error((char *)lua_tostring(L, -1), 0, FATAL);
-}
-
-
 #ifdef UNDER_CE
 int main(int argc, _TCHAR* argv[]) {
 #else
@@ -300,11 +294,7 @@ int main(int argc, char **argv) {
 		_COUT "  --lstlab                 Enable label table in listing" _ENDL;
 		_COUT "  --sym=<filename>         Save symbols list to <filename>" _ENDL;
 		_COUT "  --exp=<filename>         Save exports to <filename> (see EXPORT pseudo-op)" _ENDL;
-		//_COUT "  --autoreloc              Switch to autorelocation mode. See more in docs." _ENDL;
-		//_COUT " By output format (you can use it all in some time):" _ENDL;
 		_COUT "  --raw=<filename>         Save all output to <filename> ignoring OUTPUT pseudo-ops" _ENDL;
-		//_COUT "  --nooutput               Do not generate *.out file" _ENDL;
-		_COUT "  Note: use OUTPUT, LUA/ENDLUA and other pseudo-ops to control output" _ENDL;
 		_COUT " Logging:" _ENDL;
 		_COUT "  --nologo                 Do not show startup message" _ENDL;
 		_COUT "  --msg=error              Show only error messages" _ENDL;
@@ -320,14 +310,6 @@ int main(int argc, char **argv) {
 		exit(1);
 #endif
 	}
-
-	// init LUA
-	LUA = lua_open();
-	lua_atpanic(LUA, (lua_CFunction)LuaFatalError);
-	luaL_openlibs(LUA);
-	luaopen_pack(LUA);
-
-	//tolua_sjasm_open(LUA);
 
 	// init vars
 	Options::DestionationFName[0] = 0;
@@ -460,8 +442,6 @@ int main(int argc, char **argv) {
 	if (Devices) {
 		delete Devices;
 	}
-	// close Lua
-	lua_close(LUA);
 
 	return (ErrorCount != 0);
 }

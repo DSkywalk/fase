@@ -1945,128 +1945,6 @@ const char *readMemFile(lua_State *, void *ud, size_t *size)
   return luaMF->text;
 }
 
-void dirLUA() {
-	int error;
-	char *rp, *id;
-	char *buff = new char[32768];
-	char *bp=buff;
-	char size=0;
-	int ln=0;
-	bool execute=false;
-
-	luaMemFile luaMF;
-
-	SkipBlanks();
-
-	if ((id = GetID(lp)) && strlen(id) > 0) {
-		if (cmphstr(id, "pass1")) {
-			if (pass == 1) {
-				execute = true;
-			}
-		} else if (cmphstr(id, "pass2")) {
-			if (pass == 2) {
-				execute = true;
-			}
-		} else if (cmphstr(id, "pass3")) {
-			if (pass == 3) {
-				execute = true;
-			}
-		} else if (cmphstr(id, "allpass")) {
-			execute = true;
-		} else {
-			//_COUT id _CMDL "A" _ENDL;
-			Error("[LUA] Syntax error", id);
-		}
-	} else if (pass == LASTPASS) {
-		execute = true;
-	}
-
-	ln = CurrentLocalLine;
-	ListFile();
-	while (1) {
-		if (!ReadLine(false)) {
-			Error("[LUA] Unexpected end of lua script", 0, PASS3); break;
-		}
-		lp = line;
-		rp = line;
-		SkipBlanks(rp);
-		if (cmphstr(rp, "endlua")) {
-			if (execute) {
-				if ((bp-buff) + (rp-lp-6) < 32760 && (rp-lp-6) > 0) {
-					STRNCPY(bp, 32768-(bp-buff)+1, lp, rp-lp-6);
-					bp += rp-lp-6;
-					*(bp++) = '\n';
-					*(bp) = 0;
-				} else {
-					Error("[LUA] Maximum size of Lua script is 32768 bytes", 0, FATAL);
-					return;
-				}
-			}
-			lp = rp;
-			break;
-		}
-		if (execute) {
-			if ((bp-buff) + strlen(lp) < 32760) {
-				STRCPY(bp, 32768-(bp-buff)+1, lp);
-				bp += strlen(lp);
-				*(bp++) = '\n';
-				*(bp) = 0;
-			} else {
-				Error("[LUA] Maximum size of Lua script is 32768 bytes", 0, FATAL);
-				return;
-			}
-		}
-
-		ListFileSkip(line);
-	}
-
-	if (execute) {
-		LuaLine = ln;
-		luaMF.text = buff;
-		luaMF.size = strlen(luaMF.text);
-		error = lua_load(LUA, readMemFile, &luaMF, "script") || lua_pcall(LUA, 0, 0, 0);
-		//error = luaL_loadbuffer(LUA, (char*)buff, sizeof(buff), "script") || lua_pcall(LUA, 0, 0, 0);
-		//error = luaL_loadstring(LUA, buff) || lua_pcall(LUA, 0, 0, 0);
-		if (error) {
-			_lua_showerror();
-		}
-		LuaLine = -1;
-	}
-
-	delete[] buff;
-}
-
-void dirENDLUA() {
-	Error("[ENDLUA] End of lua script without script", 0);
-}
-
-/* modified */
-void dirINCLUDELUA() {
-	char* fnaam;
-	fnaam = GetFileName(lp);
-	int error;
-
-	if (pass != 1) {
-		return;
-	}
-
-	//WinExec ( "C:\\path\\to\\program.exe", SW_SHOWNORMAL );
-
-	if (!FileExists(fnaam)) {
-		Error("[INCLUDELUA] File doesn't exist", fnaam, PASS1);
-		return;
-	}
-
-	LuaLine = CurrentLocalLine;
-	error = luaL_loadfile(LUA, fnaam) || lua_pcall(LUA, 0, 0, 0);
-	if (error) {
-		_lua_showerror();
-	}
-	LuaLine = -1;
-
-	delete[] fnaam;
-}
-
 void dirDEVICE() {
 	char* id;
 
@@ -2169,10 +2047,6 @@ void InsertDirectives() {
 	DirectivesTable.insertd("ends", dirENDS);
 
 	DirectivesTable.insertd("device", dirDEVICE);
-
-	DirectivesTable.insertd("lua", dirLUA);
-	DirectivesTable.insertd("endlua", dirENDLUA);
-	DirectivesTable.insertd("includelua", dirINCLUDELUA);
 
 	DirectivesTable_dup.insertd("dup", dirDUP); /* added */
 	DirectivesTable_dup.insertd("edup", dirEDUP); /* added */
