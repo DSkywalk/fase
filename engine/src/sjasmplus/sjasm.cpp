@@ -97,9 +97,6 @@ CStructureTable StructureTable;
 CAddressList* AddressList = 0; /* from SjASM 0.39g */
 CStringsList* ModuleList = 0;
 
-lua_State *LUA;
-int LuaLine=-1;
-
 /* modified */
 void InitPass(int p) {
 	reglenwidth = 1;

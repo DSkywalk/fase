@@ -1879,71 +1879,11 @@ void dirDEFARRAY() {
 	//while (a) { STRCPY(ml,a->string); _COUT ml _ENDL; a=a->next; }
 }
 
-void _lua_showerror() {
-	int ln;
-
-	// part from Error(...)
-	char *err = STRDUP(lua_tostring(LUA, -1));
-	if (err == NULL) {
-		Error("No enough memory!", 0, FATAL);
-	}
-	//_COUT err _ENDL;
-	err += 18;
-	char *pos = strstr(err, ":");
-	//_COUT err _ENDL;
-	//_COUT pos _ENDL;
-	*(pos++) = 0;
-	//_COUT err _ENDL;
-	ln = atoi(err) + LuaLine;
-
-	// print error and other actions
-	err = ErrorLine;
-	SPRINTF3(err, LINEMAX2, "%s(%lu): error: [LUA]%s", filename, ln, pos);
-
-	if (!strchr(err, '\n')) {
-		STRCAT(err, LINEMAX2, "\n");
-	}
-
-	if (FP_ListingFile != NULL) {
-		fputs(ErrorLine, FP_ListingFile);
-	}
-	_COUT ErrorLine _END;
-
-	PreviousErrorLine = ln;
-
-	ErrorCount++;
-
-	char count[25];
-	SPRINTF1(count, 25, "%lu", ErrorCount);
-	DefineTable.Replace("_ERRORS", count);
-	// end Error(...)
-
-	lua_pop(LUA, 1);
-}
-
 typedef struct luaMemFile
 {
   const char *text;
   size_t size;
 } luaMemFile;
-
-const char *readMemFile(lua_State *, void *ud, size_t *size)
-{
-  // Convert the ud pointer (UserData) to a pointer of our structure
-  luaMemFile *luaMF = (luaMemFile *) ud;
-
-  // Are we done?
-  if(luaMF->size == 0)
-    return NULL;
-
-  // Read everything at once
-  // And set size to zero to tell the next call we're done
-  *size = luaMF->size;
-  luaMF->size = 0;
-
-  // Return a pointer to the readed text
-  return luaMF->text;
-}
 
 void dirDEVICE() {
 	char* id;
@@ -2053,33 +1993,6 @@ void InsertDirectives() {
 	DirectivesTable_dup.insertd("endm", dirENDM); /* added */
 	DirectivesTable_dup.insertd("endr", dirEDUP); /* added */
 	DirectivesTable_dup.insertd("rept", dirDUP); /* added */
-}
-
-bool LuaSetPage(aint n) {
-	if (n < 0) {
-		Error("sj.set_page: negative page number are not allowed", lp); return false;
-	} else if (n > Device->PagesCount - 1) {
-		char buf[LINEMAX];
-		SPRINTF1(buf, LINEMAX, "sj.set_page: page number must be in range 0..%lu", Device->PagesCount - 1);
-		Error(buf, 0, CATCHALL); return false;
-	}
-	Slot->Page = Device->GetPage(n);
-	CheckPage();
-	return true;
-}
-
-bool LuaSetSlot(aint n) {
-	if (n < 0) {
-		Error("sj.set_slot: negative slot number are not allowed", lp); return false;
-	} else if (n > Device->SlotsCount - 1) {
-		char buf[LINEMAX];
-		SPRINTF1(buf, LINEMAX, "sj.set_slot: slot number must be in range 0..%lu", Device->SlotsCount - 1);
-		Error(buf, 0, CATCHALL); return false;
-	}
-	Slot = Device->GetSlot(n);
-	Device->CurrentSlot = Slot->Number;
-	CheckPage();
-	return true;
 }
 
 //eof direct.cpp

@@ -96,9 +96,6 @@ extern CStructureTable StructureTable;
 extern CAddressList* AddressList; /*from SjASM 0.39g*/
 extern CStringsList* ModuleList;
 
-extern lua_State *LUA;
-extern int LuaLine;
-
 #ifdef UNDER_CE
 int main(int argc, _TCHAR* argv[]);
 #endif

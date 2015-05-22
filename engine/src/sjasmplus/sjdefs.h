@@ -75,22 +75,6 @@ using std::stack;
 #include <ctype.h>
 #include <math.h>
 
-#ifdef UNDER_CE
-extern "C" {
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-#include "tolua++.h"
-}
-#else
-extern "C" {
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-#include "tolua++.h"
-}
-#endif
-
 // global defines
 #define LINEMAX 2048
 #define LINEMAX2 LINEMAX*2
@@ -106,9 +90,6 @@ extern "C" {
 #define aint unsigned long
 
 // include all headers
-extern "C" {
-#include "lua_lpack.h"
-}
 #include "devices.h"
 #include "support.h"
 #include "tables.h"

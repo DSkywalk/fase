@@ -99,7 +99,6 @@ void Error(char* fout, char* bd, int type) {
 	char* ep = ErrorLine;
 	char* count;
 	int ln;
-	lua_Debug ar;
 
 	if (IsSkipErrors && PreviousErrorLine == CurrentLocalLine && type != FATAL) {
 		return;
@@ -135,13 +134,7 @@ void Error(char* fout, char* bd, int type) {
 	if (pass > LASTPASS) {
 		SPRINTF1(ep, LINEMAX2, "error: %s", fout);
 	} else {
-		if (LuaLine >= 0) {
-			lua_getstack(LUA, 1, &ar) ;
-			lua_getinfo(LUA, "l", &ar);
-			ln = LuaLine + ar.currentline;
-		} else {
-			ln = CurrentLocalLine;
-		}
+		ln = CurrentLocalLine;
 		SPRINTF3(ep, LINEMAX2, "%s(%lu): error: %s", filename, ln, fout);
 	}
 
@@ -168,7 +161,6 @@ void Warning(char* fout, char* bd, int type) {
 	char* ep = ErrorLine;
 	char* count;
 	int ln;
-	lua_Debug ar;
 
 	if (type == PASS1 && pass != 1) {
 		return;
@@ -185,13 +177,7 @@ void Warning(char* fout, char* bd, int type) {
 	if (pass > LASTPASS) {
 		SPRINTF1(ep, LINEMAX2, "warning: %s", fout);
 	} else {
-		if (LuaLine >= 0) {
-			lua_getstack(LUA, 1, &ar) ;
-			lua_getinfo(LUA, "l", &ar);
-			ln = LuaLine + ar.currentline;
-		} else {
-			ln = CurrentLocalLine;
-		}
+		ln = CurrentLocalLine;
 		SPRINTF3(ep, LINEMAX2, "%s(%lu): warning: %s", filename, ln, fout);
 	}
 
