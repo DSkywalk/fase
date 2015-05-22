@@ -35,29 +35,14 @@
 #define LASTPASS 3
 
 // output
-#ifdef UNDER_CE
-#define _COUT WriteOutput(
-#define _CMDL );WriteOutput(
-#define _ENDL );WriteOutputEOF();
-#define _END );
-#else 
 #define _COUT cout << 
 #define _CMDL  << 
 #define _ENDL << endl
 #define _END ;
-#endif
 
 // standard libraries
 #ifdef WIN32
 #include <windows.h>
-#endif
-
-#ifdef UNDER_CE
-#include <windows.h>
-#include <assert.h>
-#undef _ASSERTE
-#define _ASSERTE  
-#include "tconvert.h"
 #endif
 
 #include <stack>

@@ -1621,15 +1621,3 @@ CDevicePage::~CDevicePage() {
 		delete Next;
 	}*/
 }
-
-int LuaGetLabel(char *name) {
-	aint val;
-
-	if (!LabelTable.GetValue(name, val)) {
-		return -1;
-	} else {
-		return val;
-	}
-}
-
-//eof tables.cpp

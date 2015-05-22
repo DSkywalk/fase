@@ -30,11 +30,7 @@
 
 #include "sjdefs.h"
 
-#ifdef UNDER_CE
-
-#endif
-
-#if !defined (_MSC_VER) || defined (UNDER_CE)
+#if !defined (_MSC_VER)
 
 void GetCurrentDirectory(int whatever, char* pad) {
 	pad[0] = 0;
@@ -111,29 +107,3 @@ long GetTickCount() {
 #endif
 
 #endif
-
-void LuaShellExec(char *command) {
-#ifdef UNDER_CE
-	//_wsystem(_towchar(command));
-	SHELLEXECUTEINFO info;
-	info.cbSize = sizeof(SHELLEXECUTEINFO);
-	info.fMask = NULL;
-    info.hwnd = NULL;
-    info.lpVerb = NULL;
-    info.lpFile = _totchar(command);
-    info.lpParameters = NULL;
-    info.lpDirectory = NULL;
-    info.nShow = SW_MAXIMIZE;
-    info.hInstApp = NULL;
-	ShellExecuteEx(&info);
-#else
-#ifdef WIN32
-
-	WinExec(command, SW_SHOWNORMAL);
-#else	
-	system(command);
-#endif
-#endif
-}
-
-//eof support.cpp

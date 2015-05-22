@@ -96,9 +96,5 @@ extern CStructureTable StructureTable;
 extern CAddressList* AddressList; /*from SjASM 0.39g*/
 extern CStringsList* ModuleList;
 
-#ifdef UNDER_CE
-int main(int argc, _TCHAR* argv[]);
-#endif
-
 #endif
 //eof sjasm.h

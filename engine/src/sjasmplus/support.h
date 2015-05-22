@@ -28,19 +28,7 @@
 
 // support.h
 
-#ifdef UNDER_CE
-void WriteOutput(char Char);
-void WriteOutput(char* String);
-void WriteOutput(int Number);
-void WriteOutput(float Number);
-void WriteOutput(unsigned char Number);
-void WriteOutput(long Number);
-void WriteOutput(unsigned long Number);
-void WriteOutput(_TCHAR* String);
-void WriteOutputEOF();
-#endif
-
-#if defined (_MSC_VER) && !defined (UNDER_CE)
+#if defined (_MSC_VER)
 
 #define STRDUP _strdup
 #define STRSET(str, sizeInBytes, c) _strset_s(str, sizeInBytes, c)
@@ -57,12 +45,8 @@ void WriteOutputEOF();
 
 #else
 
-#ifdef UNDER_CE
-#include <time.h>
-#else
 #include <sys/time.h>
 #include <unistd.h>
-#endif
 
 #ifndef TCHAR
 #define TCHAR char
@@ -74,11 +58,7 @@ char* strset(char* str, char val);
 long GetTickCount();
 #endif
 
-#ifdef UNDER_CE
-#define STRDUP _strdup
-#else
 #define STRDUP strdup
-#endif
 #define STRSET(str, sizeInBytes, c) strset(str, c)
 #define STRCAT(strDestination, sizeInBytes, strSource) strcat(strDestination, strSource)
 #define STRCPY(strDestination, sizeInBytes, strSource) strcpy(strDestination, strSource)

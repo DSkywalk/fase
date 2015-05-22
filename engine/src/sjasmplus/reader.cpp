@@ -630,7 +630,7 @@ char* GetFileName(char*& p, bool convertslashes) {
 	}
 	*np = 0; 
 	for (np = fn; *np; ++np) {
-#if defined(WIN32) || defined(UNDER_CE)
+#if defined(WIN32)
 		if (*np == '/' && convertslashes) {
 			*np = '\\';
 		}
