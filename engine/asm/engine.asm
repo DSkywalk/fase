@@ -1,5 +1,5 @@
-        include build/define.asm
-        include build/defmap.asm
+        include ../build/define.asm
+        include ../build/defmap.asm
 ; 0 black, 1 blue, 2 red, 3 magenta, 4 green, 5 cyan, 6 yellow, 7 white
 ; 8 none, 9-15 bright versions of 1-7
         DEFINE  scolor  0
@@ -41,7 +41,7 @@
     ELSE
         ld      h, 0
         ld      l, e
-      IF  data != 1 && data != 2 && data != 4 && data != 8 && data != 16 && data != 32 && data != 64 && data != 128
+      IF  data != 1 & data != 2 & data != 4 & data != 8 & data != 16 & data != 32 & data != 64 & data != 128
         ld      d, h
       ENDIF
         multsub %10000000, %01000000
@@ -172,7 +172,7 @@
         org     staspr+final-mapend-$
 staspr  defw    draw_sprites+1&$ffff
         nop
-        include mus/effx.asm
+        include ../mus/effx.asm
 do_sprites
       IF  machine=1
         ld      (drawz+1&$ffff), sp
@@ -360,7 +360,8 @@ descc   ld      a, b            ; save b (byte reading) on a
         pop     hl              ; restore source address (compressed data)
         ld      b, a            ; restore b register
         jr      desc6           ; jump to main loop
-descd IF  tmode=3
+descd
+      IF  tmode=3
         ld      a, mapbuf-1&$ff ; end of decompression stuff
       ELSE
         ld      a, mapbuf&$ff
@@ -394,7 +395,8 @@ upco2   ld      bc, mapbuf&$ff00
         ld      a, 0            ; inner and outer loop, if complete update we
 upco3   ex      af, af'         ; repeat the loop scrh*scrw times
         ld      a, 0
-upco4 IF  tmode=3
+upco4
+      IF  tmode=3
         ld      hl, upco5+1     ; increment pointer to actual tile
         inc     (hl)
 upco5   ld      hl, mapbuf
@@ -809,7 +811,7 @@ draw1   ld      (draw8+1&$ffff), a
         dec     l               ; and the source of the sprite (bullet) in SP
         ld      a, (hl)         ; read x
         add     a, 4
-      IF safehr && !cliphr
+      IF safehr & !cliphr
         cp      8
         jp      c, draw8&$ffff
         cp      (scrw<<4)+1
@@ -1007,7 +1009,7 @@ draw9   ld      (draww+1&$ffff), a
         add     a, a            ; use the rest of the bits to found
         add     a, a            ; a pointer to the actual sprite
         inc     l               ; and then calculate the X and Y coordinates
-    IF safehr && !cliphr        ; the lower bits of X also counts to calculate
+    IF safehr & !cliphr        ; the lower bits of X also counts to calculate
         ex      af, af          ; the actual sprite because there are
         ld      a, (hl)         ; 4 (or 8 if smooth=1) rotated versions of the
         cp      9               ; same sprite
@@ -1061,7 +1063,7 @@ drawc   ld      sp, (sprites)
     ENDIF
 drawd   add     a, d
   IF clipup=0
-      IF safevr=1 && offsey>0
+      IF safevr=1 & offsey>0
         cp      offsey<<3
         jr      nc, drawe
         ld      a, offsey<<3
@@ -1823,10 +1825,10 @@ init    ld      (ini8+1&$ffff), sp
       ENDIF
         ldir
     ENDIF
-  IF  scrw=16 || cliphr=0
+  IF  scrw=16 | cliphr=0
         xor     a
   ELSE
-    IF  scrw=15 && offsex=1
+    IF  scrw=15 & offsex=1
         ld      de, $0020
       IF atrbar>0
         ld      a, 0+atrbar
@@ -2013,7 +2015,7 @@ ini8    ld      sp, 0
       ENDIF
 
 ; This code is part of the map compressor, exactly a get bit routine
-    IF bithlf=1 && bitsym>1
+    IF bithlf=1 & bitsym>1
 gbit1   sub     $80 - (1 << bitsym - 2)
         defb    $da             ; second part of half bit implementation
     ENDIF
@@ -2038,7 +2040,7 @@ ini9    in      a, ($ff)
       ENDIF
 
 ; Map file. Generated externally with TmxCompress.c from map.tmx
-map     incbin  build/map_compressed.bin
+map     incbin  ../build/map_compressed.bin
 mapend
 
 ; Look up 256 bytes table and space to decompressor
