@@ -3,13 +3,13 @@
         org     $c004
         jp      inicia_efecto
         jp      poff
-        jp      cancion
+        jp      cancio
 
 ; SPECTRUM PSG proPLAYER V 0.2 - WYZ 07.09.2011
 ; VER AL FINAL PARA DATOS PROPIOS:
 
 ; ISR LLAMA A:
-inicio  call    rout
+inicio: call    rout
         ld      hl, psg_reg
         ld      de, psg_reg_sec
         ld      bc, 14
@@ -47,7 +47,7 @@ inicio  call    rout
         call    localiza_efecto
 
 ;pautas               
-pautas  ld      iy, psg_reg+0
+pautas: ld      iy, psg_reg+0
         ld      ix, puntero_p_a
         ld      hl, psg_reg+8
         call    pauta           ;pauta canal a
@@ -68,25 +68,25 @@ pautas  ld      iy, psg_reg+0
 ;       7    6     5     4   3-0                        3-0  
 ; BYTE 1 (LOOP|OCT-1|OCT+1|ORNMT|VOL) - BYTE 2 ( | | | |PITCH/NOTA)
 
-pauta   bit     4, (hl)         ;si la envolvente esta activada no actua pauta
+pauta:  bit     4, (hl)         ;si la envolvente esta activada no actua pauta
         ret     nz
         ld      a, (iy+0)
         ld      b, (iy+1)
         or      b
         ret     z
         push    hl
-pcajp4  ld      l, (ix+0)
+pcajp4: ld      l, (ix+0)
         ld      h, (ix+1)         
         ld      a, (hl)
         bit     7, a            ;loop / el resto de bits no afectan
         jr      z, pcajp0
-        and     %00011111       ;máximo loop pauta (0,32)x2!!!-> para ornamentos
+        and     00011111B       ;máximo loop pauta (0,32)x2!!!-> para ornamentos
         rlca                    ;x2
         ld      d, 0
         ld      e, a
         sbc     hl, de
         ld      a, (hl)
-pcajp0  bit     6, a            ;octava -1
+pcajp0: bit     6, a            ;octava -1
         jr      z, pcajp1
         ld      e, (iy+0)
         ld      d, (iy+1)
@@ -96,7 +96,7 @@ pcajp0  bit     6, a            ;octava -1
         ld      (iy+0), e
         ld      (iy+1), d
         jr      pcajp2
-pcajp1  bit     5, a            ;octava +1
+pcajp1: bit     5, a            ;octava +1
         jr      z, pcajp2
         ld      e, (iy+0)
         ld      d, (iy+1)
@@ -105,7 +105,7 @@ pcajp1  bit     5, a            ;octava +1
         rl      d
         ld      (iy+0), e
         ld      (iy+1), d        
-pcajp2  ld      a, (hl)
+pcajp2: ld      a, (hl)
         bit     4, a
         jr      nz, pcajp6      ;ornamentos seleccionados
         inc     hl              ;funcion pitch de frecuencia
@@ -115,24 +115,24 @@ pcajp2  ld      a, (hl)
         ld      l, a
         and     a
         ld      a, e
-        jr      z, ornmjp1
+        jr      z, ornmj1
         ld      a, (iy+0)       ;si la frecuencia es 0 no hay pitch
         add     a, (iy+1)
         and     a
         ld      a, e
-        jr      z, ornmjp1
+        jr      z, ornmj1
         bit     7, l
         jr      z, ornneg
         ld      h, $ff
         jr      pcajp3
-ornneg  ld      h, 0
-pcajp3  ld      e, (iy+0)
+ornneg: ld      h, 0
+pcajp3: ld      e, (iy+0)
         ld      d, (iy+1)
         adc     hl, de
         ld      (iy+0), l
         ld      (iy+1), h
-        jr      ornmjp1
-pcajp6  inc     hl              ;funcion ornamentos
+        jr      ornmj1
+pcajp6: inc     hl              ;funcion ornamentos
         push    hl
         push    af
         ld      a, (ix+24)      ;recupera registro de nota en el canal
@@ -140,18 +140,18 @@ pcajp6  inc     hl              ;funcion ornamentos
         adc     a, e            ;+- nota 
         call    tabla_notas
         pop     af
-ornmjp1 pop     hl
+ornmj1: pop     hl
         inc     hl
         ld      (ix+0), l
         ld      (ix+1), h
-pcajp5  pop     hl
-        and     %00001111       ;volumen final
+pcajp5: pop     hl
+        and     00001111B       ;volumen final
         ld      (hl), a
         ret
 
 ;carga una cancion
 ;in:(a)=nº de cancion
-cancion ld      hl, interr      ;carga cancion
+cancio: ld      hl, interr      ;carga cancion
         set     1, (hl)         ;reproduce cancion
         ld      hl, song
         ld      (hl), a         ;nº (a)
@@ -184,7 +184,7 @@ cancion ld      hl, interr      ;carga cancion
         ld      hl, interr
         set     4, (hl)
         pop     hl
-nptjp0  inc     hl              ;2 bytes reservados
+nptjp0: inc     hl              ;2 bytes reservados
         inc     hl
         inc     hl
 
@@ -193,7 +193,7 @@ nptjp0  inc     hl              ;2 bytes reservados
         ld      (puntero_p_deca), hl
         ld      e, $3f          ;codigo intrumento 0
         ld      b, $ff          ;el modulo debe tener una longitud menor de $ff00 ... o_o!
-bgicmo1 xor     a               ;busca el byte 0
+bgicm1: xor     a               ;busca el byte 0
         cpir
         dec     hl
         dec     hl
@@ -201,9 +201,9 @@ bgicmo1 xor     a               ;busca el byte 0
         cp      (hl)
         inc     hl
         inc     hl
-        jr      z, bgicmo1
+        jr      z, bgicm1
         ld      (puntero_p_decb), hl
-bgicmo2 xor     a               ;busca el byte 0
+bgicm2: xor     a               ;busca el byte 0
         cpir
         dec     hl
         dec     hl
@@ -211,9 +211,9 @@ bgicmo2 xor     a               ;busca el byte 0
         cp      (hl)            ;es el instrumento 0??
         inc     hl
         inc     hl
-        jr      z, bgicmo2
+        jr      z, bgicm2
         ld      (puntero_p_decc), hl
-bgicmo3 xor     a               ;busca el byte 0
+bgicm3: xor     a               ;busca el byte 0
         cpir
         dec     hl
         dec     hl
@@ -221,7 +221,7 @@ bgicmo3 xor     a               ;busca el byte 0
         cp      (hl)            ;es el instrumento 0??
         inc     hl
         inc     hl
-        jr      z, bgicmo3
+        jr      z, bgicm3
         ld      (puntero_p_decp), hl
 
 ;lee datos de las notas
@@ -485,28 +485,28 @@ FIN_CANAL_A:
             LD      HL,interr           ;LOOP?
             BIT     4,(HL)              
             JR      NZ,FCA_CONT
-poff    xor     a
+poff:   xor     a
         ld      (interr), a
         ld      hl, psg_reg
         ld      de, psg_reg+1
         ld      bc, 14*2-1
         ld      (hl), a
         ldir
-rout    ld      de, $ffc0
+rout:   ld      de, $ffc0
         ld      bc, $fffe
         ld      hl, psg_reg_sec+13
         xor     a
         cpd
         jr      nz, qout
-sout    ld      a, 12
-lout    out     (c), a
+sout:   ld      a, 12
+lout:   out     (c), a
         ld      b, e
         outd
         ld      b, d
         dec     a
         jp      p, lout
         ret
-qout    ld      a, 13
+qout:   ld      a, 13
         out     (c), a
         inc     l
         ld      b, e
@@ -615,7 +615,8 @@ NOTA:       LD      L,C
             LD      B,A
             JR      NZ,ENVOLVENTES
             LD      A,B
-tabla_notas LD      HL,DATOS_NOTAS      ;BUSCA FRECUENCIA
+tabla_notas:
+            LD      HL,DATOS_NOTAS      ;BUSCA FRECUENCIA
             CALL    ext_word
             LD      (IY+0),L
             LD      (IY+1),H
@@ -676,7 +677,7 @@ OCTBC01:    ADD     A,12                ;INCREMENTA OCTAVAS
 ;   (A)= POSICION
 ;OUT(HL)=WORD
 
-ext_word    LD      D,0
+ext_word:   LD      D,0
             RLCA
             LD      E,A
             ADD     HL,DE
@@ -749,52 +750,52 @@ FIN_EFECTO: LD      HL,interr
 ; VARIABLES__________________________
 
 
-interr          DB     00               ;INTERRUPTORES 1=ON 0=OFF
+interr:         defb   00               ;INTERRUPTORES 1=ON 0=OFF
                                         ;BIT 0=CARGA CANCION ON/OFF
                                         ;BIT 1=PLAYER ON/OFF
                                         ;BIT 2=SONIDOS ON/OFF
                                         ;BIT 3=EFECTOS ON/OFF
-ttempo          DB     00               ;DB CONTADOR TEMPO
-tempo           DB     00               ;DB TEMPO
-song            DB     00               ;DBNº DE CANCION
-puntero_a       DW     00               ;DW PUNTERO DEL CANAL A
-puntero_b       DW     00               ;DW PUNTERO DEL CANAL B
-puntero_c       DW     00               ;DW PUNTERO DEL CANAL C
+ttempo:         defb   00               ;DB CONTADOR TEMPO
+tempo:          defb   00               ;DB TEMPO
+song:           defb   00               ;DBNº DE CANCION
+puntero_a:      defw   00               ;DW PUNTERO DEL CANAL A
+puntero_b:      defw   00               ;DW PUNTERO DEL CANAL B
+puntero_c:      defw   00               ;DW PUNTERO DEL CANAL C
 
-canal_a         DW     buffers_canales      ;DW DIRECION DE INICIO DE LA MUSICA A
-canal_b         DW     buffers_canales+$30  ;DW DIRECION DE INICIO DE LA MUSICA B
-canal_c         DW     buffers_canales+$60  ;DW DIRECION DE INICIO DE LA MUSICA C
+canal_a:        defw   buffers_canales      ;DW DIRECION DE INICIO DE LA MUSICA A
+canal_b:        defw   buffers_canales+$30  ;DW DIRECION DE INICIO DE LA MUSICA B
+canal_c:        defw   buffers_canales+$60  ;DW DIRECION DE INICIO DE LA MUSICA C
 
-puntero_p_a     DW     00               ;DW PUNTERO PAUTA CANAL A
-puntero_p_b     DW     00               ;DW PUNTERO PAUTA CANAL B
-puntero_p_c     DW     00               ;DW PUNTERO PAUTA CANAL C
+puntero_p_a:    defw   00               ;DW PUNTERO PAUTA CANAL A
+puntero_p_b:    defw   00               ;DW PUNTERO PAUTA CANAL B
+puntero_p_c:    defw   00               ;DW PUNTERO PAUTA CANAL C
 
-PUNTERO_P_A0:   DW     00               ;DW INI PUNTERO PAUTA CANAL A
-PUNTERO_P_B0:   DW     00               ;DW INI PUNTERO PAUTA CANAL B
-PUNTERO_P_C0:   DW     00               ;DW INI PUNTERO PAUTA CANAL C
+PUNTERO_P_A0:   defw   00               ;DW INI PUNTERO PAUTA CANAL A
+PUNTERO_P_B0:   defw   00               ;DW INI PUNTERO PAUTA CANAL B
+PUNTERO_P_C0:   defw   00               ;DW INI PUNTERO PAUTA CANAL C
 
 
-puntero_p_deca  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL A
-puntero_p_decb  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL B
-puntero_p_decc  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL C
+puntero_p_deca: defw   00               ;DW PUNTERO DE INICIO DEL DECODER CANAL A
+puntero_p_decb: defw   00               ;DW PUNTERO DE INICIO DEL DECODER CANAL B
+puntero_p_decc: defw   00               ;DW PUNTERO DE INICIO DEL DECODER CANAL C
 
-puntero_deca    DW     00               ;DW PUNTERO DECODER CANAL A
-puntero_decb    DW     00               ;DW PUNTERO DECODER CANAL B
-puntero_decc    DW     00               ;DW PUNTERO DECODER CANAL C       
+puntero_deca:   defw   00               ;DW PUNTERO DECODER CANAL A
+puntero_decb:   defw   00               ;DW PUNTERO DECODER CANAL B
+puntero_decc:   defw   00               ;DW PUNTERO DECODER CANAL C       
 
-REG_NOTA_A:     DB     00               ;DB REGISTRO DE LA NOTA EN EL CANAL A
-                DB     00               ;VACIO
-REG_NOTA_B:     DB     00               ;DB REGISTRO DE LA NOTA EN EL CANAL B
-                DB     00               ;VACIO
-REG_NOTA_C:     DB     00               ;DB REGISTRO DE LA NOTA EN EL CANAL C
-                DB     00               ;VACIO
+REG_NOTA_A:     defb   00               ;DB REGISTRO DE LA NOTA EN EL CANAL A
+                defb   00               ;VACIO
+REG_NOTA_B:     defb   00               ;DB REGISTRO DE LA NOTA EN EL CANAL B
+                defb   00               ;VACIO
+REG_NOTA_C:     defb   00               ;DB REGISTRO DE LA NOTA EN EL CANAL C
+                defb   00               ;VACIO
 
 ;CANAL DE EFECTOS - ENMASCARA OTRO CANAL
 
-puntero_p       DW     00               ;DW PUNTERO DEL CANAL EFECTOS
-canal_p         DW     buffers_canales+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
-puntero_p_decp  DW     00               ;DW PUNTERO DE INICIO DEL DECODER CANAL P
-puntero_decp    DW     00               ;DW PUNTERO DECODER CANAL P
+puntero_p:      defw   00               ;DW PUNTERO DEL CANAL EFECTOS
+canal_p:        defw   buffers_canales+$90 ;DW DIRECION DE INICIO DE LOS EFECTOS
+puntero_p_decp: defw   00               ;DW PUNTERO DE INICIO DEL DECODER CANAL P
+puntero_decp:   defw   00               ;DW PUNTERO DECODER CANAL P
 
 psg_reg:        defs   14               ;DB (11) BUFFER DE REGISTROS DEL PSG
 psg_reg_sec:    defs   14               ;DB (11) BUFFER SECUNDARIO DE REGISTROS DEL PSG
@@ -808,20 +809,20 @@ psg_reg_sec:    defs   14               ;DB (11) BUFFER SECUNDARIO DE REGISTROS 
 
 ;EFECTOS DE SONIDO
 
-N_SONIDO:       DB      0               ;DB : NUMERO DE SONIDO
-PUNTERO_SONIDO: DW      0               ;DW : PUNTERO DEL SONIDO QUE SE REPRODUCE
+N_SONIDO:       defb    0               ;DB : NUMERO DE SONIDO
+PUNTERO_SONIDO: defw    0               ;DW : PUNTERO DEL SONIDO QUE SE REPRODUCE
 
 ;EFECTOS
 
-N_EFECTO:       DB      0               ;DB : NUMERO DE SONIDO
-PUNTERO_EFECTO: DW      0               ;DW : PUNTERO DEL SONIDO QUE SE REPRODUCE
-CANAL_EFECTOS:  DB      1               ; CANAL DE SFX
-ENVOLVENTE:     DB      0               ;DB : FORMA DE LA ENVOLVENTE
+N_EFECTO:       defb    0               ;DB : NUMERO DE SONIDO
+PUNTERO_EFECTO: defw    0               ;DW : PUNTERO DEL SONIDO QUE SE REPRODUCE
+CANAL_EFECTOS:  defb    1               ; CANAL DE SFX
+ENVOLVENTE:     defb    0               ;DB : FORMA DE LA ENVOLVENTE
                                         ;BIT 0    : FRECUENCIA CANAL ON/OFF
                                         ;BIT 1-2  : RATIO 
                                         ;BIT 3-3  : FORMA
 
-;BUFFER_DEC:     DB      $00     
+;BUFFER_DEC:     defb    $00     
 
 ;************************* mucha atencion!!!!
 ; aqui se decodifica la cancion hay que dejar suficiente espacio libre.
@@ -832,4 +833,4 @@ ENVOLVENTE:     DB      0               ;DB : FORMA DE LA ENVOLVENTE
                 INCLUDE "mus/list.asm"
 
 ;; NADA A PARTIR DE AQUI!!!
-buffers_canales
+buffers_canales:

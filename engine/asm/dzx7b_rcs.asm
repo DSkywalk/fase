@@ -4,17 +4,17 @@
 ;   HL: source address (compressed data)
 ;   DE: destination address (decompressing)
 ; -----------------------------------------------------------------------------
-dzx7    ld      bc, $8000
+dzx7:   ld      bc, $8000
         ld      a, b
-copyby  inc     c
+copyby: inc     c
         ldd
-mainlo  add     a, a
+mainlo: add     a, a
         call    z, getbit
         jr      nc, copyby
         push    de
         ld      d, c
         defb    $30
-lenval  add     a, a
+lenval: add     a, a
         call    z, getbit
         rl      c
         rl      b
@@ -28,26 +28,26 @@ lenval  add     a, a
         sll     e
         jr      nc, offend
         ld      d, $10
-nexbit  add     a, a
+nexbit: add     a, a
         call    z, getbit
         rl      d
         jr      nc, nexbit
         inc     d
         srl     d
-offend  rr      e
+offend: rr      e
         ex      (sp), hl
         ex      de, hl
         adc     hl, de
         lddr
         pop     hl
         jr      mainlo
-exitdz  pop     de
+exitdz: pop     de
         ret
-drcs    inc     de
+drcs:   inc     de
         inc     e
         ld      b, 2
-drcsne  push    de
-drcslo  ld      h, d
+drcsne: push    de
+drcslo: ld      h, d
         ld      a, e
         djnz    drcsco
         rrca
@@ -59,7 +59,7 @@ drcslo  ld      h, d
         ld      h, a
         xor     d
         xor     c
-drcsco  ld      l, a
+drcsco: ld      l, a
         rlca
         rrc     h
         rla
@@ -82,14 +82,14 @@ drcsco  ld      l, a
         ld      (hl), a
         ld      a, c
         ld      (de), a
-drcssk  inc     b
+drcssk: inc     b
         inc     de
         ld      a, d
         cp      $58
         jr      nz, drcslo
         pop     de
         djnz    drcsne
-getbit  ld      a, (hl)
+getbit: ld      a, (hl)
         dec     hl
         adc     a, a
         ret
