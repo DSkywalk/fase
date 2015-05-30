@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+  #define BS "\\\\"
+#else
+  #define BS "/"
+#endif
 FILE *fi, *fo;
 unsigned char mem[0x10000];
 int i, blo1cm, blo2cm, maincm, engicm, mainrw;
@@ -29,5 +34,5 @@ int main(void){
               "        DEFINE  blo1cm  %d\n"
               "        DEFINE  blo2cm  %d\n", engicm, maincm, mainrw, blo1cm, blo2cm);
   fclose(fo);
-  printf("\nFile build\\engine.zx7b generated in STEP 3\n");
+  printf("\nFile build"BS"engine.zx7b generated in STEP 3\n");
 }
