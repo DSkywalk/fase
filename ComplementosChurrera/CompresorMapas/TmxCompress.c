@@ -270,15 +270,14 @@ int main(int argc, char* argv[]){
   if( !fi )
     printf("\nInput file not found: %s\n", argv[1]),
     exit(-1);
-  while ( !feof(fi) && !strstr(tmpstr, "data e") ){
-    fgets(tmpstr, 1000, fi);
+  while ( fgets(tmpstr, 1000, fi) && !strstr(tmpstr, "data e") ){
     if( fou= (char *) strstr(tmpstr, " width") )
       scrw= atoi(fou+8);
     if( fou= (char *) strstr(tmpstr, " height") )
       scrh= atoi(fou+9);
   }
-  fgets(tmpstr, 1000, fi);
-  token= (char *) strtok(tmpstr, ",");
+  if( fgets(tmpstr, 1000, fi) )
+    token= (char *) strtok(tmpstr, ",");
   while ( token != NULL ){
     if( tmpi= atoi(token) )
       mem[size++]= tmpi-1;
@@ -286,15 +285,13 @@ int main(int argc, char* argv[]){
   }
   mapw= scrw-size+1;
   scrw= size/mapw;
-  fgets(tmpstr, 1000, fi);
-  while ( !strstr(tmpstr, "/layer") ){
+  while ( fgets(tmpstr, 1000, fi) && !strstr(tmpstr, "/layer") ){
     token= (char *) strtok(tmpstr, ",");
     while ( token != NULL ){
       if( tmpi= atoi(token) )
         mem[size++]= tmpi-1;
       token= (char *) strtok(NULL, ",");
     }
-    fgets(tmpstr, 1000, fi);
   }
   maph= scrh-size/mapw/scrw+1;
   scrh= (scrh-maph+1)/maph;
@@ -315,9 +312,6 @@ int main(int argc, char* argv[]){
     out[i]= out[size-1-i],
     out[size-1-i]= tmpchar;
   free(mem);
-  fgets(tmpstr, 1000, fi);
-  while ( !feof(fi) )
-    fgets(tmpstr, 1000, fi);
   fclose(fi);
   fo= fopen(argv[2], "wb+");
   if( !fo )

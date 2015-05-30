@@ -7,10 +7,13 @@ endif
 
 CC = gcc -pedantic -Os -std=c99
 
-all:  ../bin/TmxCompress$(EXT)    ../bin/Png2Rcs$(EXT)      ../bin/step1$(EXT)          \
-      ../bin/step2$(EXT)          ../bin/step3$(EXT)        ../bin/xm2tritone$(EXT)     \
-      ../bin/zx7b$(EXT)           ../bin/numbers4map$(EXT)  ../bin/generate_table$(EXT) \
-      ../bin/GenTmx$(EXT)         ../bin/GenTape$(EXT)
+all:  directories                 ../bin/TmxCompress$(EXT)  ../bin/Png2Rcs$(EXT)      \
+      ../bin/step1$(EXT)          ../bin/step2$(EXT)        ../bin/step3$(EXT)        \
+      ../bin/xm2tritone$(EXT)     ../bin/zx7b$(EXT)         ../bin/numbers4map$(EXT)  \
+      ../bin/generate_table$(EXT) ../bin/GenTmx$(EXT)       ../bin/GenTape$(EXT)
+
+directories:
+	mkdir -p ../bin ../build
 
 ../bin/TmxCompress$(EXT): ../../ComplementosChurrera/CompresorMapas/TmxCompress.c
 	$(CC) -o $@ $<
