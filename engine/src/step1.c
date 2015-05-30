@@ -105,8 +105,10 @@ int main(int argc, char *argv[]){
     if( system(command) )
       printf("\nError: plug error with command: %s\n", command),
       exit(-1);
-    system("bin"BS"zx7b build"BS"tmp.rcs build"BS"tmp.rcs.zx7b");
-    system("bin"BS"zx7b build"BS"tmp.atr build"BS"tmp.atr.zx7b");
+    if( system("bin"BS"zx7b build"BS"tmp.rcs build"BS"tmp.rcs.zx7b")
+      ||system("bin"BS"zx7b build"BS"tmp.atr build"BS"tmp.atr.zx7b") )
+      printf("\nError: while compressing.\n"),
+      exit(-1);
     fi= fopen("build/tmp.atr.zx7b", "rb");
     j+= i= fread(output, 1, 0x300, fi);
     fwrite(output, 1, i, fo);
@@ -134,8 +136,7 @@ int main(int argc, char *argv[]){
 // config
 
   ft= fopen("config.def", "r");
-  while ( !feof(ft) ){
-    fgets(tmpstr, 20, ft);
+  while ( fgets(tmpstr, 20, ft) ){
     if( fou= (char *) strstr(tmpstr, "tmode") )
       tmode= atoi(fou+5);
     else if( fou= (char *) strstr(tmpstr, "smooth") )
@@ -175,7 +176,7 @@ int main(int argc, char *argv[]){
     printf("Error. The width of tiles.png must be 256");
   if( exist("gfx/tiles.atr") )
     fi= fopen("gfx/tiles.atr", "rb"),
-    fread(input, 1, 0x400, fi),
+    0x400==fread(input, 1, 0x400, fi),
     fclose(fi),
     forceatr= 1;
   for ( i= 0; i < height>>4; i++ )
