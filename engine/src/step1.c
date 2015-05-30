@@ -2,7 +2,11 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include "../../ComplementosChurrera/lodepng.c"
-
+#ifdef _WIN32
+  #define BS "\\\\"
+#else
+  #define BS "/"
+#endif
 unsigned char *image, *pixel, output[0x10000], input[0x400];
 char  tmpstr[50], command[50], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr,
       offsex, offsey, notabl, bullet, bulmax, sprmax, forceatr= 0;
@@ -81,28 +85,28 @@ int main(int argc, char *argv[]){
   while ( fgets(tmpstr, 50, ft) ){
     if( tmpstr[8]=='"' ){
       strchr(tmpstr+9, '"')[1]= 0;
-      sprintf(command, "bin\\Png2Rcs \"gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+9);
+      sprintf(command, "bin"BS"Png2Rcs \"gfx"BS"%s build"BS"tmp.rcs build"BS"tmp.atr", tmpstr+9);
       fou= (char *) strchr(tmpstr+9, '.');
       fou[1]= 'a', fou[2]= 't', fou[3]= 'r', fou[4]= 0;
-      sprintf(tmpstr, " -a \"gfx\\%s", tmpstr+9);
+      sprintf(tmpstr, " -a \"gfx"BS"%s", tmpstr+9);
       if( exist(tmpstr+5) )
         strcat(command, tmpstr),
         strcat(command, "\"");
     }
     else{
       strchr(tmpstr+8, '\n')[0]= 0,
-      sprintf(command, "bin\\Png2Rcs gfx\\%s build\\tmp.rcs build\\tmp.atr", tmpstr+8);
+      sprintf(command, "bin"BS"Png2Rcs gfx"BS"%s build"BS"tmp.rcs build"BS"tmp.atr", tmpstr+8);
       fou= (char *) strchr(tmpstr+8, '.');
       fou[1]= 'a', fou[2]= 't', fou[3]= 'r';
       if( exist(tmpstr+8) )
-        strcat(command, " -a gfx\\"),
+        strcat(command, " -a gfx"BS),
         strcat(command, tmpstr+8);
     }
     if( system(command) )
       printf("\nError: plug error with command: %s\n", command),
       exit(-1);
-    system("bin\\zx7b build\\tmp.rcs build\\tmp.rcs.zx7b");
-    system("bin\\zx7b build\\tmp.atr build\\tmp.atr.zx7b");
+    system("bin"BS"zx7b build"BS"tmp.rcs build"BS"tmp.rcs.zx7b");
+    system("bin"BS"zx7b build"BS"tmp.atr build"BS"tmp.atr.zx7b");
     fi= fopen("build/tmp.atr.zx7b", "rb");
     j+= i= fread(output, 1, 0x300, fi);
     fwrite(output, 1, i, fo);
