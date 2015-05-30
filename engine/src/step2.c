@@ -33,10 +33,10 @@ int main(int argc, char *argv[]){
   stasp= stasp<scode2 ? scode2 : stasp;
   stasp= stasp-2&0xfffe;
   fseek(fi, 0, SEEK_SET);
-  2==fread(&point, 1, 2, fi);
+  0!=fread(&point, 1, 2, fi);
   fseek(fi, (scode&1)+2, SEEK_SET);
   scode&= 0xfffe;
-  0x2000==fread(mem+0x10002-scode, 1, 0x2000, fi);
+  0!=fread(mem+0x10002-scode, 1, 0x2000, fi);
   fclose(fi);
   init0= mem[0xfffd] | mem[0xfffe]<<8;
   frame0= mem[0xfffa] | mem[0xfffb]<<8;
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
     blocks[0].addr= 0xff01;
   if( bullet ){
     fi= fopen("build/bullet.bin", "rb");
-    8==fread(bullets, 1, smooth ? 8 : 4, fi);
+    0!=fread(bullets, 1, smooth ? 8 : 4, fi);
     ssprites+= fread(sprites+(64<<smooth)+ssprites, 1, 0x200, fi);
     fclose(fi);
     nsprites= bulimit+(smooth ? 8 : 4);
@@ -179,11 +179,11 @@ int main(int argc, char *argv[]){
   fclose(fi);
   fi2= fopen("build/engine2.bin", "rb");
   fseek(fi2, -10, SEEK_END);
-  9==fread(mem+0xfff6, 1, 9, fi2);
+  0!=fread(mem+0xfff6, 1, 9, fi2);
   fclose(fi2);
   fi2= fopen("build/engine1.bin", "rb");
   fseek(fi2, -9, SEEK_END);
-  2==fread(mem+0xfff7, 1, 2, fi2);
+  0!=fread(mem+0xfff7, 1, 2, fi2);
   parche= mem[0xfff7];
   mem[0xfff7]= 0;
   fclose(fi2);
@@ -208,10 +208,10 @@ int main(int argc, char *argv[]){
   fseek(fi2, 0, SEEK_END);
   scode1= ftell(fi2);
   fseek(fi2, 0, SEEK_SET);
-  2==fread(&point, 1, 2, fi2);
+  0!=fread(&point, 1, 2, fi2);
   fseek(fi2, (scode1&1)+2, SEEK_SET);
   scode1&= 0xfffe;
-  0x2000==fread(mem+0x10002-scode1, 1, 0x2000, fi2);
+  0!=fread(mem+0x10002-scode1, 1, 0x2000, fi2);
   fclose(fi2);
   init1= mem[0xfffd] | mem[0xfffe]<<8;
   frame1= mem[0xfffa] | mem[0xfffb]<<8;
@@ -225,10 +225,10 @@ int main(int argc, char *argv[]){
   fseek(fi2, 0, SEEK_END);
   scode2= ftell(fi2);
   fseek(fi2, 0, SEEK_SET);
-  2==fread(&point, 1, 2, fi2);
+  0!=fread(&point, 1, 2, fi2);
   fseek(fi2, (scode2&1)+2, SEEK_SET);
   scode2&= 0xfffe;
-  0x2000==fread(mem+0x10002-scode2, 1, 0x2000, fi2);
+  0!=fread(mem+0x10002-scode2, 1, 0x2000, fi2);
   fclose(fi2);
   mem[point]= 0xfffe - stasp & 0xff;
   mem[point+1]= 0xfffe - stasp >> 8;

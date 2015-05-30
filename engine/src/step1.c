@@ -176,7 +176,7 @@ int main(int argc, char *argv[]){
     printf("Error. The width of tiles.png must be 256");
   if( exist("gfx/tiles.atr") )
     fi= fopen("gfx/tiles.atr", "rb"),
-    0x400==fread(input, 1, 0x400, fi),
+    0!=fread(input, 1, 0x400, fi),
     fclose(fi),
     forceatr= 1;
   for ( i= 0; i < height>>4; i++ )

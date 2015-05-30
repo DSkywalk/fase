@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
   size= ftell(file);
   fseek(file, 0, SEEK_SET);
   xm= (unsigned char*) malloc(size);
-  fread(xm, size, 1, file);
+  0!=fread(xm, size, 1, file);
   fclose(file);
   if( memcmp(xm, "Extended Module: ", 17) )
     printf("Error: Not XM module\n"),

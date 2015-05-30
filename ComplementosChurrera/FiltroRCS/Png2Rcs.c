@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
     printf("\nError. Incorrect size on %s, must be 256x64, 256x128 or 256x192", argv[input1]);
   if( input2 )
     fo= fopen(argv[input2], "rb"),
-    0x300==fread(input, 1, 0x300, fo),
+    0!=fread(input, 1, 0x300, fo),
     fclose(fo);
   fo= fopen(argv[output1], "wb+");
   if( !fo )
