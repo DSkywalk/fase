@@ -26,8 +26,9 @@ directories:
 	$(CC) -o $@ $<
 	$@
 ../bin/GenTape$(EXT): GenTape.c
-	wget -O $< http://sourceforge.net/p/emuscriptoria/code/HEAD/tree/desprot/GenTape.c?format=raw
 	$(CC) -o $@ $<
+GenTape.c:
+	wget -O $@ http://sourceforge.net/p/emuscriptoria/code/HEAD/tree/desprot/GenTape.c?format=raw
 ../bin/%$(EXT): %.c
 	$(CC) -o $@ $<
 
