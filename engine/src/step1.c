@@ -8,7 +8,7 @@
   #define BS "/"
 #endif
 unsigned char *image, *pixel, output[0x10000], input[0x400];
-char  tmpstr[50], command[50], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr,
+char  tmpstr[50], command[100], *fou, tmode, clipup, clipdn, cliphr, safevr, safehr,
       offsex, offsey, notabl, bullet, bulmax, sprmax, forceatr= 0;
 unsigned error, width, height, i, j, l, min, max, nmin, nmax, amin, amax,
           pics, apics, inipos, iniposback, reppos, smooth, outpos, fondo, tinta;
@@ -84,8 +84,7 @@ int main(int argc, char *argv[]){
   k= j= 0;
   while ( fgets(tmpstr, 50, ft) ){
     if( tmpstr[8]=='"' ){
-      if( strchr(tmpstr+9, '"') )
-        strchr(tmpstr+9, '"')[1]= 0;
+      strchr(tmpstr+9, '"')[1]= 0;
       sprintf(command, "bin"BS"Png2Rcs \"gfx"BS"%s build"BS"tmp.rcs build"BS"tmp.atr", tmpstr+9);
       fou= (char *) strchr(tmpstr+9, '.');
       fou[1]= 'a', fou[2]= 't', fou[3]= 'r', fou[4]= 0;
@@ -106,8 +105,10 @@ int main(int argc, char *argv[]){
     if( system(command) )
       printf("\nError: plug error with command: %s\n", command),
       exit(-1);
-    0!=system("bin"BS"zx7b build"BS"tmp.rcs build"BS"tmp.rcs.zx7b");
-    0!=system("bin"BS"zx7b build"BS"tmp.atr build"BS"tmp.atr.zx7b");
+    if( system("bin"BS"zx7b build"BS"tmp.rcs build"BS"tmp.rcs.zx7b")
+      ||system("bin"BS"zx7b build"BS"tmp.atr build"BS"tmp.atr.zx7b") )
+      printf("\nError: while compressing.\n"),
+      exit(-1);
     fi= fopen("build/tmp.atr.zx7b", "rb");
     j+= i= fread(output, 1, 0x300, fi);
     fwrite(output, 1, i, fo);
