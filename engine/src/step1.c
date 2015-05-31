@@ -84,7 +84,8 @@ int main(int argc, char *argv[]){
   k= j= 0;
   while ( fgets(tmpstr, 50, ft) ){
     if( tmpstr[8]=='"' ){
-      strchr(tmpstr+9, '"')[1]= 0;
+      if( strchr(tmpstr+9, '"') )
+        strchr(tmpstr+9, '"')[1]= 0;
       sprintf(command, "bin"BS"Png2Rcs \"gfx"BS"%s build"BS"tmp.rcs build"BS"tmp.atr", tmpstr+9);
       fou= (char *) strchr(tmpstr+9, '.');
       fou[1]= 'a', fou[2]= 't', fou[3]= 'r', fou[4]= 0;
