@@ -105,10 +105,8 @@ int main(int argc, char *argv[]){
     if( system(command) )
       printf("\nError: plug error with command: %s\n", command),
       exit(-1);
-    if( system("bin"BS"zx7b build"BS"tmp.rcs build"BS"tmp.rcs.zx7b")
-      ||system("bin"BS"zx7b build"BS"tmp.atr build"BS"tmp.atr.zx7b") )
-      printf("\nError: while compressing.\n"),
-      exit(-1);
+    0!=system("bin"BS"zx7b build"BS"tmp.rcs build"BS"tmp.rcs.zx7b");
+    0!=system("bin"BS"zx7b build"BS"tmp.atr build"BS"tmp.atr.zx7b");
     fi= fopen("build/tmp.atr.zx7b", "rb");
     j+= i= fread(output, 1, 0x300, fi);
     fwrite(output, 1, i, fo);
