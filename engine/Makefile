@@ -53,7 +53,7 @@ build/ndefload.asm: build/defload.asm
 
 build/main.bin: main.bas build/defload.asm
 ifeq ($(COMPILER),zxb)
-	zxb/zxb main.bas -S 32772 -o build/main.bin
+	zxbasic/zxb.py main.bas -S 32772 -o build/main.bin
 else
 	zcc +zx -zorg=32772 -O3 -vn main.c -o build\main.bin -lndos
 endif

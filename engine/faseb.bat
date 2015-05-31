@@ -1,7 +1,7 @@
 @echo off
-if not exist zxb\zxb.exe (
+if not exist zxbasic\zxb.py (
   echo.
-  echo Error: You need ZX Basic installed into the zxb folder.
+  echo Error: You need ZX Basic installed into the zxbasic folder.
   exit /b 1
 )
 if "%1"=="gfx" (
@@ -28,7 +28,7 @@ if "%1"=="config" (
   bin\zx7b build\block2.bin build\block2.zx7b
 )
 echo.
-zxb\zxb main.bas -S 32772 -o build\main.bin
+python zxbasic\zxb.py main.bas -S 32772 -o build\main.bin
 echo File main.bin compiled from main.bas
 bin\zx7b build\main.bin build\main.zx7b
 bin\step3
