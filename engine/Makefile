@@ -53,7 +53,7 @@ build/ndefload.asm: build/defload.asm
 
 build/main.bin: main.bas build/defload.asm
 ifeq ($(COMPILER),zxb)
-	zxbasic/zxb.py main.bas -S 32772 -o build/main.bin
+	/usr/bin/python zxbasic/zxb.py main.bas -S 32772 -o build/main.bin
 else
 	zcc +zx -zorg=32772 -O3 -vn main.c -o build\main.bin -lndos
 endif
@@ -65,13 +65,13 @@ build/loader.bin: build/music.zx7b build/screen.bin build/main.bin build/map_com
 
 game.tzx: build/loader.bin build/engine.zx7b
 ifeq ($(PLAYER_EXISTS),1)
-	bin/gentape game.tzx                  \
+	bin/GenTape game.tzx                  \
         basic game 0  build/loader.bin  \
          data         build/engine.zx7b \
        stop48                           \
          data         build/player.zx7b
 else
-	bin/gentape game.tzx                  \
+	bin/GenTape game.tzx                  \
         basic game 0  build/loader.bin  \
          data         build/engine.zx7b
 endif
