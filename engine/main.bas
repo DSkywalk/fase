@@ -1,6 +1,10 @@
 #include <keys.bas>
 #include "fase.bas"
 
+#define   gconst  20
+#define   maxvx   600
+#define   maxvy   600
+
 dim dirbul(3) as ubyte
 dim datos(19) as ubyte = { _
     $00, $42, $11, 0, _
@@ -8,7 +12,9 @@ dim datos(19) as ubyte = { _
     $09, $a8, $48, 3, _
     $0a, $22, $02, 1, _
     $0c, $d0, $6e, 2}
-dim i, j, x, y, spacepressed, killed, numbullets as byte
+
+dim i, j, mapx, mapy, spacepressed, killed, numbullets as byte
+dim x, vx, ax, y, vy, ay as integer
 dim tmpx, tmpy as ubyte
 dim points as uinteger
 
@@ -21,7 +27,7 @@ function abso( a as ubyte, b as ubyte ) as uinteger
 end function
 
 sub FASTCALL updatescreen()
-  scr= y*mapw + x
+  scr= mapy*mapw + mapx
   for j = 1 to 4
     if GetSpriteV(j) > $7f then
       SetSpriteV(j, GetSpriteV(j)-$80)
@@ -72,8 +78,10 @@ start:
   end while
   DisableInt
   killed= 0
-  x= 0
-  y= 0
+  mapx= 0
+  mapy= 0
+  x= $3000
+  y= $1000
   spacepressed= 0
   numbullets= 0
   shadow= 0
@@ -189,40 +197,67 @@ start:
       end if
     next i
 
+    vx= vx + ax
+    x= x + vx
+    if vx + 8 >> 3 then
+      ax = -vx >> 3
+    else
+      vx = 0
+      ax = 0
+    end if
+    if CAST(uinteger, x) > scrw << 12 then
+      if vx > 0 then
+        if mapx < mapw - 1 then
+          x = 0
+          mapx = mapx + 1
+          updatescreen()
+        else
+          x = scrw << 12
+          vx = 0
+        end if
+      else
+        if mapx then
+          x = scrw << 12
+          mapx = mapx - 1
+          updatescreen()
+        else
+          vx = 0
+          x = 0
+        end if
+      end if
+    end if
+    SetSpriteX(0, x >> 8)
+
+    if vy > maxvy then
+      vy = maxvy
+    else
+      vy = vy + ay + gconst
+    end if
+    if CAST(uinteger, y) <= 15 << 11 then
+      y = y + vy
+    else
+      vy = 0
+      y = 15 << 11
+    end if
+    SetSpriteY(0, y >> 8)
+
     if Inputs() & RIGHT then
-      if GetSpriteX(0) < scrw*16 then
-        SetSpriteX(0, GetSpriteX(0)+1)
-      elseif x < mapw-1 then
-        SetSpriteX(0, 0)
-        x= x + 1
-        updatescreen()
+      if vx<maxvx then
+        ax = 40
+      else
+        ax = 0
       end if
     end if
     if Inputs() & LEFT then
-      if GetSpriteX(0) > 0 then
-        SetSpriteX(0, GetSpriteX(0)-1)
-      elseif x then
-        SetSpriteX(0, scrw*16)
-        x= x - 1
-        updatescreen()
-      end if
-    end if
-    if Inputs() & DOWN then
-      if GetSpriteY(0) < scrh*16 then
-        SetSpriteY(0, GetSpriteY(0)+1)
-      elseif y < maph-1 then
-        SetSpriteY(0, 0)
-        y= y + 1
-        updatescreen()
+      if vx>-maxvx then
+        ax = -40
+      else
+        ax = 0
       end if
     end if
     if Inputs() & UP then
-      if GetSpriteY(0) > 0 then
-        SetSpriteY(0, GetSpriteY(0)-1)
-      elseif y then
-        SetSpriteY(0, scrh*16)
-        y= y - 1
-        updatescreen()
+      if y = 15<<11 then
+        vy = -800
       end if
     end if
     if Inputs() & FIRE and (not spacepressed) and numbullets<4 then

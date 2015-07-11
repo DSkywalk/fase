@@ -1,6 +1,6 @@
 # zxb-> Boriel ZX Basic Compiler. zcc-> z88dk C compiler
-COMPILER = zxb
-ZCCPATH = /c/z88dk
+COMPILER = zcc
+ZCCPATH = /c/z88dk10
 
 ifneq ("$(wildcard asm/player.asm)","")
 	PLAYER_EXISTS = 1

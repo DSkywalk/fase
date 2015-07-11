@@ -11,7 +11,7 @@ all:  directories                 ../bin/TmxCompress$(EXT)  ../bin/Png2Rcs$(EXT)
       ../bin/step1$(EXT)          ../bin/step2$(EXT)        ../bin/step3$(EXT)        \
       ../bin/xm2tritone$(EXT)     ../bin/zx7b$(EXT)         ../bin/numbers4map$(EXT)  \
       ../bin/generate_table$(EXT) ../bin/GenTmx$(EXT)       ../bin/GenTape$(EXT)      \
-      ../bin/sjasmplus$(EXT)      ../zxbasic/zxbasic-1.4.0.tar.gz
+      ../bin/sjasmplus$(EXT)      zxbasic-1.4.0.tar.gz
 
 .PHONY: directories clean
 
@@ -44,7 +44,7 @@ GenTape.c:
 ../bin/sjasmplus$(EXT): sjasmplus/*.cpp sjasmplus/*.h
 	make -C sjasmplus
 
-../zxbasic/zxbasic-1.4.0.tar.gz:
+zxbasic-1.4.0.tar.gz:
 	wget -O $@ http://www.boriel.com/files/zxb/zxbasic-1.4.0.tar.gz
 	tar zxvf $@ -C ..
 
