@@ -1,6 +1,6 @@
 ; -----------------------------------------------------------------------------
 ; ZX7 Backwards by Einar Saukas, Antonio Villena
-; "Standard" version (67 bytes only)
+; "Standard" version (64 bytes only)
 ; -----------------------------------------------------------------------------
 ; Parameters:
 ;   HL: source address (compressed data)
@@ -10,18 +10,14 @@ dzx7:   ld      bc, $8000
         ld      a, b
 copyby: inc     c
         ldd
-mainlo: add     a, a
-        call    z, getbit
+mainlo: call    getbit
         jr      nc, copyby
         push    de
         ld      d, c
-        defb    $30
-lenval: add     a, a
-        call    z, getbit
+lenval: call    nc, getbit
         rl      c
         rl      b
-        add     a, a
-        call    z, getbit
+        call    getbit
         jr      nc, lenval
         inc     c
         jr      z, exitdz
@@ -30,8 +26,7 @@ lenval: add     a, a
         sll     e
         jr      nc, offend
         ld      d, $10
-nexbit: add     a, a
-        call    z, getbit
+nexbit: call    getbit
         rl      d
         jr      nc, nexbit
         inc     d
@@ -43,7 +38,9 @@ offend: rr      e
         lddr
 exitdz: pop     hl
         jr      nc, mainlo
-getbit: ld      a, (hl)
+getbit: add     a, a
+        ret     nz
+        ld      a, (hl)
         dec     hl
         adc     a, a
         ret
