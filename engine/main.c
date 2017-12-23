@@ -14,11 +14,21 @@ unsigned char data[20]= {
 
 char i, j, killed, mapx, mapy, spacepressed, dirbul[4], num_bullets;
 char *points= "0";
-unsigned char tmpx, tmpy;
+unsigned char tmpx, tmpy, salto;
 short x, vx, ax, y, vy, ay;
 void remove_bullet( char k );
 void update_screen();
 void update_scoreboard();
+
+char obstacle(short x, short y){
+  unsigned char tmp;
+  if( x<0 )
+    x= 0;
+  if( x>scrw-1 )
+    x= scrw-1;
+  tmp= tiles[y*scrw+x];
+  return tmp != 1 && tmp != 2 && tmp != 12 && tmp != 13;
+}
 
 main(){
 
@@ -47,7 +57,7 @@ start:
     }
   }
   DI;
-  killed= mapx= mapy= spacepressed= num_bullets= *shadow= 0;
+  killed= salto= mapx= mapy= spacepressed= num_bullets= *shadow= 0;
   x= 0x30<<7;
   y= 0x10<<7;
   update_scoreboard();
@@ -156,7 +166,8 @@ start:
     }
 
     vx+= ax;
-    x+= vx;
+    if( obstacle(x+vx>>11, y>>11) )
+      x+= vx;
     if( vx+8>>3 )
       ax= -vx>>3;
     else
@@ -182,11 +193,26 @@ start:
       vy= maxvy;
     else
       vy+= ay+gconst;
-    if( y <= 15<<10 )
+    if( x>0 && x<scrw<<11 && obstacle(x>>11, y+vy>>11) )
       y+= vy;
     else
-      vy= 0,
-      y= 15<<10;
+      vy= 0;
+
+    if( y<0 )
+      if( mapy )
+        y= scrh<<11,
+        mapy--,
+        update_screen();
+      else
+        vy= y= 0;
+    if( y > scrh<<11 )
+      if( mapy < maph-1 )
+        y= 0,
+        mapy++,
+        update_screen();
+      else
+        y= scrh<<11,
+        vy= 0;
     sprites[0].y= y>>7;
 
     // movimiento del protagonista
@@ -195,9 +221,12 @@ start:
     else if( Input() & LEFT ) // O
       ax= vx>-maxvx ? -20 : 0;
     if( Input() & UP ){ // Q
-      if( y == 15<<10 )
+      if( !salto && vy == 0 )
         vy= -400;
+      salto= 1;
     }
+    else
+      salto= 0;
     if( Input() & FIRE && !spacepressed && num_bullets<4 ){ // Space
       Sound(EFFX, 0);
       bullets[num_bullets].x= sprites[0].x;

@@ -3,9 +3,9 @@ const offsey= 0;
 const bulmax= 4;
 const sprmax= 5;
 
-const gconst= 20;
-const maxvx= 600;
-const maxvy= 600;
+const gconst= 10;
+const maxvx= 300;
+const maxvy= 300;
 
 function remove_bullet( k ){
   if( num_bullets ){
@@ -64,11 +64,20 @@ function init(){
   start();
 }
 
+function obstacle(x, y){
+  if( x<0 )
+    x= 0;
+  if( x>scrw-1 )
+    x= scrw-1;
+  var tmp= tiles[y*scrw+x];
+  return tmp != 1 && tmp != 2 && tmp != 12 && tmp != 13;
+}
+
 function start(){
 
-  salto= vx= ax= vy= ay= killed= mapx= mapy= spacepressed= num_bullets= 0;
-  x= 0x3000;
-  y= 0x1000;
+  fr= salto= vx= ax= vy= ay= killed= mapx= mapy= spacepressed= num_bullets= 0;
+  x= 0x30<<7;
+  y= 0x10<<7;
 
   update_scoreboard();
 
@@ -128,88 +137,101 @@ function frame(){
           sprites[i].f^= 2;
     }
 
-    // movimiento de las balas
-    for ( i = 0; i < num_bullets; i++ ){
-      if( dirbul[i]&3 ){
-        if( dirbul[i]&1 ){
-          if( bullets[i].x<scrw*16 )
-            bullets[i].x+= 4;
-          else
-            remove_bullet( i );
-        }
-        else{
-          if( bullets[i].x>4 )
-            bullets[i].x-= 4;
-          else
-            remove_bullet( i );
-        }
+  // movimiento de las balas
+  for ( i = 0; i < num_bullets; i++ ){
+    if( dirbul[i]&3 ){
+      if( dirbul[i]&1 ){
+        if( bullets[i].x<scrw*16 )
+          bullets[i].x+= 4;
+        else
+          remove_bullet( i );
       }
-      if( dirbul[i]&12 ){
-        if( dirbul[i]&4 ){
-          if( bullets[i].y<scrh*16 )
-            bullets[i].y+= 4;
-          else
-            remove_bullet( i );
-        }
-        else{
-          if( bullets[i].y>4 )
-            bullets[i].y-= 4;
-          else
-            remove_bullet( i );
-        }
+      else{
+        if( bullets[i].x>4 )
+          bullets[i].x-= 4;
+        else
+          remove_bullet( i );
       }
     }
+    if( dirbul[i]&12 ){
+      if( dirbul[i]&4 ){
+        if( bullets[i].y<scrh*16 )
+          bullets[i].y+= 4;
+        else
+          remove_bullet( i );
+      }
+      else{
+        if( bullets[i].y>4 )
+          bullets[i].y-= 4;
+        else
+          remove_bullet( i );
+      }
+    }
+  }
 
   vx+= ax;
-  x+= vx;
+  if( obstacle(x+vx>>11, y>>11) )
+    x+= vx;
   if( vx+8>>3 )
     ax= -vx>>3;
   else
     ax= vx= 0;
-  if( (x&0xffff) > scrw<<12 )
-    if( vx>0 )
-      if( mapx < mapw-1 )
-        x= 0,
-        mapx++,
-        update_screen();
-      else
-        x= scrw<<12,
-        vx= 0;
-    else if( mapx )
-      x= scrw<<12,
+  if( x < 0 )
+    if( mapx )
+      x= scrw<<11,
       mapx--,
       update_screen();
     else
       vx= x= 0;
-  sprites[0].x= x>>8;
+  if( x > scrw<<11 )
+    if( mapx < mapw-1 )
+      x= 0,
+      mapx++,
+      update_screen();
+    else
+      x= scrw<<11,
+      vx= 0;
+  sprites[0].x= x>>7;
 
   if( vy>maxvy )
     vy= maxvy;
   else
     vy+= ay+gconst;
-  if( y <= 15<<11 )
+  if( x>0 && x<scrw<<11 && obstacle(x>>11, y+vy>>11) )
     y+= vy;
   else
-    vy= 0,
-    y= 15<<11;
-  sprites[0].y= y>>8;
-
+    vy= 0;
+  if( y<0 )
+    if( mapy )
+      y= scrh<<11,
+      mapy--,
+      update_screen();
+    else
+      vy= y= 0;
+  if( y > scrh<<11 )
+    if( mapy < maph-1 )
+      y= 0,
+      mapy++,
+      update_screen();
+    else
+      y= scrh<<11,
+      vy= 0;
+  sprites[0].y= y>>7;
 
   // movimiento del protagonista
   if( kb[4] & 0x01 ) // P
-    ax= vx<maxvx ? 40 : 0;
+    ax= vx<maxvx ? 20 : 0;
   else if( kb[4] & 0x04 ) // O
-    ax= vx>-maxvx ? -40 : 0;
+    ax= vx>-maxvx ? -20 : 0;
 //  if( kb[5] & 0x80 ){ // A
 //  }
   if( kb[4] & 0x02 ){ // Q
-    salto++;
-    if( y == 15<<11 )
-      vy= -800;
+    if( !salto && vy == 0 )
+      vy= -400;
+    salto= 1;
   }
-  else{
+  else
     salto= 0;
-  }
   if( kb[1] & 0x40 && !spacepressed && num_bullets<4 ){ // Space
     bullets[num_bullets].x= sprites[0].x;
     bullets[num_bullets].y= sprites[0].y;
