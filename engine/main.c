@@ -1,9 +1,9 @@
 #include  <stdlib.h>
 #include  "fase.h"
 
-#define gconst  20
-#define maxvx   600
-#define maxvy   600
+#define gconst  10
+#define maxvx   300
+#define maxvy   300
 
 unsigned char data[20]= {
   0x00, 0x42, 0x11, 0,
@@ -48,8 +48,8 @@ start:
   }
   DI;
   killed= mapx= mapy= spacepressed= num_bullets= *shadow= 0;
-  x= 0x3000;
-  y= 0x1000;
+  x= 0x30<<7;
+  y= 0x10<<7;
   update_scoreboard();
 
   // inicializar engine
@@ -161,42 +161,42 @@ start:
       ax= -vx>>3;
     else
       ax= vx= 0;
-    if( (unsigned int)x > scrw<<12 )
-      if( vx>0 )
-        if( mapx < mapw-1 )
-          x= 0,
-          mapx++,
-          update_screen();
-        else
-          x= scrw<<12,
-          vx= 0;
-      else if( mapx )
-        x= scrw<<12,
+    if( x < 0 )
+      if( mapx )
+        x= scrw<<11,
         mapx--,
         update_screen();
       else
         vx= x= 0;
-    sprites[0].x= x>>8;
+    if( x > scrw<<11 )
+      if( mapx < mapw-1 )
+        x= 0,
+        mapx++,
+        update_screen();
+      else
+        x= scrw<<11,
+        vx= 0;
+    sprites[0].x= x>>7;
 
     if( vy>maxvy )
       vy= maxvy;
     else
       vy+= ay+gconst;
-    if( (unsigned int)y <= 15<<11 )
+    if( y <= 15<<10 )
       y+= vy;
     else
       vy= 0,
-      y= 15<<11;
-    sprites[0].y= y>>8;
+      y= 15<<10;
+    sprites[0].y= y>>7;
 
     // movimiento del protagonista
     if( Input() & RIGHT ) // P
-      ax= vx<maxvx ? 40 : 0;
+      ax= vx<maxvx ? 20 : 0;
     else if( Input() & LEFT ) // O
-      ax= vx>-maxvx ? -40 : 0;
+      ax= vx>-maxvx ? -20 : 0;
     if( Input() & UP ){ // Q
-      if( (unsigned int)y == 15<<11 )
-        vy= -800;
+      if( y == 15<<10 )
+        vy= -400;
     }
     if( Input() & FIRE && !spacepressed && num_bullets<4 ){ // Space
       Sound(EFFX, 0);

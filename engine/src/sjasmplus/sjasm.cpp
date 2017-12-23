@@ -143,7 +143,7 @@ void InitPass(int p) {
 
 	// predefined
 	DefineTable.Replace("_SJASMPLUS", "1");
-	DefineTable.Replace("_VERSION", "\"1.07\"");
+	DefineTable.Replace("_VERSION", "\"1.08\"");
 	DefineTable.Replace("_RELEASE", "7");
 	DefineTable.Replace("_ERRORS", "0");
 	DefineTable.Replace("_WARNINGS", "0");
@@ -254,13 +254,14 @@ int main(int argc, char* argv[]) {
 	char buf[MAX_PATH];
 	int base_encoding; /* added */
 	char* p;
-	char* logo = "SjASMPlus Z80 Cross-Assembler v1.07 RC7 (build 02-04-2008)";
+	char* logo = "SjASMPlus Z80 Cross-Assembler v1.08 (build 07-04-2016)";
 	int i = 1;
 
 	if (argc == 1) {
 		_COUT logo _ENDL;
 		_COUT "based on code of SjASM by Sjoerd Mastijn / http://www.xl2s.tk /" _ENDL;
 		_COUT "Copyright 2004-2008 by Aprisobal / http://sjasmplus.sf.net / my@aprisobal.by /" _ENDL;
+		_COUT "Modified 2016 AntonioVillena" _ENDL;
 		_COUT "\nUsage:\nsjasmplus [options] sourcefile(s)" _ENDL;
 		_COUT "\nOption flags as follows:" _ENDL;
 		_COUT "  --help                   Help information (you see it)" _ENDL;
