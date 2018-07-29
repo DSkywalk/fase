@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
   stasp= scode= ftell(fi);
   stasp= stasp<scode1 ? scode1 : stasp;
   stasp= stasp<scode2 ? scode2 : stasp;
-  stasp= stasp-2&0xfffe;
+  stasp= stasp-6&0xfffe;
   fseek(fi, 0, SEEK_SET);
   0!=fread(&point, 1, 2, fi);
   fseek(fi, (scode&1)+2, SEEK_SET);

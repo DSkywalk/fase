@@ -67,7 +67,7 @@ int SearchPath(char* oudzp, char* filename, char* whatever, int maxlen, char* ni
 char* strset(char* str, char val) {
 	//non-aligned
 	char* pByte = str;
-	while (((unsigned long)pByte) & 3) {
+	while (((unsigned long)pByte[0]) & 3) {
 		if (*pByte) {
 			*pByte++ = val;
 		} else {

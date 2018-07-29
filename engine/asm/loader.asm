@@ -169,7 +169,7 @@ copied  lddr                    ; copio máquina 0 ó 2
         ld      hl, 0xffad-tmpbuf-stasp-1
         call    $8060
         ld      hl, $8000+mitad-prnbuf+music+scrlen
-        ld      d, $80
+        ld      de, $8000
         ld      bc, maincm
         ldir
         ex      de, hl

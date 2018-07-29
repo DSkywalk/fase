@@ -522,6 +522,11 @@ upco6   ld      sp, 0
       ENDIF
         dec     a
         jp      nz, upco4
+        ld      de, (upco4-1)
+        ld      a, (upco5+1)
+        add     a, scrw
+        sub     e
+        ld      (upco5+1), a
         exx
         ex      de, hl
 upco7   ld      bc, 0
