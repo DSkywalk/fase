@@ -15,7 +15,7 @@ rem  bin\GenTmx 3 3 10 10 gfx\map.tmx
   bin\xm2tritone mus\music.xm build\music.asm
   bin\step1
   bin\sjasmplus asm\music.asm > nul
-  bin\zx7b build\music.bin build\music.zx7b
+  if exist mus/music.xm bin\zx7b build\music.bin build\music.zx7b
   goto cont
 )
 if "%1"=="config" (
