@@ -7,6 +7,13 @@ ifneq ("$(wildcard asm/player.asm)","")
 else
 	PLAYER_EXISTS = 0
 endif
+
+ifneq ("$(wildcard mus/music.xm)","")
+	TRITONE_EXISTS = 1
+else
+	TRITONE_EXISTS = 0
+endif
+
 export Z80_OZFILES=${ZCCPATH}/lib/
 export ZCCCFG     =${ZCCPATH}/lib/config/
 export PATH=$PATH:${ZCCPATH}/bin
@@ -34,17 +41,22 @@ build/player.bin: asm/player.asm mus/list.asm
 build/music.asm: mus/music.xm
 	bin/xm2tritone mus/music.xm build/music.asm
 
+ifeq ($(PLAYER_EXISTS),1)
 build/define.asm: config.def gfx/screen.def build/player.bin #gfx/tiles.atr 
 	bin/step1
+else
+build/define.asm: config.def gfx/screen.def #gfx/tiles.atr 
+	bin/step1
+endif
 
-build/music.zx7b: build/music.asm build/define.asm
-	bin/sjasmplus asm/music.asm > nul
+build/music.zx7b: build/music.asm
+	bin/sjasmplus asm/music.asm > /dev/null
 	bin/zx7b build/music.bin build/music.zx7b
 
-build/defload.asm: config.def build/player.bin build/music.bin build/tiles.bin build/bullet.bin build/map_compressed.bin build/screen.bin build/sprites.bin
-	bin/sjasmplus asm/engine0.asm > nul
-	bin/sjasmplus asm/engine1.asm > nul
-	bin/sjasmplus asm/engine2.asm > nul
+build/defload.asm: config.def build/tiles.bin build/bullet.bin build/map_compressed.bin build/screen.bin build/sprites.bin
+	bin/sjasmplus asm/engine0.asm > /dev/null
+	bin/sjasmplus asm/engine1.asm > /dev/null
+	bin/sjasmplus asm/engine2.asm > /dev/null
 	bin/step2
 
 build/ndefload.asm: build/defload.asm
@@ -59,9 +71,15 @@ else
 endif
 	bin/zx7b build/main.bin build/main.zx7b
 
-build/loader.bin: build/music.zx7b build/screen.bin build/main.bin build/map_compressed.bin build/defload.asm asm/loader.asm asm/engine.asm build/ndefload.asm build/define.asm build/loading.rcs.zx7b asm/dzx7b_rcs.asm
+ifeq ($(TRITONE_EXISTS),1)
+build/loader.bin: build/define.asm build/music.zx7b build/screen.bin build/main.bin build/map_compressed.bin build/defload.asm asm/loader.asm asm/engine.asm build/ndefload.asm build/define.asm build/loading.rcs.zx7b asm/dzx7b_rcs.asm
 	bin/step3
 	bin/sjasmplus asm/loader.asm
+else
+build/loader.bin: build/define.asm build/screen.bin build/main.bin build/map_compressed.bin build/defload.asm asm/loader.asm asm/engine.asm build/ndefload.asm build/define.asm build/loading.rcs.zx7b asm/dzx7b_rcs.asm
+	bin/step3
+	bin/sjasmplus asm/loader.asm
+endif
 
 game.tzx: build/loader.bin build/engine.zx7b
 ifeq ($(PLAYER_EXISTS),1)

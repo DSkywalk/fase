@@ -162,12 +162,39 @@ copied  lddr                    ; copio máquina 0 ó 2
         lddr
         dec     bc
         ld      ($fffe-stasp), bc
+      IF  music>0
         ld      hl, $8000+mitad-prnbuf+music-1
         ld      de, $8060+musirw-1
         call    desc
+      ENDIF    
         ld      sp, 0x10000-tmpbuf-stasp
         ld      hl, 0xffad-tmpbuf-stasp-1
+        ld      e, (hl)
+        inc     hl
+        ld      d, (hl)
+        add     hl, de
+        ld      a, (hl)
+        rrca
+        rra
+        dec     hl
+        push    hl
+        ld      hl, $5aff
+        ld      de, $5afe
+        ld      bc, $02ff
+        ld      (hl), a
+        lddr                    ; pongo pantalla en blanco
+        pop     hl
+        call    desc
+        push    hl
+        call    desc+65
+        pop     hl
+        ld      de, $5aff
+        call    desc
+      IF  music>0
         call    $8060
+      ELSE
+        out     ($fe), a
+      ENDIF
         ld      hl, $8000+mitad-prnbuf+music+scrlen
         ld      de, $8000
         ld      bc, maincm

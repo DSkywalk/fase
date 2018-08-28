@@ -18,27 +18,6 @@ OP_SCF  equ     $37
 
         ;define NO_VOLUME       ;define this if you want to have the same volume for all the channels
 
-        ld      e, (hl)
-        inc     hl
-        ld      d, (hl)
-        add     hl, de
-        ld      a, (hl)
-        rrca
-        rra
-        dec     hl
-        push    hl
-        ld      hl, $5aff
-        ld      de, $5afe
-        ld      bc, $02ff
-        ld      (hl), a
-        lddr                    ; pongo pantalla en blanco
-        pop     hl
-        call    desc
-        push    hl
-        call    desc+65
-        pop     hl
-        ld      de, $5aff
-        call    desc
 play    ld      c, 16
         push    iy
         exx

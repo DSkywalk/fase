@@ -248,7 +248,7 @@ int main(int argc, char *argv[]){
     fseek(fi, 0, SEEK_END),
     i= ftell(fi),
     fclose(fi);
-  k= 0;
+  k= l= 0;
   fi= fopen("build/music.zx7b", "rb");
   if( fi )
     fseek(fi, 0, SEEK_END),
