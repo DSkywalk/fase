@@ -2055,15 +2055,13 @@ mapend
 lookt   incbin  asm/file1.bin
       ENDIF
         block   $feff-$&$ffff
-        defb    $ff
     ELSE
         block   $7f
       IF notabl=0
 lookt   incbin  asm/file1.bin
       ENDIF
-        block   $100
+        block   $ff
     ENDIF
-        defb    $ff
         block   $fff4-$&$ffff
         inc     hl
         ret

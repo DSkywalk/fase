@@ -38,9 +38,7 @@ ini     ld      de, desc        ; apunto al descompresor
         ld      de, engicm
         call    $07f4           ; cargo bloque cinta principal
         di
-        ld      hl, $ffff
-        ld      ($feff), hl
-        ld      a, $fe
+        ld      a, $38
         ld      i, a
         im      2
         ld      hl, $5ccb+prnbuf-ini

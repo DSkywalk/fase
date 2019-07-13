@@ -91,16 +91,14 @@ int main(int argc, char *argv[]){
   if( smooth ){
     ssprites-= sprites[--nsprites];
     --bulimit;
-    blocks[0].len= (243-sprites[nsprites])>>1;
-    blocks[0].addr= 0xff01+sprites[nsprites];
-    mem[0xfefe]= 0x01;
-    mem[0xfeff]= 0xff;
+    blocks[0].len= (245-sprites[nsprites])>>1;
+    blocks[0].addr= 0xfeff+sprites[nsprites];
     for ( l= 0; l<sprites[nsprites]; l++ )
-      mem[0xff01+l]= sprites[saccum[nsprites]+64+smooth*64+l];
+      mem[0xfeff+l]= sprites[saccum[nsprites]+64+smooth*64+l];
   }
   else
-    blocks[0].len= 243>>1,
-    blocks[0].addr= 0xff01;
+    blocks[0].len= 245>>1,
+    blocks[0].addr= 0xfeff;
   if( bullet ){
     fi= fopen("build/bullet.bin", "rb");
     0!=fread(bullets, 1, smooth ? 8 : 4, fi);
